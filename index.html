@@ -182,7 +182,8 @@
   var VIS = [
     { name: 'Objetos do mundo', key: 'world' },
     { name: 'Câmera de fundo', key: 'cam' },
-    { name: 'Rastreamento da mão', key: 'hand' }
+    { name: 'Rastreamento da mão', key: 'hand' },
+    { name: 'Ancorar no lugar', key: 'anchor' }
   ];
   var PTR_COLORS = [
     { n: 'Branco', css: '#ffffff' }, { n: 'Preto', css: '#000000' },
@@ -235,8 +236,9 @@
     moving: null, cur: null, hover: null,
     grabbing: false, dAz: 0, dH: -0.4, dist: DIST_DEFAULT, hoverIcon: -1,
     curved: true, objOn: true, hud: 'dark', psize: 3, ptrColor: '#ffffff',
-    camOn: true, camLive: false, showHand: false,
+    camOn: true, camLive: false, showHand: false, anchorOn: false, anchor: null,
     handReady: false, hand: null, pinched: false, pinchClick: false,
+    handState: 'none', pinchOn: 0, pinchOff: 0, handPrev: null,
     installed: { clock: false, notes: false }
   };
 
@@ -557,17 +559,77 @@
     });
   }
 
-  // Pinça: polegar e indicador juntos. Histerese para não disparar tremendo.
+  // Limites em proporção do tamanho da mão. Ajustar no celular se necessário.
+  var FIST_MAX = 0.35, OPEN_MIN = 1.1, PINCH_ON = 0.3, PINCH_HOLD = 0.5, STABLE = 3;
+
+  // Mão fechada: as pontas 2, 3 e 4 ficam juntas. Mão aberta: ficam bem separadas.
+  // Pinça: polegar (0) e indicador (1) juntos, com a mão nem fechada nem aberta.
+  function classifyHand(lm) {
+    var size = Math.hypot(lm[0].x - lm[9].x, lm[0].y - lm[9].y) || 1;
+    var t = TIP_IDX.map(function (i) { return lm[i]; });
+    var pairs = [[2, 3], [2, 4], [3, 4]], sum = 0;
+    pairs.forEach(function (p) { sum += Math.hypot(t[p[0]].x - t[p[1]].x, t[p[0]].y - t[p[1]].y) / size; });
+    var spread = sum / pairs.length;
+    var d01 = Math.hypot(t[0].x - t[1].x, t[0].y - t[1].y) / size;
+    if (spread < FIST_MAX) return 'fechada';
+    if (spread > OPEN_MIN) return 'aberta';
+    if (d01 < (S.pinched ? PINCH_HOLD : PINCH_ON)) return 'pinca';
+    return 'livre';
+  }
+
+  // Só muda de estado depois de STABLE quadros seguidos: evita toque fantasma
   function onHands(results) {
     var lm = results && results.multiHandLandmarks && results.multiHandLandmarks[0];
     S.hand = lm || null;
-    if (!lm) { S.pinched = false; return; }
-    var size = Math.hypot(lm[0].x - lm[9].x, lm[0].y - lm[9].y) || 1;
-    var ratio = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y) / size;
-    var pinch = S.pinched ? ratio < 0.5 : ratio < 0.3;
-    if (pinch && !S.pinched) S.pinchClick = true;
-    S.pinched = pinch;
+    if (!lm) {
+      S.handState = 'none';
+      S.pinchOn = 0; S.pinchOff = (S.pinchOff || 0) + 1;
+      if (S.pinched && S.pinchOff >= STABLE) setPinch(false);
+      return;
+    }
+    var state = classifyHand(lm);
+    S.handState = state;
+    if (state === 'pinca') { S.pinchOn = (S.pinchOn || 0) + 1; S.pinchOff = 0; }
+    else { S.pinchOff = (S.pinchOff || 0) + 1; S.pinchOn = 0; }
+    if (!S.pinched && S.pinchOn >= STABLE) setPinch(true);
+    else if (S.pinched && S.pinchOff >= STABLE) setPinch(false);
   }
+
+  function setPinch(on) {
+    if (on === !!S.pinched) return;
+    S.pinched = on;
+    if (on) handPressStart();
+    else handPressEnd(S.handState !== 'livre' && S.handState !== 'pinca');
+  }
+
+  // Posição do cursor da mão: meio entre os pontos 0 e 1, convertido para a tela
+  function handToScreen(p) {
+    var sw = stage.clientWidth, sh = stage.clientHeight, vw = video.videoWidth, vh = video.videoHeight;
+    var sc = Math.max(sw / vw, sh / vh);
+    return [(sw - vw * sc) / 2 + p.x * vw * sc, (sh - vh * sc) / 2 + p.y * vh * sc];
+  }
+  function handCursor() {
+    var a = S.hand[TIP_IDX[0]], b = S.hand[TIP_IDX[1]];
+    return handToScreen({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+  }
+
+  function handPressStart() {
+    if (!S.hand || !video.videoWidth) return;
+    var c = handCursor();
+    press = { x: c[0], y: c[1], t: performance.now(), moved: 0, hover: S.hover, timer: 0, hand: true };
+    S.handPrev = c;
+    if (S.hover && S.hover.kind === 'handle') S.grabbing = true;
+  }
+
+  function handPressEnd(cancelled) {
+    if (!press || !press.hand) return;
+    S.handPrev = null;
+    endPress(null, cancelled);
+  }
+
+  // Pontas numeradas: 0 polegar, 1 indicador, 2 médio, 3 anelar, 4 mindinho
+  var TIP_IDX = [4, 8, 12, 16, 20];
+  var HAND_TXT = { pinca: 'pinça', livre: 'mão livre', aberta: 'mão aberta', fechada: 'mão fechada', none: '' };
 
   function drawHands() {
     var hc = handCv.getContext('2d');
@@ -598,7 +660,27 @@
         hc.fill();
         hc.lineWidth = 2; hc.strokeStyle = '#000000'; hc.stroke();
       }
+      // Números das pontas, de 0 a 4
+      hc.font = '600 15px ' + SANS;
+      hc.textAlign = 'left'; hc.textBaseline = 'middle';
+      TIP_IDX.forEach(function (li, n) {
+        var q = pts[li];
+        hc.lineWidth = 4; hc.strokeStyle = '#000000';
+        hc.strokeText(String(n), q[0] + 11, q[1] - 11);
+        hc.fillStyle = '#ffffff';
+        hc.fillText(String(n), q[0] + 11, q[1] - 11);
+      });
+      // Anel verde entre os pontos 0 e 1 enquanto a pinça está segurada
+      if (S.pinched) {
+        var a0 = pts[TIP_IDX[0]], a1 = pts[TIP_IDX[1]];
+        hc.beginPath();
+        hc.arc((a0[0] + a1[0]) / 2, (a0[1] + a1[1]) / 2, 22, 0, Math.PI * 2);
+        hc.lineWidth = 4; hc.strokeStyle = '#22c55e'; hc.stroke();
+      }
     });
+    hc.font = '500 14px ' + SANS; hc.fillStyle = '#ffffff';
+    hc.textAlign = 'left'; hc.textBaseline = 'alphabetic';
+    hc.fillText(HAND_TXT[S.handState] || '', 16, 118);
   }
 
   function feedHands() {
@@ -951,10 +1033,14 @@
       drawOptions(c, w, 'world', 'Objetos, nomes e linhas', ['Mostrar', 'Ocultar'], S.objOn ? 0 : 1);
     } else if (key === 'cam') {
       drawOptions(c, w, 'cam', 'Câmera ao fundo (AR)', ['Ligada', 'Desligada'], S.camOn ? 0 : 1);
-    } else {
+    } else if (key === 'hand') {
       drawOptions(c, w, 'hand', 'Linhas e bolinhas da mão', ['Mostrar', 'Ocultar'], S.showHand ? 0 : 1);
       c.font = '400 22px ' + SANS; c.fillStyle = K.muted;
       c.fillText('O rastreamento segue ativo; isto só mostra o desenho.', OPT_X, 400);
+    } else {
+      drawOptions(c, w, 'anchor', 'Barra e janelas presas no lugar', ['Ativar', 'Desativar'], S.anchorOn ? 0 : 1);
+      c.font = '400 22px ' + SANS; c.fillStyle = K.muted;
+      c.fillText('Ao andar até elas, ficam maiores. Teste: não detecta a parede.', OPT_X, 400);
     }
   }
 
@@ -993,7 +1079,7 @@
       c.font = '600 30px ' + SANS; c.fillStyle = K.ink;
       c.fillText('Rede em VR', 300, 200);
       c.font = '400 24px ' + SANS; c.fillStyle = K.muted;
-      c.fillText('Versão 8', 300, 244);
+      c.fillText('Versão 10', 300, 244);
       c.fillText('Cena 3D de rede para celular, com câmera e mão.', 300, 282);
     }
   }
@@ -1069,22 +1155,35 @@
     c.textAlign = 'left';
   }
 
+  var NOTES_TIPS = [
+    'Roteador conecta redes diferentes.',
+    'Ele escolhe o caminho dos pacotes.',
+    'Switch liga aparelhos da mesma rede.',
+    'Ele usa o endereço MAC de cada um.',
+    'Firewall filtra o tráfego que entra.',
+    'Regras dizem o que pode e o que não pode.',
+    'DNS transforma nomes em endereços IP.',
+    'Ex.: um nome de site vira um número de IP.',
+    'Servidor Web responde com HTTP ou HTTPS.',
+    'Cliente é quem começa cada pedido.',
+    'Pacote é um pedaço de dado da rede.',
+    'Protocolo é a regra que os dois lados seguem.'
+  ];
+
   function drawNotes(w) {
     var c = w.ctx;
     winFrame(c, w);
     c.textAlign = 'left'; c.textBaseline = 'alphabetic';
     c.font = '600 34px ' + SANS; c.fillStyle = K.ink;
     c.fillText('Dicas de redes', 40, 130);
-    var tips = [
-      'Roteador conecta redes diferentes e escolhe o caminho dos pacotes.',
-      'Switch liga dispositivos da mesma rede pelo endereço MAC.',
-      'Firewall permite ou bloqueia o tráfego conforme regras.',
-      'DNS transforma nomes de sites em endereços IP.'
-    ];
-    tips.forEach(function (t, i) {
+    c.save();
+    c.beginPath(); c.rect(3, 150, WCW - 6, WCH - 154); c.clip();
+    c.translate(0, -(w.scroll || 0));
+    NOTES_TIPS.forEach(function (t, i) {
       c.font = '400 26px ' + SANS; c.fillStyle = K.ink;
-      c.fillText('•  ' + t, 40, 200 + i * 80);
+      c.fillText((i + 1) + '.  ' + t, 40, 200 + i * 80);
     });
+    c.restore();
   }
 
   var wins = {
@@ -1131,16 +1230,27 @@
   }
 
   // Cada janela fica num arco ao redor de você, do lado da anterior; a barra é o centro do arco
+  // Sem ancoragem, o arco segue você. Com ancoragem, o arco fica parado no lugar onde foi ligado.
+  function baseArc() {
+    if (S.anchorOn && S.anchor) return S.anchor;
+    return { cx: rig.position.x, cz: rig.position.z, y: EYE + S.dH, az: S.dAz, dist: S.dist };
+  }
+
   function updateWindows() {
-    var y = EYE + S.dH + DOCK_H / 2 + 0.12 + WIN_H / 2;
-    var step = (WIN_W + GAP_W) / S.dist;
+    var A = baseArc();
+    var y = A.y + DOCK_H / 2 + 0.12 + WIN_H / 2;
     Object.keys(wins).forEach(function (k) {
       var w = wins[k];
       if (!w.open) return;
-      var a = S.dAz + w.slot * step;
-      w.mesh.position.set(rig.position.x + Math.sin(a) * S.dist, y, rig.position.z - Math.cos(a) * S.dist);
+      var a = A.az + w.slot * (WIN_W + GAP_W) / A.dist;
+      w.mesh.position.set(A.cx + Math.sin(a) * A.dist, y, A.cz - Math.cos(a) * A.dist);
       w.mesh.rotation.set(0, -a, 0);
     });
+  }
+
+  function setAnchor(on) {
+    S.anchorOn = on;
+    S.anchor = on ? { cx: rig.position.x, cz: rig.position.z, y: EYE + S.dH, az: S.dAz, dist: S.dist } : null;
   }
 
   function refreshWins() {
@@ -1150,7 +1260,7 @@
       var tick = w.key === 'clock' ? Math.floor(Date.now() / 1000) : '';
       var key = [w.sel, w.sub || 0, w.hov || '', THEME, S.hud, S.curved ? 1 : 0, S.objOn ? 1 : 0,
                  S.psize, S.ptrColor, S.camOn ? 1 : 0, S.showHand ? 1 : 0, S.installed.clock ? 1 : 0,
-                 S.installed.notes ? 1 : 0, w.url || '', S.grabbing ? 1 : 0, tick].join('|');
+                 S.installed.notes ? 1 : 0, S.anchorOn ? 1 : 0, w.url || '', S.grabbing ? 1 : 0, tick].join('|');
       if (key !== w.dkey) {
         w.dkey = key;
         w.draw(w);
@@ -1277,6 +1387,7 @@
         }
         if (key === 'world') return optHit('world', x, y, 2);
         if (key === 'cam') return optHit('cam', x, y, 2);
+        if (key === 'anchor') return optHit('anchor', x, y, 2);
         return optHit('hand', x, y, 2);
       }
       return 'body';
@@ -1401,6 +1512,7 @@
     tmpV.set(0, 0, -1).applyQuaternion(rig.quaternion);
     S.dAz = Math.atan2(tmpV.x, -tmpV.z);
     S.dH = -0.4;
+    if (S.anchorOn) setAnchor(true);
   }
 
   function openLink(url) {
@@ -1425,6 +1537,7 @@
     if (kind === 'world') { setObjs(val === '0'); return; }
     if (kind === 'cam') { setCam(val === '0'); return; }
     if (kind === 'hand') { S.showHand = val === '0'; return; }
+    if (kind === 'anchor') { setAnchor(val === '0'); return; }
     if (kind === 'psize') { S.psize = +val; return; }
     if (kind === 'pcol') { S.ptrColor = PTR_COLORS[+val].css; return; }
     if (kind === 'get') {
@@ -1494,19 +1607,33 @@
     try { stage.setPointerCapture(e.pointerId); } catch (x) {}
   });
 
-  stage.addEventListener('pointermove', function (e) {
+  // Movimento com toque, mouse ou pinça segurada. Serve para barra, rolagem e olhar.
+  var NOTES_SCROLL_MAX = 560;
+  function pressMove(dx, dy) {
     if (!press) return;
-    var dx = e.clientX - press.x, dy = e.clientY - press.y;
-    press.x = e.clientX; press.y = e.clientY;
     press.moved += Math.abs(dx) + Math.abs(dy);
     if (S.grabbing) {
       // Segurando a barra: arrastar para baixo traz para perto, para cima leva para longe
-      S.dist = THREE.MathUtils.clamp(S.dist + dy * 0.012, DIST_MIN, DIST_MAX);
+      S.dist = THREE.MathUtils.clamp(S.dist - dy * 0.012, DIST_MIN, DIST_MAX);
       if (!S.gyro) S.dAz += dx * 0.004;
+      return;
+    }
+    var t = press.hover;
+    if (t && t.kind === 'win' && t.win.key === 'notes') {
+      // Rolagem: arrastar para cima mostra o conteúdo de baixo
+      t.win.scroll = THREE.MathUtils.clamp((t.win.scroll || 0) - dy, 0, NOTES_SCROLL_MAX);
+      t.win.dkey = '';
       return;
     }
     S.yaw += dx * 0.0045;
     if (!S.gyro) S.pitch = Math.max(-1.35, Math.min(1.35, S.pitch + dy * 0.0045));
+  }
+
+  stage.addEventListener('pointermove', function (e) {
+    if (!press || press.hand) return;
+    var dx = e.clientX - press.x, dy = e.clientY - press.y;
+    press.x = e.clientX; press.y = e.clientY;
+    pressMove(dx, dy);
   });
 
   function endPress(e, cancelled) {
@@ -1550,8 +1677,15 @@
       S.dH = THREE.MathUtils.clamp(tmpV.y * S.dist, -1.4, 1.0);
     }
     S.dH = THREE.MathUtils.clamp(S.dH, -1.4, 1.0);
-    var az = S.dAz;
-    dock.position.set(rig.position.x + Math.sin(az) * S.dist, EYE + S.dH, rig.position.z - Math.cos(az) * S.dist);
+    if (S.anchorOn && S.anchor) {
+      // Ao segurar a barra, a ancoragem acompanha o arrasto
+      if (S.grabbing) { S.anchor.az = S.dAz; S.anchor.dist = S.dist; S.anchor.y = EYE + S.dH; }
+      var A = S.anchor;
+      dock.position.set(A.cx + Math.sin(A.az) * A.dist, A.y, A.cz - Math.cos(A.az) * A.dist);
+    } else {
+      var az = S.dAz;
+      dock.position.set(rig.position.x + Math.sin(az) * S.dist, EYE + S.dH, rig.position.z - Math.cos(az) * S.dist);
+    }
     dock.lookAt(rig.position.x, dock.position.y, rig.position.z);
     refreshDock();
   }
@@ -1610,10 +1744,11 @@
     updateWindows();
     refreshWins();
 
-    // Pinça com a mão: clica no que está mirado
-    if (S.pinchClick) {
-      S.pinchClick = false;
-      act(S.hover);
+    // Pinça segurada: o cursor da mão move a barra ou rola a janela
+    if (S.pinched && press && press.hand && S.hand && S.handPrev && video.videoWidth) {
+      var hc2 = handCursor();
+      pressMove(hc2[0] - S.handPrev[0], hc2[1] - S.handPrev[1]);
+      S.handPrev = hc2;
     }
 
     feedHands();
@@ -1640,7 +1775,7 @@
     if (S.camLive && videoTex && video.videoWidth) {
       setBgUV(vw / vh);
       renderer.render(bgScene, bgCam);
-      renderer.clearDepth();
+      renderer.clear(false, true, false);
     }
     renderer.render(scene, camera);
   }
@@ -1733,7 +1868,8 @@
     dockCanvas: dockCanvas, cfgCanvas: wins.cfg.canvas, webCanvas: wins.web.canvas, storeCanvas: wins.store.canvas,
     go: go, act: act, tap: onTap, cancel: cancelAll, bring: bring, toggle: toggleWin,
     theme: applyTheme, getTheme: function () { return THEME; }, frame: frameEl, K: K,
-    onHands: onHands, pinch: function () { S.pinchClick = true; }, dockIds: dockIds,
+    onHands: onHands, setPinch: setPinch, pressMove: pressMove, dockIds: dockIds,
+    press: function () { return press; }, handState: function () { return S.handState; },
     handCanvas: handCv
   };
 
