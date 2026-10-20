@@ -154,6 +154,8 @@
   var DIST_MIN = 2.0, DIST_MAX = 5.0, DIST_DEFAULT = 2.6;
   var CURVE_R = 2.6;
   var TAP_MAX_MS = 450, TAP_MOVE = 12, DOUBLE_MS = 320, HOLD_MS = 350;
+  // Pinça: menos de 2 s solta = clique; 2,5 s ou mais segurando = pegar/selecionar
+  var CLICK_PINCH_MS = 2000, HOLD_PINCH_MS = 2500;
   var SANS = 'system-ui, -apple-system, "Segoe UI", sans-serif';
   var reduceMotion = false;
   try { reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
@@ -616,15 +618,21 @@
   function handPressStart() {
     if (!S.hand || !video.videoWidth) return;
     var c = handCursor();
-    press = { x: c[0], y: c[1], t: performance.now(), moved: 0, hover: S.hover, timer: 0, hand: true };
+    press = { x: c[0], y: c[1], sx: c[0], sy: c[1], t: performance.now(), moved: 0, maxD: 0,
+              hover: S.hover, timer: 0, hand: true, held: false };
     S.handPrev = c;
-    if (S.hover && S.hover.kind === 'handle') S.grabbing = true;
   }
 
+  // Soltar: se durou menos de 2 s e não saiu do lugar, é clique. Se já foi segurada, não clica.
+  // Entre 2 s e 2,5 s, soltar não faz nada.
   function handPressEnd(cancelled) {
     if (!press || !press.hand) return;
+    var p = press;
+    press = null;
     S.handPrev = null;
-    endPress(null, cancelled);
+    if (S.grabbing) { S.grabbing = false; setStatus(); return; }
+    var dur = performance.now() - p.t;
+    if (!cancelled && !p.held && dur < CLICK_PINCH_MS && p.maxD < 40) onTap(p.hover);
   }
 
   // Pontas numeradas: 0 polegar, 1 indicador, 2 médio, 3 anelar, 4 mindinho
@@ -1744,11 +1752,17 @@
     updateWindows();
     refreshWins();
 
-    // Pinça segurada: o cursor da mão move a barra ou rola a janela
+    // Pinça: depois de 2,5 s segurada, o cursor da mão move a barra ou rola a janela
     if (S.pinched && press && press.hand && S.hand && S.handPrev && video.videoWidth) {
       var hc2 = handCursor();
-      pressMove(hc2[0] - S.handPrev[0], hc2[1] - S.handPrev[1]);
+      var hdx = hc2[0] - S.handPrev[0], hdy = hc2[1] - S.handPrev[1];
       S.handPrev = hc2;
+      press.maxD = Math.max(press.maxD, Math.hypot(hc2[0] - press.sx, hc2[1] - press.sy));
+      if (!press.held && performance.now() - press.t >= HOLD_PINCH_MS) {
+        press.held = true;
+        if (press.hover && press.hover.kind === 'handle') S.grabbing = true;
+      }
+      if (press.held) pressMove(hdx, hdy);
     }
 
     feedHands();
