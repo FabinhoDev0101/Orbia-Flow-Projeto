@@ -1,1920 +1,1097 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
-<title>Rede em VR</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f2f2f7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Notas</title>
 <style>
   :root {
-    --bg: #000000;
-    --ink: #f2f2f2;
-    --muted: #8a8a8a;
-    --line: rgba(255, 255, 255, .16);
-    --panel: rgba(10, 10, 10, .88);
-    --accent: #f2f2f2;
-    --mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
-    --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-    color-scheme: dark;
+    --accent-l:#6a5af9; --accent-d:#8b7dff; --on-l:#fff; --on-d:#fff;
+    --accent:var(--accent-l); --on-accent:var(--on-l);
+    --bg:#f2f2f7; --card:#ffffff; --text:#000; --muted:#8e8e93; --sep:rgba(60,60,67,.16);
+    --danger:#ff3b30; --field:rgba(118,118,128,.12);
+    --glass:rgba(255,255,255,.38); --glass-hi:rgba(255,255,255,.55); --glass-shadow:rgba(0,0,0,.14);
   }
-  [hidden] { display: none !important; }
-  html, body { height: 100%; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font: 14px/1.45 var(--sans);
-    overflow: hidden;
-    touch-action: none;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
+  :root[data-theme="dark"] {
+    --accent:var(--accent-d); --on-accent:var(--on-d);
+    --bg:#000; --card:#1c1c1e; --text:#fff; --muted:#98989f; --sep:rgba(84,84,88,.55);
+    --field:rgba(118,118,128,.24);
+    --glass:rgba(58,58,62,.42); --glass-hi:rgba(255,255,255,.16); --glass-shadow:rgba(0,0,0,.5);
   }
-  #stage { position: fixed; inset: 0; background: var(--bg); }
-  #stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-  #hand-layer { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
-  #web-frame { position: fixed; z-index: 3; border: 0; background: #fff; }
+  @media (prefers-color-scheme: dark) {
+    :root[data-theme="auto"] {
+      --accent:var(--accent-d); --on-accent:var(--on-d);
+      --bg:#000; --card:#1c1c1e; --text:#fff; --muted:#98989f; --sep:rgba(84,84,88,.55);
+      --field:rgba(118,118,128,.24);
+      --glass:rgba(58,58,62,.42); --glass-hi:rgba(255,255,255,.16); --glass-shadow:rgba(0,0,0,.5);
+    }
+  }
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html { background:var(--bg); }
+  body { font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
+  button { font-family:inherit; cursor:pointer; }
+  svg.i { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 
-  .divider { position: fixed; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; background: #000; pointer-events: none; }
+  /* ---------- Liquid glass ---------- */
+  .glass {
+    position:relative;
+    background:linear-gradient(135deg, var(--glass-hi), var(--glass) 45%, var(--glass));
+    -webkit-backdrop-filter:blur(18px) saturate(190%) brightness(1.05);
+    backdrop-filter:blur(18px) saturate(190%) brightness(1.05);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.12), inset 0 0 14px rgba(255,255,255,.12),
+      0 10px 30px var(--glass-shadow), 0 2px 6px rgba(0,0,0,.08);
+    transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+  }
+  .glass::before {
+    content:""; position:absolute; inset:0; border-radius:inherit; padding:1px; pointer-events:none;
+    background:linear-gradient(135deg, rgba(255,255,255,.95), rgba(255,255,255,0) 38%, rgba(255,255,255,0) 62%, rgba(255,255,255,.6));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+  }
+  .glass:active { transform:scale(.96); }
 
-  .top {
-    position: fixed; left: 0; right: 0; top: 0; z-index: 4;
-    padding-top: calc(12px + env(safe-area-inset-top, 0px));
-    padding-left: max(16px, env(safe-area-inset-left, 0px));
-    padding-right: max(16px, env(safe-area-inset-right, 0px));
-    display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; justify-content: space-between;
-    pointer-events: none;
-  }
-  .top .btn, .top .row { pointer-events: auto; }
-  .chip {
-    font: 400 12px/1.2 var(--mono);
-    letter-spacing: .02em;
-    color: var(--ink);
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 7px 10px;
-    max-width: 100%;
-  }
-  .chip::before {
-    content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
-    background: var(--muted); margin-right: 8px; vertical-align: 1px;
-  }
-  .chip.live::before { background: var(--accent); }
+  /* ---------- Telas ---------- */
+  .screen { display:none; padding:calc(env(safe-area-inset-top) + 8px) 16px 150px; max-width:720px; margin:0 auto; }
+  .screen.active { display:block; animation:fadeIn .35s ease; }
+  .screen.sub.active { animation:slideIn .38s cubic-bezier(.32,.72,0,1); }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+  @keyframes slideIn { from { opacity:0; transform:translateX(34px); } to { opacity:1; transform:none; } }
 
-  .exit-vr {
-    position: fixed; top: calc(10px + env(safe-area-inset-top, 0px)); left: 50%;
-    transform: translateX(-50%); z-index: 5; display: none;
-  }
-  .vr .exit-vr { display: block; }
+  /* barra superior (título compacto + voltar) */
+  .topbar { position:fixed; top:0; left:0; right:0; height:calc(env(safe-area-inset-top) + 44px); padding-top:env(safe-area-inset-top);
+    display:flex; align-items:center; justify-content:center; font-weight:600; font-size:17px; z-index:15;
+    opacity:0; pointer-events:none; transition:opacity .2s, background .2s;
+    -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
+    background:var(--glass); border-bottom:.5px solid var(--sep); }
+  .topbar.show { opacity:1; pointer-events:auto; }
+  .topbar.sub:not(.scrolled) { background:transparent; border-bottom-color:transparent; -webkit-backdrop-filter:none; backdrop-filter:none; }
+  .topbar.sub:not(.scrolled) #tbTitle { opacity:0; }
+  #tbTitle { transition:opacity .2s; max-width:55%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tb-back { display:none; position:absolute; left:4px; bottom:0; height:44px; align-items:center; gap:0; background:none; border:0; color:var(--accent); font-size:17px; padding:0 10px 0 4px; }
+  .topbar.sub .tb-back { display:flex; }
+  .tb-back svg.i { width:26px; height:26px; }
 
-  .dock {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 4;
-    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-    padding-left: max(16px, env(safe-area-inset-left, 0px));
-    padding-right: max(16px, env(safe-area-inset-right, 0px));
-    display: flex; flex-direction: column; align-items: center;
-  }
-  .card {
-    width: 100%; max-width: 460px;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 16px;
-  }
-  .card h1 { margin: 0 0 6px; font: 500 22px/1.2 var(--mono); letter-spacing: -.01em; }
-  .card p { margin: 0 0 14px; color: var(--muted); text-wrap: pretty; }
-  .card .note { margin: 12px 0 0; font-size: 12px; }
-  .row { display: flex; flex-wrap: wrap; gap: 8px; }
+  h1.large { font-size:34px; font-weight:700; letter-spacing:.3px; margin:44px 0 10px; line-height:1.15; }
 
-  .btn {
-    min-height: 44px; padding: 0 16px;
-    border-radius: 8px;
-    border: 1px solid var(--line);
-    background: var(--panel);
-    color: var(--ink);
-    font: 500 14px/1 var(--sans);
-    cursor: pointer;
-  }
-  .btn.primary { background: var(--ink); border-color: transparent; color: #000; font-weight: 600; }
-  .btn[aria-pressed="true"] { border-color: var(--ink); }
-  .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .search { display:flex; align-items:center; gap:6px; background:var(--field); border-radius:10px; padding:0 10px; height:36px; color:var(--muted); margin-bottom:18px; }
+  .search svg { width:17px; height:17px; flex:none; }
+  .search input { flex:1; border:0; background:transparent; font-size:17px; color:var(--text); outline:none; }
+  .search input::placeholder { color:var(--muted); }
 
-  .vr .ui { display: none; }
-  .rotate, .fallback {
-    position: fixed; inset: 0; z-index: 6; display: grid; place-items: center; text-align: center;
-    padding: 24px; background: rgba(0, 0, 0, .94); color: var(--ink); font: 500 16px/1.4 var(--mono);
-  }
+  .group { background:var(--card); border-radius:12px; overflow:hidden; }
+  .row { padding:11px 16px; position:relative; }
+  .row + .row::before { content:""; position:absolute; top:0; left:16px; right:0; height:.5px; background:var(--sep); }
+  .row:active { background:var(--field); }
+  .row h3 { font-size:17px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .row .sub { font-size:15px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+  .row .sub b { color:var(--text); font-weight:400; margin-right:8px; }
+  .count { text-align:center; color:var(--muted); font-size:13px; margin-top:16px; }
+  .empty { text-align:center; color:var(--muted); padding:60px 20px; font-size:15px; line-height:1.5; }
+
+  /* ---------- Ajustes (sessões) ---------- */
+  .section-title { font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:.4px; color:var(--accent); margin:26px 16px 8px; }
+  .nav-row, .item { display:flex; align-items:center; gap:12px; width:100%; padding:11px 16px; min-height:46px; background:none; border:0; color:var(--text); font-size:17px; text-align:left; position:relative; }
+  .nav-row + .nav-row::before, .item + .item::before, .item + label.item::before, label.item + .item::before { content:""; position:absolute; top:0; left:16px; right:0; height:.5px; background:var(--sep); }
+  .nav-row.t + .nav-row.t::before { left:58px; }
+  .nav-row:active, button.item:active, label.item:active { background:var(--field); }
+  .tile { width:30px; height:30px; border-radius:7px; background:var(--accent); color:var(--on-accent); display:grid; place-items:center; flex:none; }
+  .tile svg.i { width:18px; height:18px; }
+  .lbl { flex:1; }
+  .val { color:var(--muted); display:flex; align-items:center; gap:8px; font-size:17px; }
+  .chev { width:18px; height:18px; color:var(--muted); opacity:.7; flex:none; }
+  .item { justify-content:space-between; }
+  .item.act { color:var(--accent); }
+  .item.danger { color:var(--danger); }
+  .note-help { font-size:13px; color:var(--muted); margin:8px 16px 0; line-height:1.4; }
+  .dot { width:22px; height:22px; border-radius:50%; flex:none; border:1px solid rgba(128,128,128,.35); display:inline-block; }
+
+  /* interruptor estilo iOS */
+  .sw { position:relative; width:51px; height:31px; flex:none; }
+  .sw input { position:absolute; opacity:0; inset:0; width:100%; height:100%; margin:0; z-index:1; cursor:pointer; }
+  .sw span { position:absolute; inset:0; border-radius:99px; background:rgba(120,120,128,.32); transition:background .25s; }
+  .sw span::after { content:""; position:absolute; top:2px; left:2px; width:27px; height:27px; border-radius:50%; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,.3); transition:transform .25s cubic-bezier(.34,1.4,.64,1); }
+  .sw input:checked + span { background:var(--accent); }
+  .sw input:checked + span::after { transform:translateX(20px); }
+
+  /* ---------- Tema: pré-visualizações ---------- */
+  .themes { display:grid; grid-template-columns:1fr 1fr; gap:22px; max-width:320px; margin:6px auto 0; }
+  .theme-card { background:none; border:0; color:var(--text); font-size:15px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .mini { width:100%; aspect-ratio:9/16; border-radius:16px; padding:10px 9px; display:flex; flex-direction:column; gap:7px; overflow:hidden; border:1px solid rgba(128,128,128,.3); transition:outline-color .2s; outline:2.5px solid transparent; outline-offset:3px; }
+  .mini.light { background:#f2f2f7; --m-card:#fff; --m-line:#d1d1d6; --m-text:#000; --m-pill:rgba(255,255,255,.75); --m-accent:var(--accent-l); }
+  .mini.dark  { background:#000; --m-card:#1c1c1e; --m-line:#48484a; --m-text:#fff; --m-pill:rgba(255,255,255,.14); --m-accent:var(--accent-d); }
+  .m-title { height:8px; width:46%; border-radius:4px; background:var(--m-text); margin:8px 0 2px; }
+  .m-card { background:var(--m-card); border-radius:8px; padding:8px 7px; display:flex; flex-direction:column; gap:5px; }
+  .m-card i { display:block; height:4px; border-radius:2px; background:var(--m-line); }
+  .m-card i:nth-child(odd) { width:62%; background:var(--m-text); opacity:.85; }
+  .m-card i:nth-child(even) { width:90%; margin-bottom:4px; }
+  .m-card i:last-child { margin-bottom:0; }
+  .m-pill { margin-top:auto; align-self:center; display:flex; gap:8px; padding:5px 10px; border-radius:99px; background:var(--m-pill); border:.5px solid var(--m-line); }
+  .m-pill b { width:9px; height:9px; border-radius:50%; background:var(--m-line); }
+  .m-pill b.on { background:var(--m-accent); }
+  .tradio { width:24px; height:24px; border-radius:50%; border:2px solid var(--muted); display:grid; place-items:center; color:var(--on-accent); transition:background .2s, border-color .2s; }
+  .tradio svg.i { width:14px; height:14px; stroke-width:3.2; opacity:0; }
+  .theme-card.sel .mini { outline-color:var(--accent); }
+  .theme-card.sel .tradio { background:var(--accent); border-color:var(--accent); }
+  .theme-card.sel .tradio svg.i { opacity:1; }
+
+  /* paleta */
+  .pal-row { display:flex; align-items:center; gap:14px; width:100%; padding:11px 16px; min-height:50px; background:none; border:0; color:var(--text); font-size:17px; text-align:left; position:relative; }
+  .pal-row + .pal-row::before { content:""; position:absolute; top:0; left:52px; right:0; height:.5px; background:var(--sep); }
+  .pal-row:active { background:var(--field); }
+  .pal-row .ck { width:22px; height:22px; color:var(--accent); stroke-width:3; }
+
+  /* ---------- Calendário ---------- */
+  .cal-head { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; margin:44px 4px 14px; }
+  .cal-num { font-size:20px; font-weight:600; color:var(--accent); font-variant-numeric:tabular-nums; }
+  .cal-name { font-size:30px; font-weight:700; letter-spacing:.2px; text-align:center; background:none; border:0; color:var(--text); padding:0 6px; }
+  .cal-year { font-size:20px; font-weight:600; color:var(--muted); text-align:right; font-variant-numeric:tabular-nums; }
+  .cal-card { background:var(--card); border-radius:16px; padding:12px 8px 8px; -webkit-user-select:none; user-select:none; }
+  .cal-wd { display:grid; grid-template-columns:repeat(7,1fr); padding-bottom:8px; border-bottom:.5px solid var(--sep); margin-bottom:6px; }
+  .cal-wd span { text-align:center; font-size:13px; font-weight:600; color:var(--muted); }
+  .cal-wd span:first-child { color:var(--danger); }
+  .cal-view { overflow:hidden; touch-action:pan-y; }
+  .cal-track { display:flex; width:300%; will-change:transform; }
+  .cal-m { flex:none; width:33.3333%; display:grid; grid-template-columns:repeat(7,1fr); row-gap:4px; }
+  .cal-m .d { height:46px; display:grid; place-items:center; font-size:19px; font-variant-numeric:tabular-nums; }
+  .cal-m .d span { width:40px; height:40px; border-radius:50%; display:grid; place-items:center; }
+  .cal-m .d.out { color:var(--muted); opacity:.45; }
+  .cal-m .d.sun { color:var(--danger); }
+  .cal-m .d.today span { background:var(--accent); color:var(--on-accent); font-weight:700; }
+
+  /* ---------- Dock (barra de navegação) ---------- */
+  .dock { position:fixed; left:0; right:0; bottom:calc(14px + env(safe-area-inset-bottom)); display:flex; justify-content:center; align-items:center; gap:12px; z-index:20; pointer-events:none; }
+  .dock > * { pointer-events:auto; }
+  .dock { transition:transform .38s cubic-bezier(.32,.72,0,1), opacity .25s, visibility 0s; }
+  .dock.away { transform:translateY(160%); opacity:0; visibility:hidden; transition:transform .38s cubic-bezier(.32,.72,0,1), opacity .25s, visibility 0s .38s; }
+  .dock.away > * { pointer-events:none; }
+  .pill { display:flex; padding:5px; border-radius:999px; --tw:78px; }
+  .bubble { position:absolute; top:5px; bottom:5px; left:5px; width:var(--tw); border-radius:999px; z-index:0;
+    background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.18));
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.7), inset 0 -2px 6px rgba(255,255,255,.15), 0 4px 14px rgba(0,0,0,.12);
+    transition:transform .5s cubic-bezier(.34,1.45,.64,1); }
+  :root[data-theme="dark"] .bubble { background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06)); }
+  @media (prefers-color-scheme: dark) { :root[data-theme="auto"] .bubble { background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06)); } }
+  .bubble { transform:translateX(calc(var(--i, 0) * var(--tw))); }
+
+  .tab { position:relative; z-index:1; width:var(--tw); height:56px; border:0; background:none; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10.5px; font-weight:600; color:var(--muted); transition:color .3s; }
+  .tab.active { color:var(--accent); }
+  .tab .ico { position:relative; width:26px; height:26px; display:grid; place-items:center; }
+  .tab svg.i { width:25px; height:25px; position:relative; transition:filter .3s, opacity .3s, transform .3s; }
+  .tab .ico::before { content:""; position:absolute; inset:-4px; border-radius:50%; background:currentColor; filter:blur(10px); opacity:0; transition:opacity .35s; }
+  .tab.active .ico::before { opacity:.38; }
+  .tab:not(.active) svg.i { filter:blur(.35px); opacity:.85; }
+  .tab.active svg.i { fill:currentColor; fill-opacity:.2; }
+  .tab:active svg.i { filter:blur(2px); transform:scale(.9); }
+  .tab.blur-in svg.i { animation:blurIn .45s ease; }
+  @keyframes blurIn { 0% { filter:blur(7px); opacity:.2; transform:scale(.8); } 100% { filter:blur(0); opacity:1; transform:scale(1); } }
+
+  .fab { width:66px; height:66px; border-radius:50%; border:0; display:grid; place-items:center; color:var(--accent); transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .25s, visibility .25s, width .35s cubic-bezier(.32,.72,0,1), margin .35s cubic-bezier(.32,.72,0,1); }
+  .fab svg.i { width:26px; height:26px; transition:filter .25s; }
+  .fab:active svg.i { filter:blur(2px); }
+  .fab.hide { opacity:0; visibility:hidden; transform:scale(.6); width:0; margin-left:-12px; } /* sai do layout: a pílula centraliza */
+
+  /* ---------- Editor ---------- */
+  #editor { position:fixed; inset:0; background:var(--card); z-index:30; display:flex; flex-direction:column; transform:translateX(100%); visibility:hidden; transition:transform .38s cubic-bezier(.32,.72,0,1), visibility 0s .38s; }
+  #editor.open { transform:none; visibility:visible; transition:transform .38s cubic-bezier(.32,.72,0,1); }
+  .ebar { display:flex; align-items:center; justify-content:space-between; padding:calc(env(safe-area-inset-top) + 6px) 8px 6px; min-height:calc(env(safe-area-inset-top) + 50px); }
+  .ebar button { background:none; border:0; color:var(--accent); font-size:17px; display:flex; align-items:center; gap:2px; padding:8px; }
+  .ebar button svg.i { width:22px; height:22px; }
+  .ebar .right { display:flex; gap:6px; }
+  #wrap { flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .edate { color:var(--muted); font-size:12px; text-align:center; padding:10px 20px 4px; }
+  #title { display:block; width:100%; border:0; background:transparent; color:var(--text); font-size:28px; font-weight:700; padding:6px 20px 0; outline:none; font-family:inherit; }
+  #paper { position:relative; display:flex; flex-direction:column; min-height:55vh; }
+  #body { flex:1; color:var(--text); font-size:18px; line-height:1.5; padding:10px 20px 80px; outline:none; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; word-break:break-word; -webkit-user-select:text; user-select:text; }
+  #body:empty::before { content:attr(data-ph); color:var(--muted); pointer-events:none; }
+  #ink { position:absolute; left:0; top:0; pointer-events:none; }
+  #editor.drawing[data-tool="pen"] #ink, #editor.drawing[data-tool="eraser"] #ink { pointer-events:auto; touch-action:none; cursor:crosshair; }
+
+  /* barra de formatação */
+  .tools { background:var(--card); border-top:.5px solid var(--sep); border-bottom:.5px solid var(--sep); }
+  .fmt, .drawbar { display:flex; align-items:center; gap:6px; padding:7px 10px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+  .fmt::-webkit-scrollbar, .drawbar::-webkit-scrollbar { display:none; }
+  .drawbar { display:none; }
+  #editor.drawing .fmt { display:none; }
+  #editor.drawing .drawbar { display:flex; }
+  .fb { flex:none; height:36px; min-width:36px; padding:0 9px; border:0; border-radius:10px; background:var(--field); color:var(--text); font-size:15px; display:inline-flex; align-items:center; justify-content:center; gap:4px; transition:background .15s, color .15s, transform .15s; }
+  .fb:active { transform:scale(.94); }
+  .fb.on { background:var(--accent); color:var(--on-accent); }
+  .fb.open { box-shadow:inset 0 0 0 2px var(--accent); }
+  .fb.wide { min-width:112px; justify-content:space-between; }
+  .fb svg.i { width:20px; height:20px; }
+  .fb svg.cv { width:13px; height:13px; opacity:.6; }
+  .sepv { flex:none; width:1px; height:22px; background:var(--sep); margin:0 3px; }
+  .cA { position:relative; font-weight:700; font-size:17px; line-height:1; }
+  .cA::after { content:""; position:absolute; left:-1px; right:-1px; bottom:-4px; height:3px; border-radius:2px; background:var(--cbar, currentColor); }
+  .dotc { flex:none; width:26px; height:26px; margin:0 3px; border-radius:50%; border:0; box-shadow:inset 0 0 0 1px rgba(128,128,128,.4); }
+  .dotc.on { box-shadow:inset 0 0 0 1px rgba(128,128,128,.4), 0 0 0 2px var(--card), 0 0 0 4px var(--accent); }
+  .th i { display:block; border-radius:50%; background:currentColor; }
+
+  /* popovers */
+  .pop { position:fixed; z-index:50; display:none; background:var(--card); border-radius:14px; padding:6px; min-width:150px; max-height:min(60vh,420px); overflow:auto; box-shadow:0 12px 36px rgba(0,0,0,.28), 0 0 0 .5px var(--sep); transform-origin:top left; }
+  .pop.show { display:block; animation:popIn .18s cubic-bezier(.34,1.4,.64,1); }
+  @keyframes popIn { from { opacity:0; transform:scale(.92) translateY(-4px); } to { opacity:1; transform:none; } }
+  .pop .pi { display:flex; align-items:center; justify-content:space-between; gap:14px; width:100%; padding:9px 10px; border:0; background:none; border-radius:9px; color:var(--text); font-size:16px; text-align:left; }
+  .pop .pi:active { background:var(--field); }
+  .pop .pi svg.i { width:18px; height:18px; color:var(--accent); stroke-width:3; }
+  .pop .sizes { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; min-width:190px; }
+  .pop .sizes .pi { justify-content:center; padding:9px 4px; }
+  .pop .sizes .pi.on, .pop .aligns .pi.on { background:var(--accent); color:var(--on-accent); }
+  .pop .grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; padding:8px; }
+  .pop .sw2 { width:34px; height:34px; border-radius:50%; border:0; box-shadow:inset 0 0 0 1px rgba(128,128,128,.35); }
+  .pop .sw2.auto { background:linear-gradient(135deg,#000 50%,#fff 50%); }
+  .pop .sw2.on { box-shadow:inset 0 0 0 1px rgba(128,128,128,.35), 0 0 0 2px var(--card), 0 0 0 4px var(--accent); }
+  .pop .aligns { display:flex; gap:4px; }
+  .pop .aligns .pi { width:auto; padding:10px 12px; justify-content:center; }
+  .pop .aligns .pi svg.i { color:inherit; stroke-width:2; width:20px; height:20px; }
 </style>
+</head>
+<body>
 
-<div id="stage" aria-label="Cena 3D de uma rede de computadores"></div>
-<iframe id="web-frame" hidden title="Página da web" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
-<div class="divider" id="divider" hidden></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="i-compose" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="i-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></symbol>
+  <symbol id="i-archive" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+  <symbol id="i-access" viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2"/><path d="M5 8.5h14M12 8.5v5M12 13.5l-3 7M12 13.5l3 7"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="i-device" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+  <symbol id="i-chevd" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+  <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+  <symbol id="i-eraser" viewBox="0 0 24 24"><path d="M20 20H9l-5-5a2 2 0 0 1 0-2.8l9.2-9.2a2 2 0 0 1 2.8 0l5.2 5.2a2 2 0 0 1 0 2.8L12 20"/><path d="M7 11l6 6"/></symbol>
+  <symbol id="i-move" viewBox="0 0 24 24"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></symbol>
+  <symbol id="i-lh" viewBox="0 0 24 24"><path d="M5 4v16M2.5 6.5 5 4l2.5 2.5M2.5 17.5 5 20l2.5-2.5"/><path d="M11 6h11M11 12h11M11 18h11"/></symbol>
+  <symbol id="i-al-left" viewBox="0 0 24 24"><path d="M3 6h18M3 12h12M3 18h16"/></symbol>
+  <symbol id="i-al-center" viewBox="0 0 24 24"><path d="M3 6h18M7 12h10M5 18h14"/></symbol>
+  <symbol id="i-al-right" viewBox="0 0 24 24"><path d="M3 6h18M9 12h12M5 18h16"/></symbol>
+  <symbol id="i-al-justify" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+</svg>
 
-<header class="top ui">
-  <div class="chip" id="status" role="status">Giroscópio desligado</div>
-  <div class="row">
-    <button class="btn" id="btn-vr" type="button" aria-pressed="false">Modo VR</button>
-    <button class="btn" id="btn-full" type="button">Tela cheia</button>
+<div class="topbar" id="topbar">
+  <button class="tb-back" id="tbBack"><svg class="i"><use href="#i-back"/></svg><span id="tbBackLbl">Ajustes</span></button>
+  <span id="tbTitle">Notas</span>
+</div>
+
+<!-- Notas -->
+<main id="home" class="screen active">
+  <h1 class="large">Notas</h1>
+  <label class="search"><svg class="i"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Buscar"></label>
+  <div id="list"></div>
+  <div class="count" id="count"></div>
+</main>
+
+<!-- Calendário -->
+<main id="calendar" class="screen">
+  <div class="cal-head">
+    <span class="cal-num" id="calNum"></span>
+    <button class="cal-name" id="calName" aria-label="Voltar para hoje"></button>
+    <span class="cal-year" id="calYear"></span>
   </div>
-</header>
-<button class="btn exit-vr" id="exit-vr" type="button">Sair do modo VR</button>
+  <div class="cal-card">
+    <div class="cal-wd"><span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span></div>
+    <div class="cal-view" id="calView"><div class="cal-track" id="calTrack"></div></div>
+  </div>
+</main>
 
-<section class="dock ui" id="intro">
-  <div class="card">
-    <h1>Rede em VR</h1>
-    <p>Explore uma rede de computadores em 3D. Gire o celular para olhar em volta.</p>
-    <p>Toque num círculo do chão para andar até ele. Toque num programa da barra para abrir ou fechar a janela dele. Segure a barrinha para mover a barra: arraste para baixo para trazer para perto e para cima para afastar. Toque duas vezes para cancelar.</p>
-    <p>A câmera abre por padrão como fundo, para o ambiente aparecer ao redor. Com a mão na frente da câmera, faça pinça com o dedo polegar e o indicador para clicar.</p>
-    <div class="row">
-      <button class="btn primary" id="go-gyro" type="button">Iniciar com giroscópio</button>
-      <button class="btn" id="go-touch" type="button">Só arrastar na tela</button>
+<!-- Ajustes (raiz) -->
+<main id="settings" class="screen">
+  <h1 class="large">Ajustes</h1>
+  <div class="group">
+    <button class="nav-row t" data-go="set-sound"><span class="tile"><svg class="i"><use href="#i-sound"/></svg></span><span class="lbl">Sons e vibrações</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-theme"><span class="tile"><svg class="i"><use href="#i-contrast"/></svg></span><span class="lbl">Tema e Aparência</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-data"><span class="tile"><svg class="i"><use href="#i-cloud"/></svg></span><span class="lbl">Contas e backups</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-update"><span class="tile"><svg class="i"><use href="#i-download"/></svg></span><span class="lbl">Atualização do software</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-guide"><span class="tile"><svg class="i"><use href="#i-book"/></svg></span><span class="lbl">Guia do usuário</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-access"><span class="tile"><svg class="i"><use href="#i-access"/></svg></span><span class="lbl">Acessibilidade</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-privacy"><span class="tile"><svg class="i"><use href="#i-shield"/></svg></span><span class="lbl">Segurança e privacidade</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-devices"><span class="tile"><svg class="i"><use href="#i-device"/></svg></span><span class="lbl">Aparelhos conectados</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+  </div>
+  <div class="group" style="margin-top:22px">
+    <button class="nav-row t" data-go="set-about"><span class="tile"><svg class="i"><use href="#i-info"/></svg></span><span class="lbl">Sobre</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+  </div>
+</main>
+
+<!-- Ajustes › Tema e Aparência -->
+<main id="set-theme" class="screen sub">
+  <h1 class="large">Tema e Aparência</h1>
+
+  <div class="section-title">Tema</div>
+  <div class="themes">
+    <button class="theme-card" data-t="light">
+      <div class="mini light"><div class="m-title"></div><div class="m-card"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="m-pill"><b class="on"></b><b></b></div></div>
+      <span>Claro</span><span class="tradio"><svg class="i"><use href="#i-check"/></svg></span>
+    </button>
+    <button class="theme-card" data-t="dark">
+      <div class="mini dark"><div class="m-title"></div><div class="m-card"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="m-pill"><b class="on"></b><b></b></div></div>
+      <span>Escuro</span><span class="tradio"><svg class="i"><use href="#i-check"/></svg></span>
+    </button>
+  </div>
+  <div class="group" style="margin-top:20px">
+    <div class="item"><span class="lbl">Automático</span><label class="sw"><input type="checkbox" id="autoSw"><span></span></label></div>
+  </div>
+  <p class="note-help">No modo automático, o tema acompanha o do seu aparelho.</p>
+
+  <div class="section-title">Aparência</div>
+  <div class="group">
+    <button class="nav-row" data-go="set-palette"><span class="lbl">Paleta de cores</span><span class="val"><i class="dot" id="palDot"></i><span id="palName"></span></span><svg class="i chev"><use href="#i-chev"/></svg></button>
+  </div>
+</main>
+
+<!-- Ajustes › Tema e Aparência › Paleta de cores -->
+<main id="set-palette" class="screen sub">
+  <h1 class="large">Paleta de cores</h1>
+  <p class="note-help" style="margin:0 16px 16px">Muda a cor dos ícones, dos títulos em caixa alta e dos botões.</p>
+  <div class="group" id="palList"></div>
+</main>
+
+<!-- Ajustes › Dados e Backup -->
+<main id="set-data" class="screen sub">
+  <h1 class="large">Contas e backups</h1>
+  <div class="group">
+    <button class="item act" id="exportBtn"><span>Exportar notas</span><span class="val" id="exportCount"></span></button>
+    <label class="item act" style="cursor:pointer"><span>Importar notas</span><span class="val">.json</span>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </label>
+  </div>
+  <div class="group" style="margin-top:22px">
+    <button class="item danger" id="wipeBtn"><span>Apagar todas as notas</span></button>
+  </div>
+  <p class="note-help">As notas ficam salvas apenas neste navegador e neste aparelho. Exporte de vez em quando para ter um backup.</p>
+</main>
+
+<!-- Ajustes › Sons e vibrações -->
+<main id="set-sound" class="screen sub">
+  <h1 class="large">Sons e vibrações</h1>
+</main>
+
+<!-- Ajustes › Atualização do software -->
+<main id="set-update" class="screen sub">
+  <h1 class="large">Atualização do software</h1>
+</main>
+
+<!-- Ajustes › Guia do usuário -->
+<main id="set-guide" class="screen sub">
+  <h1 class="large">Guia do usuário</h1>
+</main>
+
+<!-- Ajustes › Acessibilidade -->
+<main id="set-access" class="screen sub">
+  <h1 class="large">Acessibilidade</h1>
+</main>
+
+<!-- Ajustes › Segurança e privacidade -->
+<main id="set-privacy" class="screen sub">
+  <h1 class="large">Segurança e privacidade</h1>
+</main>
+
+<!-- Ajustes › Aparelhos conectados -->
+<main id="set-devices" class="screen sub">
+  <h1 class="large">Aparelhos conectados</h1>
+</main>
+
+<!-- Ajustes › Sobre -->
+<main id="set-about" class="screen sub">
+  <h1 class="large">Sobre</h1>
+  <div class="group">
+    <div class="item"><span>Versão</span><span class="val">1.1</span></div>
+    <div class="item"><span>Notas salvas</span><span class="val" id="aboutCount">0</span></div>
+    <div class="item"><span>Armazenamento</span><span class="val">Neste aparelho</span></div>
+  </div>
+</main>
+
+<!-- Barra de navegação -->
+<nav class="dock" id="dock">
+  <div class="pill glass" id="pill" data-active="home">
+    <div class="bubble"></div>
+    <button class="tab active" data-tab="home" aria-label="Notas">
+      <span class="ico"><svg class="i"><use href="#i-home"/></svg></span>Notas
+    </button>
+    <button class="tab" data-tab="calendar" aria-label="Calendário">
+      <span class="ico"><svg class="i"><use href="#i-calendar"/></svg></span>Calendário
+    </button>
+    <button class="tab" data-tab="settings" aria-label="Ajustes">
+      <span class="ico"><svg class="i"><use href="#i-gear"/></svg></span>Ajustes
+    </button>
+  </div>
+  <button class="fab glass" id="fab" aria-label="Nova nota"><svg class="i"><use href="#i-compose"/></svg></button>
+</nav>
+
+<!-- Editor -->
+<section id="editor" aria-hidden="true">
+  <div class="ebar">
+    <button id="back"><svg class="i"><use href="#i-back"/></svg>Notas</button>
+    <div class="right">
+      <button id="del" aria-label="Excluir"><svg class="i"><use href="#i-trash"/></svg></button>
+      <button id="done" style="font-weight:600">OK</button>
     </div>
-    <p class="note">Para óculos de caixa, inicie e toque em Modo VR. O botão de volume do Cardboard também funciona como toque.</p>
+  </div>
+  <div class="tools" id="tools">
+    <div class="fmt" id="fmt">
+      <button class="fb wide" data-f="font" aria-label="Fonte"><span id="fFontL">Sistema</span><svg class="i cv"><use href="#i-chevd"/></svg></button>
+      <button class="fb" data-f="size" aria-label="Tamanho do texto"><span id="fSizeL">18</span><svg class="i cv"><use href="#i-chevd"/></svg></button>
+      <span class="sepv"></span>
+      <button class="fb" id="f-bold" data-f="bold" aria-label="Negrito"><b>B</b></button>
+      <button class="fb" id="f-italic" data-f="italic" aria-label="Itálico"><i style="font-family:Georgia,serif;font-size:17px">I</i></button>
+      <button class="fb" id="f-underline" data-f="underline" aria-label="Sublinhado"><u>U</u></button>
+      <button class="fb" data-f="color" aria-label="Cor do texto"><span class="cA" id="fColorA">A</span><svg class="i cv"><use href="#i-chevd"/></svg></button>
+      <span class="sepv"></span>
+      <button class="fb" data-f="align" aria-label="Alinhamento"><svg class="i"><use id="fAlignU" href="#i-al-left"/></svg><svg class="i cv"><use href="#i-chevd"/></svg></button>
+      <button class="fb" data-f="lh" aria-label="Espaço entre linhas"><svg class="i"><use href="#i-lh"/></svg><span id="fLhL">1.5</span><svg class="i cv"><use href="#i-chevd"/></svg></button>
+      <span class="sepv"></span>
+      <button class="fb" id="f-draw" data-f="draw" aria-label="Desenhar"><svg class="i"><use href="#i-pencil"/></svg></button>
+    </div>
+    <div class="drawbar" id="drawbar">
+      <button class="fb on" data-d="exit" aria-label="Voltar para o texto"><svg class="i"><use href="#i-pencil"/></svg></button>
+      <span class="sepv"></span>
+      <button class="fb" data-tool="pen" aria-label="Caneta"><svg class="i"><use href="#i-pen"/></svg></button>
+      <button class="fb" data-tool="eraser" aria-label="Borracha"><svg class="i"><use href="#i-eraser"/></svg></button>
+      <button class="fb" data-tool="hand" aria-label="Mover a página"><svg class="i"><use href="#i-move"/></svg></button>
+      <button class="fb" data-d="undo" aria-label="Desfazer traço"><svg class="i"><use href="#i-undo"/></svg></button>
+      <span class="sepv"></span>
+      <span id="inkColors" style="display:flex"></span>
+      <span class="sepv"></span>
+      <button class="fb th" data-w="2" aria-label="Fina"><i style="width:4px;height:4px"></i></button>
+      <button class="fb th" data-w="4" aria-label="Média"><i style="width:8px;height:8px"></i></button>
+      <button class="fb th" data-w="8" aria-label="Grossa"><i style="width:13px;height:13px"></i></button>
+    </div>
+  </div>
+  <div id="wrap">
+    <div class="edate" id="edate"></div>
+    <input id="title" placeholder="Título">
+    <div id="paper">
+      <div id="body" contenteditable="true" data-ph="Escreva aqui..."></div>
+      <canvas id="ink"></canvas>
+    </div>
   </div>
 </section>
+<div class="pop" id="pop"></div>
 
-<div class="rotate" id="rotate" hidden>Vire o celular na horizontal para usar o modo VR.</div>
-<div class="fallback" id="fallback" hidden>Este aparelho ou navegador não conseguiu iniciar o 3D (WebGL). Tente abrir em outro navegador.</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-(function () {
-  'use strict';
-  var $ = function (id) { return document.getElementById(id); };
-  var stage = $('stage');
+const KEY = 'bloco-de-notas-v1', CFG = 'bloco-de-notas-cfg';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  if (!window.THREE) { $('fallback').hidden = false; return; }
+const PALETTES = {
+  mono:   { name:'Monocromático', l:'#000000', d:'#ffffff', onL:'#ffffff', onD:'#000000' },
+  blue:   { name:'Azul',     l:'#007aff', d:'#0a84ff', onL:'#ffffff', onD:'#ffffff' },
+  purple: { name:'Roxo',     l:'#6a5af9', d:'#8b7dff', onL:'#ffffff', onD:'#ffffff' },
+  red:    { name:'Vermelho', l:'#ff3b30', d:'#ff453a', onL:'#ffffff', onD:'#ffffff' },
+  green:  { name:'Verde',    l:'#2fb457', d:'#30d158', onL:'#ffffff', onD:'#ffffff' }
+};
+const TABS = ['home', 'calendar', 'settings'];
+const TITLES = { home:'Notas', calendar:'Calendário', settings:'Ajustes', 'set-theme':'Tema e Aparência', 'set-palette':'Paleta de cores', 'set-data':'Contas e backups', 'set-about':'Sobre', 'set-sound':'Sons e vibrações', 'set-update':'Atualização do software', 'set-guide':'Guia do usuário', 'set-access':'Acessibilidade', 'set-privacy':'Segurança e privacidade', 'set-devices':'Aparelhos conectados' };
 
-  var renderer;
+let notes = [], cfg = { auto:true, theme:'light', palette:'purple' }, current = null;
+let stack = ['settings'];
+try { notes = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
+try {
+  const s = JSON.parse(localStorage.getItem(CFG)) || {};
+  if (s.theme && s.auto === undefined) { s.auto = s.theme === 'auto'; if (s.theme === 'auto') s.theme = 'light'; } // migra versão anterior
+  Object.assign(cfg, s);
+  if (!PALETTES[cfg.palette]) cfg.palette = 'purple';
+} catch (e) {}
+
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(notes)); } catch (e) { alert('Não foi possível salvar as notas.'); } };
+const saveCfg = () => { try { localStorage.setItem(CFG, JSON.stringify(cfg)); } catch (e) {} };
+
+/* ---------- Tema e paleta ---------- */
+const mq = window.matchMedia('(prefers-color-scheme: dark)');
+const eff = () => cfg.auto ? (mq.matches ? 'dark' : 'light') : cfg.theme;
+
+function applyTheme() { document.documentElement.dataset.theme = cfg.auto ? 'auto' : cfg.theme; redrawInk(); }
+function applyPalette() {
+  const p = PALETTES[cfg.palette], r = document.documentElement.style;
+  r.setProperty('--accent-l', p.l); r.setProperty('--accent-d', p.d);
+  r.setProperty('--on-l', p.onL);   r.setProperty('--on-d', p.onD);
+}
+const dotBg = key => key === 'mono' ? 'linear-gradient(135deg,#000 50%,#fff 50%)' : PALETTES[key][eff() === 'dark' ? 'd' : 'l'];
+
+function renderAppearance() {
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.toggle('sel', c.dataset.t === eff()));
+  $('autoSw').checked = cfg.auto;
+  $('palName').textContent = PALETTES[cfg.palette].name;
+  $('palDot').style.background = dotBg(cfg.palette);
+  $('palList').innerHTML = Object.keys(PALETTES).map(k => `
+    <button class="pal-row" data-p="${k}">
+      <i class="dot" style="background:${dotBg(k)}"></i>
+      <span class="lbl">${PALETTES[k].name}${k === 'purple' ? ' <span style="color:var(--muted);font-size:14px">· padrão</span>' : ''}</span>
+      ${k === cfg.palette ? '<svg class="i ck"><use href="#i-check"/></svg>' : ''}
+    </button>`).join('');
+}
+document.querySelectorAll('.theme-card').forEach(c => c.onclick = () => {
+  cfg.theme = c.dataset.t; cfg.auto = false; saveCfg(); applyTheme(); renderAppearance();
+});
+$('autoSw').onchange = e => {
+  const atual = eff();
+  cfg.auto = e.target.checked;
+  if (!cfg.auto) cfg.theme = atual;
+  saveCfg(); applyTheme(); renderAppearance();
+};
+$('palList').onclick = e => {
+  const b = e.target.closest('.pal-row'); if (!b) return;
+  cfg.palette = b.dataset.p; saveCfg(); applyPalette(); renderAppearance();
+};
+mq.addEventListener && mq.addEventListener('change', () => { renderAppearance(); redrawInk(); });
+
+/* ---------- Lista de notas ---------- */
+function fmt(ts) {
+  const d = new Date(ts), now = new Date();
+  if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  return d.toLocaleDateString('pt-BR');
+}
+function render() {
+  const q = $('search').value.trim().toLowerCase();
+  const items = notes
+    .filter(n => !q || n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q))
+    .sort((a, b) => b.updated - a.updated);
+  $('list').innerHTML = items.length
+    ? `<div class="group">${items.map(n => `
+        <div class="row" data-id="${esc(n.id)}">
+          <h3>${esc(n.title) || 'Nova nota'}</h3>
+          <div class="sub"><b>${fmt(n.updated)}</b>${esc(n.body.replace(/\s+/g,' ')) || 'Sem texto adicional'}</div>
+        </div>`).join('')}</div>`
+    : `<div class="empty">${q ? 'Nenhum resultado.' : 'Nenhuma nota ainda.<br>Toque no botão de escrever para criar a primeira.'}</div>`;
+  $('count').textContent = notes.length ? `${notes.length} ${notes.length === 1 ? 'Nota' : 'Notas'}` : '';
+  $('exportCount').textContent = notes.length;
+  $('aboutCount').textContent = notes.length;
+}
+
+/* ---------- Navegação: abas + janelas dentro de Ajustes ---------- */
+const tabNow = () => $('pill').dataset.active;
+const screenNow = () => tabNow() === 'settings' ? stack[stack.length - 1] : tabNow();
+
+function showCurrent() {
+  const id = screenNow();
+  if (id === 'calendar') renderCal();
+  $('dock').classList.toggle('away', tabNow() === 'settings' && stack.length > 1);
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+  $('fab').classList.toggle('hide', tabNow() !== 'home');
+  updateTopbar();
+}
+function goTab(t) {
+  const same = tabNow() === t;
+  $('pill').dataset.active = t; $('pill').style.setProperty('--i', TABS.indexOf(t));
+  document.querySelectorAll('.tab').forEach(b => {
+    const on = b.dataset.tab === t;
+    if (on && !b.classList.contains('active')) { b.classList.remove('blur-in'); void b.offsetWidth; b.classList.add('blur-in'); }
+    b.classList.toggle('active', on);
+  });
+  if (same && t === 'settings') stack = ['settings']; // tocar de novo volta à raiz de Ajustes
+  showCurrent(); window.scrollTo(0, 0); updateTopbar();
+}
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => goTab(b.dataset.tab));
+
+function go(id) {
+  stack.push(id); history.pushState({ s:id }, '');
+  showCurrent(); window.scrollTo(0, 0); updateTopbar();
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go);
+});
+$('tbBack').onclick = () => history.back();
+
+function updateTopbar() {
+  const sub = tabNow() === 'settings' && stack.length > 1;
+  const scrolled = window.scrollY > 48;
+  const tb = $('topbar');
+  tb.classList.toggle('sub', sub);
+  tb.classList.toggle('scrolled', scrolled);
+  tb.classList.toggle('show', sub || scrolled);
+  $('tbTitle').textContent = TITLES[screenNow()];
+  if (sub) $('tbBackLbl').textContent = TITLES[stack[stack.length - 2]];
+}
+window.addEventListener('scroll', updateTopbar, { passive:true });
+
+/* ---------- Editor ---------- */
+function openNote(id) {
+  current = notes.find(n => n.id === id); if (!current) return;
+  $('title').value = current.title; loadNoteIntoEditor();
+  $('edate').textContent = new Date(current.updated).toLocaleString('pt-BR', { dateStyle:'long', timeStyle:'short' });
+  $('editor').classList.add('open'); $('editor').setAttribute('aria-hidden', 'false');
+  history.pushState({ editor:1 }, '');
+  if (!current.title && !current.body) setTimeout(() => $('title').focus(), 350);
+}
+function closeEditor() {
+  if (!$('editor').classList.contains('open')) return false;
+  if (current && !current.title.trim() && !current.body.trim() && !(current.ink && current.ink.length)) { notes = notes.filter(n => n.id !== current.id); save(); }
+  current = null;
+  closePop(); setDrawMode(false);
+  $('editor').classList.remove('open'); $('editor').setAttribute('aria-hidden', 'true');
+  document.activeElement && document.activeElement.blur();
+  render();
+  return true;
+}
+function onEdit() {
+  if (!current) return;
+  stripSentinel();
+  current.title = $('title').value;
+  current.body = bodyEl.innerText.replace(/​/g, '');
+  current.html = bodyEl.innerHTML;
+  current.updated = Date.now();
+  save();
+}
+const leave = () => history.back();
+window.addEventListener('popstate', () => {
+  if (closeEditor()) return;
+  if (stack.length > 1) { stack.pop(); showCurrent(); updateTopbar(); }
+});
+
+$('fab').onclick = () => {
+  const n = { id: String(Date.now()), title:'', body:'', updated: Date.now() };
+  notes.push(n); openNote(n.id);
+};
+$('list').onclick = e => { const r = e.target.closest('.row'); if (r) openNote(r.dataset.id); };
+$('back').onclick = leave;
+$('done').onclick = leave;
+$('del').onclick = () => {
+  if (current && confirm('Excluir esta nota?')) {
+    notes = notes.filter(n => n.id !== current.id); save(); current = null; leave();
+  }
+};
+$('title').oninput = onEdit;
+$('search').oninput = render;
+
+/* ---------- Dados: exportar / importar / apagar ---------- */
+$('exportBtn').onclick = () => {
+  if (!notes.length) return alert('Não há notas para exportar.');
+  const blob = new Blob([JSON.stringify(notes, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'notas-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+$('importFile').onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const data = JSON.parse(r.result);
+      if (!Array.isArray(data)) throw 0;
+      const valid = data.map(cleanNote).filter(Boolean);
+      if (!valid.length) throw 0;
+      const ids = new Set(notes.map(n => n.id));
+      const novas = valid.filter(n => !ids.has(n.id));
+      notes = notes.concat(novas); save(); render();
+      alert(`${novas.length} nota(s) importada(s).`);
+    } catch (err) { alert('Arquivo inválido.'); }
+    e.target.value = '';
+  };
+  r.readAsText(f);
+};
+$('wipeBtn').onclick = () => {
+  if (notes.length && confirm('Apagar TODAS as notas? Isso não pode ser desfeito.')) { notes = []; save(); render(); }
+};
+
+/* ---------- Editor: formatação de texto e desenho ---------- */
+const bodyEl = $('body'), paper = $('paper'), wrapEl = $('wrap'), ink = $('ink'), ictx = ink.getContext('2d'), pop = $('pop');
+const FONTS = [
+  { n:'Sistema',         v:'-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
+  { n:'Georgia',         v:'Georgia, serif' },
+  { n:'Times New Roman', v:'"Times New Roman", Times, serif' },
+  { n:'Arial',           v:'Arial, Helvetica, sans-serif' },
+  { n:'Verdana',         v:'Verdana, Geneva, sans-serif' },
+  { n:'Trebuchet MS',    v:'"Trebuchet MS", sans-serif' },
+  { n:'Courier New',     v:'"Courier New", Courier, monospace' }
+];
+const SIZES = [12, 14, 16, 18, 20, 24, 28, 32, 40], DEF_SIZE = 18;
+const LHS = [1.25, 1.5, 2], DEF_LH = 1.5;
+const TXT_COLORS = [null, '#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#00c7be', '#007aff', '#af52de', '#ff2d55', '#8e8e93'];
+const INK_COLORS = [null, '#ff3b30', '#ff9500', '#34c759', '#007aff', '#af52de'];
+const ALIGNS = [['Left','left'], ['Center','center'], ['Right','right'], ['Full','justify']];
+const CHK = '<svg class="i"><use href="#i-check"/></svg>';
+let savedRange = null, drawMode = false, tool = 'pen', inkColor = null, inkW = 4, strokes = [], activeId = null, popFor = null, popPick = null;
+try { document.execCommand('defaultParagraphSeparator', false, 'div'); } catch (e) {}
+
+/* --- segurança: limpa HTML vindo de arquivos importados --- */
+const OK_TAGS = new Set(['DIV','P','BR','SPAN','B','STRONG','I','EM','U','S','FONT','UL','OL','LI']);
+const DROP_TAGS = new Set(['SCRIPT','STYLE','IFRAME','OBJECT','EMBED','LINK','META','SVG','MATH','TEMPLATE','NOSCRIPT']);
+const OK_CSS = new Set(['color','font-size','font-family','font-weight','font-style','text-decoration','text-decoration-line','-webkit-text-decoration-line','text-align','line-height']);
+function filterStyle(s) {
+  return s.split(';').map(d => d.trim()).filter(d => {
+    const i = d.indexOf(':'); if (i < 1) return false;
+    return OK_CSS.has(d.slice(0, i).trim().toLowerCase()) && !/url\(|expression|\\|\/\*|javascript:/i.test(d);
+  }).join(';');
+}
+function sanitizeHtml(html) {
+  const doc = new DOMParser().parseFromString('<body>' + html + '</body>', 'text/html');
+  (function walk(parent) {
+    [...parent.childNodes].forEach(n => {
+      if (n.nodeType === 3) return;
+      if (n.nodeType !== 1) { n.remove(); return; }
+      if (DROP_TAGS.has(n.tagName)) { n.remove(); return; }
+      walk(n);
+      if (!OK_TAGS.has(n.tagName)) { while (n.firstChild) n.parentNode.insertBefore(n.firstChild, n); n.remove(); return; }
+      [...n.attributes].forEach(a => {
+        const k = a.name.toLowerCase();
+        if (k === 'style') { const f = filterStyle(a.value); f ? n.setAttribute('style', f) : n.removeAttribute('style'); }
+        else if (!['size','color','face','align'].includes(k)) n.removeAttribute(a.name);
+      });
+    });
+  })(doc.body);
+  return doc.body.innerHTML;
+}
+const plainToHtml = t => esc(t || '').replace(/\n/g, '<br>');
+function cleanInk(a) {
+  if (!Array.isArray(a)) return undefined;
+  const out = [];
+  for (const s of a.slice(0, 5000)) {
+    if (!s || !Array.isArray(s.p) || s.p.length < 2 || s.p.length % 2) continue;
+    const p = s.p.slice(0, 20000).map(Number); if (p.some(v => !isFinite(v))) continue;
+    out.push({ c: (typeof s.c === 'string' && /^#[0-9a-f]{3,8}$/i.test(s.c)) ? s.c : null, w: Math.min(60, Math.max(1, +s.w || 4)), e: !!s.e, p });
+  }
+  return out.length ? out : undefined;
+}
+function cleanNote(n) {
+  if (!n || typeof n.id !== 'string' || typeof n.title !== 'string' || typeof n.body !== 'string' || typeof n.updated !== 'number') return null;
+  const o = { id:n.id, title:n.title, body:n.body, updated:n.updated };
+  if (typeof n.html === 'string') o.html = sanitizeHtml(n.html.slice(0, 1000000));
+  if (LHS.includes(n.lh)) o.lh = n.lh;
+  if (typeof n.size === 'number' && n.size >= 8 && n.size <= 80) o.size = n.size;
+  const k = cleanInk(n.ink); if (k) o.ink = k;
+  if (typeof n.inkH === 'number' && n.inkH > 0 && n.inkH <= 20000) o.inkH = n.inkH;
+  return o;
+}
+
+/* --- carregar nota no editor --- */
+function loadNoteIntoEditor() {
+  const n = current;
+  bodyEl.innerHTML = typeof n.html === 'string' ? sanitizeHtml(n.html) : plainToHtml(n.body);
+  bodyEl.style.fontSize = (n.size || DEF_SIZE) + 'px';
+  bodyEl.style.lineHeight = n.lh || DEF_LH;
+  strokes = Array.isArray(n.ink) ? n.ink : [];
+  const need = Math.max(n.inkH || 0, strokes.reduce((m, s) => { for (let i = 1; i < s.p.length; i += 2) m = Math.max(m, s.p[i]); return m; }, 0) + (strokes.length ? 120 : 0));
+  paper.style.minHeight = need ? 'max(55vh,' + Math.ceil(need) + 'px)' : '';
+  savedRange = null; closePop(); setDrawMode(false);
+  wrapEl.scrollTop = 0;
+  requestAnimationFrame(() => { sizeInk(); refreshFmt(); });
+}
+
+/* --- seleção e comandos --- */
+document.addEventListener('selectionchange', () => {
+  const s = getSelection(); if (!s.rangeCount) return;
+  const r = s.getRangeAt(0);
+  if (bodyEl.contains(r.commonAncestorContainer)) { savedRange = r.cloneRange(); refreshFmt(); }
+});
+function restoreSel() {
+  bodyEl.focus({ preventScroll:true });
+  const s = getSelection();
+  if (savedRange) { s.removeAllRanges(); s.addRange(savedRange); }
+  else { const r = document.createRange(); r.selectNodeContents(bodyEl); r.collapse(false); s.removeAllRanges(); s.addRange(r); }
+}
+function cmd(c, v) {
+  if (!current || drawMode) return;
+  restoreSel();
+  document.execCommand('styleWithCSS', false, true);
+  document.execCommand(c, false, v);
+  onEdit(); refreshFmt();
+}
+function selEl() {
+  const s = getSelection(); let n = s.rangeCount ? s.focusNode : null;
+  if (n && n.nodeType === 3) n = n.parentElement;
+  return (n && bodyEl.contains(n)) ? n : bodyEl;
+}
+const firstFam = f => f.split(',')[0].replace(/["']/g, '').trim().toLowerCase();
+const curFontIdx = () => { const i = FONTS.findIndex(f => firstFam(f.v) === firstFam(getComputedStyle(selEl()).fontFamily)); return i < 0 ? 0 : i; };
+const rgbOf = h => { const v = parseInt(h.slice(1), 16); return `rgb(${v >> 16 & 255}, ${v >> 8 & 255}, ${v & 255})`; };
+const curLH = () => (current && current.lh) || DEF_LH;
+const lhTxt = v => v.toFixed(2).replace(/0$/, '');
+function curAlign() { try { for (const [c, n] of ALIGNS.slice(1)) if (document.queryCommandState('justify' + c)) return n; } catch (e) {} return 'left'; }
+
+function refreshFmt() {
+  if (!current || drawMode) return;
   try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  } catch (err) { $('fallback').hidden = false; return; }
-  renderer.autoClear = false;
-  renderer.setClearColor(0x000000, 1);
-  stage.appendChild(renderer.domElement);
+    const cs = getComputedStyle(selEl());
+    $('fFontL').textContent = FONTS[curFontIdx()].n;
+    $('fSizeL').textContent = Math.round(parseFloat(cs.fontSize));
+    ['bold', 'italic', 'underline'].forEach(c => $('f-' + c).classList.toggle('on', document.queryCommandState(c)));
+    $('fColorA').style.setProperty('--cbar', cs.color);
+    $('fAlignU').setAttribute('href', '#i-al-' + curAlign());
+    $('fLhL').textContent = lhTxt(curLH());
+  } catch (e) {}
+}
+function stripSentinel() { // cor "Automática": remove a cor-marcador deixada pelo execCommand
+  bodyEl.querySelectorAll('[style*="color"], font[color]').forEach(el => {
+    let hit = false;
+    if (el.style && el.style.color === 'rgb(1, 2, 3)') { el.style.removeProperty('color'); if (!el.getAttribute('style')) el.removeAttribute('style'); hit = true; }
+    if (el.tagName === 'FONT' && (el.getAttribute('color') || '').toLowerCase() === '#010203') { el.removeAttribute('color'); hit = true; }
+    if (hit && ['SPAN', 'FONT'].includes(el.tagName) && !el.attributes.length) { while (el.firstChild) el.parentNode.insertBefore(el.firstChild, el); el.remove(); }
+  });
+}
+function applySize(px) {
+  if (!current) return;
+  const s = getSelection();
+  restoreSel();
+  if (!s.rangeCount || s.isCollapsed) { // sem seleção: muda o tamanho padrão da nota inteira
+    current.size = px; bodyEl.style.fontSize = px + 'px'; onEdit(); refreshFmt(); return;
+  }
+  document.execCommand('styleWithCSS', false, false);
+  document.execCommand('fontSize', false, '7');
+  document.execCommand('styleWithCSS', false, true);
+  const made = [];
+  bodyEl.querySelectorAll('font[size="7"]').forEach(f => {
+    const sp = document.createElement('span'); sp.style.fontSize = px + 'px';
+    while (f.firstChild) sp.appendChild(f.firstChild);
+    f.replaceWith(sp); made.push(sp);
+    sp.querySelectorAll('[style*="font-size"]').forEach(x => x.style.removeProperty('font-size'));
+  });
+  if (made.length) { // mantém o texto selecionado, para continuar aplicando cor/fonte etc.
+    const r = document.createRange();
+    r.setStartBefore(made[0]); r.setEndAfter(made[made.length - 1]);
+    s.removeAllRanges(); s.addRange(r); savedRange = r.cloneRange();
+  }
+  onEdit(); refreshFmt();
+}
+function applyColor(c) {
+  if (c === null) { cmd('foreColor', '#010203'); stripSentinel(); onEdit(); }
+  else cmd('foreColor', c);
+}
+function setLH(v) {
+  if (!current) return;
+  current.lh = +v; bodyEl.style.lineHeight = v;
+  current.updated = Date.now(); save(); refreshFmt();
+}
 
-  var EYE = 1.6, IPD = 0.064;
-  var DIST_MIN = 2.0, DIST_MAX = 5.0, DIST_DEFAULT = 2.6;
-  var CURVE_R = 2.6;
-  var TAP_MAX_MS = 450, TAP_MOVE = 12, DOUBLE_MS = 320, HOLD_MS = 350;
-  // Pinça: menos de 2 s solta = clique; 2,5 s ou mais segurando = pegar/selecionar
-  var CLICK_PINCH_MS = 2000, HOLD_PINCH_MS = 2500;
-  var SANS = 'system-ui, -apple-system, "Segoe UI", sans-serif';
-  var reduceMotion = false;
-  try { reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+/* --- popovers --- */
+function openPop(btn, html, onPick) {
+  if (popFor === btn) return closePop();
+  closePop();
+  pop.innerHTML = html; pop.className = 'pop show'; popFor = btn; popPick = onPick;
+  btn.classList.add('open');
+  placePop();
+}
+function placePop() {
+  if (!popFor) return;
+  const r = popFor.getBoundingClientRect();
+  pop.style.top = (r.bottom + 8) + 'px'; pop.style.left = '0px';
+  pop.style.left = Math.max(8, Math.min(r.left, innerWidth - pop.offsetWidth - 8)) + 'px';
+}
+function closePop() { pop.className = 'pop'; if (popFor) popFor.classList.remove('open'); popFor = null; }
+const menuFont = () => { const c = curFontIdx(); return FONTS.map((f, i) => `<button class="pi" data-v="${i}" style="font-family:${f.v.replace(/"/g, '&quot;')}"><span>${f.n}</span>${i === c ? CHK : ''}</button>`).join(''); };
+const menuSize = () => { const c = Math.round(parseFloat(getComputedStyle(selEl()).fontSize)); return '<div class="sizes">' + SIZES.map(v => `<button class="pi${v === c ? ' on' : ''}" data-v="${v}">${v}</button>`).join('') + '</div>'; };
+const menuColor = () => {
+  const cs = getComputedStyle(selEl()).color, def = getComputedStyle(bodyEl).color;
+  return '<div class="grid">' + TXT_COLORS.map((c, i) => `<button class="sw2${c ? '' : ' auto'}${(c ? cs === rgbOf(c) : cs === def) ? ' on' : ''}" data-v="${i}" ${c ? `style="background:${c}"` : ''} aria-label="${c || 'Automática'}"></button>`).join('') + '</div>';
+};
+const menuAlign = () => { const c = curAlign(); return '<div class="aligns">' + ALIGNS.map(([k, n]) => `<button class="pi${n === c ? ' on' : ''}" data-v="${k}" aria-label="${n}"><svg class="i"><use href="#i-al-${n}"/></svg></button>`).join('') + '</div>'; };
+const menuLH = () => LHS.map(v => `<button class="pi" data-v="${v}"><span>${lhTxt(v)}</span>${v === curLH() ? CHK : ''}</button>`).join('');
 
-  /* Cores da barra e das janelas: escuro ou claro (Personalização > Tema) */
-  var HUD = {
-    dark: {
-      ink: '#f2f2f2', muted: '#8a8a8a', line: 'rgba(255,255,255,0.16)', panel: '#0a0a0a',
-      hov: 'rgba(255,255,255,0.10)', idle: '#111111', hovIcon: '#2a2a2a', sel: '#f2f2f2', selInk: '#000000',
-      win: '#000000', side: '#070707', card: 'rgba(255,255,255,0.03)', handle: 'rgba(255,255,255,0.4)'
-    },
-    light: {
-      ink: '#111111', muted: '#6b6b6b', line: 'rgba(0,0,0,0.16)', panel: '#e9e9e9',
-      hov: 'rgba(0,0,0,0.08)', idle: '#ffffff', hovIcon: '#d6d6d6', sel: '#111111', selInk: '#ffffff',
-      win: '#ffffff', side: '#f2f2f2', card: 'rgba(0,0,0,0.03)', handle: 'rgba(0,0,0,0.3)'
-    }
+function toolClick(f, btn) {
+  if (!current) return;
+  switch (f) {
+    case 'font':  openPop(btn, menuFont(),  i => cmd('fontName', FONTS[i].v)); break;
+    case 'size':  openPop(btn, menuSize(),  v => applySize(+v)); break;
+    case 'color': openPop(btn, menuColor(), i => applyColor(TXT_COLORS[i])); break;
+    case 'align': openPop(btn, menuAlign(), k => cmd('justify' + k)); break;
+    case 'lh':    openPop(btn, menuLH(),    v => setLH(v)); break;
+    case 'bold': case 'italic': case 'underline': closePop(); cmd(f); break;
+    case 'draw':  closePop(); setDrawMode(true); break;
+  }
+}
+$('tools').addEventListener('mousedown', e => e.preventDefault()); // não tira o foco/seleção do texto
+pop.addEventListener('mousedown', e => e.preventDefault());
+$('fmt').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) toolClick(b.dataset.f, b); });
+$('fmt').addEventListener('scroll', placePop, { passive:true });
+pop.addEventListener('click', e => { const b = e.target.closest('[data-v]'); if (!b || !popPick) return; const f = popPick; closePop(); f(b.dataset.v); });
+document.addEventListener('pointerdown', e => { if (popFor && !pop.contains(e.target) && !popFor.contains(e.target)) closePop(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePop(); });
+window.addEventListener('resize', closePop);
+
+bodyEl.addEventListener('input', () => {
+  if (bodyEl.innerHTML && /^(<br>|<div><br><\/div>)$/.test(bodyEl.innerHTML)) bodyEl.innerHTML = '';
+  onEdit(); refreshFmt();
+});
+bodyEl.addEventListener('paste', e => { // cola sempre como texto puro, sem importar estilos de outros sites
+  e.preventDefault();
+  document.execCommand('insertText', false, (e.clipboardData || window.clipboardData).getData('text/plain'));
+});
+bodyEl.addEventListener('drop', e => e.preventDefault());
+
+/* --- desenho --- */
+const dprNow = () => Math.min(window.devicePixelRatio || 1, 3);
+const textColor = () => getComputedStyle(document.body).color;
+function styleFor(s) {
+  ictx.lineCap = 'round'; ictx.lineJoin = 'round'; ictx.lineWidth = s.w;
+  ictx.globalCompositeOperation = s.e ? 'destination-out' : 'source-over';
+  ictx.strokeStyle = ictx.fillStyle = s.e ? '#000' : (s.c || textColor());
+}
+function dot(s) { ictx.beginPath(); ictx.arc(s.p[0], s.p[1], s.w / 2, 0, Math.PI * 2); ictx.fill(); }
+function segTo(s) { // desenha só o trecho mais novo (traço fluido durante o movimento)
+  const p = s.p, n = p.length / 2; styleFor(s);
+  if (n === 1) return dot(s);
+  if (n === 2) return;
+  const i = n - 2;
+  const sx = i === 1 ? p[0] : (p[2*i-2] + p[2*i]) / 2, sy = i === 1 ? p[1] : (p[2*i-1] + p[2*i+1]) / 2;
+  ictx.beginPath(); ictx.moveTo(sx, sy);
+  ictx.quadraticCurveTo(p[2*i], p[2*i+1], (p[2*i] + p[2*i+2]) / 2, (p[2*i+1] + p[2*i+3]) / 2);
+  ictx.stroke();
+}
+function finishSeg(s) {
+  const p = s.p, n = p.length / 2; if (n < 2) return; styleFor(s); ictx.beginPath();
+  if (n === 2) { ictx.moveTo(p[0], p[1]); ictx.lineTo(p[2], p[3]); }
+  else { ictx.moveTo((p[2*n-4] + p[2*n-2]) / 2, (p[2*n-3] + p[2*n-1]) / 2); ictx.lineTo(p[2*n-2], p[2*n-1]); }
+  ictx.stroke();
+}
+function drawFull(s) {
+  const p = s.p, n = p.length / 2; styleFor(s);
+  if (n === 1) return dot(s);
+  ictx.beginPath(); ictx.moveTo(p[0], p[1]);
+  for (let i = 1; i < n - 1; i++) ictx.quadraticCurveTo(p[2*i], p[2*i+1], (p[2*i] + p[2*i+2]) / 2, (p[2*i+1] + p[2*i+3]) / 2);
+  ictx.lineTo(p[2*n-2], p[2*n-1]); ictx.stroke();
+}
+function redrawInk() {
+  ictx.save(); ictx.setTransform(1, 0, 0, 1, 0, 0); ictx.clearRect(0, 0, ink.width, ink.height); ictx.restore();
+  strokes.forEach(s => { ictx.save(); drawFull(s); ictx.restore(); });
+}
+function sizeInk() {
+  const w = paper.clientWidth, h = paper.clientHeight; if (!w || !h) return;
+  const d = dprNow();
+  ink.width = Math.round(w * d); ink.height = Math.round(h * d);
+  ink.style.width = w + 'px'; ink.style.height = h + 'px';
+  ictx.setTransform(d, 0, 0, d, 0, 0); redrawInk();
+}
+new ResizeObserver(sizeInk).observe(paper);
+function growPaper() { // a página cresce quando o desenho chega perto do fim
+  const h = paper.clientHeight, max = Math.min(12000, Math.floor(16e6 / (paper.clientWidth * dprNow() * dprNow())));
+  if (h >= max) return;
+  const nh = Math.min(max, h + 500);
+  paper.style.minHeight = nh + 'px';
+  if (current) current.inkH = nh;
+}
+const pos = e => { const r = ink.getBoundingClientRect(); return [Math.round((e.clientX - r.left) * 10) / 10, Math.round((e.clientY - r.top) * 10) / 10]; };
+ink.addEventListener('pointerdown', e => {
+  if (!drawMode || tool === 'hand' || activeId !== null || !current) return;
+  e.preventDefault();
+  try { ink.setPointerCapture(e.pointerId); } catch (_) {}
+  activeId = e.pointerId;
+  const er = tool === 'eraser';
+  const s = { c: er ? null : inkColor, w: er ? inkW * 3 + 6 : inkW, e: er, p: pos(e) };
+  strokes.push(s); if (!current.ink) current.ink = strokes;
+  segTo(s);
+});
+ink.addEventListener('pointermove', e => {
+  if (e.pointerId !== activeId) return;
+  const s = strokes[strokes.length - 1];
+  const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
+  for (const ev of (evs.length ? evs : [e])) {
+    const [x, y] = pos(ev), n = s.p.length;
+    if (Math.hypot(x - s.p[n-2], y - s.p[n-1]) < 0.8) continue;
+    s.p.push(x, y); segTo(s);
+    if (y > paper.clientHeight - 90) growPaper();
+  }
+});
+function endStroke(e) {
+  if (e.pointerId !== activeId) return;
+  activeId = null;
+  finishSeg(strokes[strokes.length - 1]);
+  if (current) { current.updated = Date.now(); save(); }
+}
+ink.addEventListener('pointerup', endStroke);
+ink.addEventListener('pointercancel', endStroke);
+
+function setTool(t) { tool = t; $('editor').dataset.tool = t; renderDrawbar(); }
+function setDrawMode(on) {
+  drawMode = on; $('editor').classList.toggle('drawing', on);
+  $('f-draw').classList.toggle('on', on);
+  bodyEl.contentEditable = on ? 'false' : 'true';
+  closePop();
+  if (on) { const s = getSelection(); s.removeAllRanges(); if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur(); setTool('pen'); }
+  else { $('editor').dataset.tool = 'pen'; refreshFmt(); }
+}
+function renderDrawbar() {
+  $('inkColors').innerHTML = INK_COLORS.map((c, i) => `<button class="dotc${c === inkColor ? ' on' : ''}" data-ci="${i}" style="background:${c || 'linear-gradient(135deg,#000 50%,#fff 50%)'}" aria-label="Cor"></button>`).join('');
+  document.querySelectorAll('#drawbar [data-tool]').forEach(b => b.classList.toggle('on', b.dataset.tool === tool));
+  document.querySelectorAll('#drawbar [data-w]').forEach(b => b.classList.toggle('on', +b.dataset.w === inkW));
+}
+$('drawbar').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.d === 'exit') setDrawMode(false);
+  else if (b.dataset.d === 'undo') { if (strokes.length) { strokes.pop(); redrawInk(); if (current) { current.updated = Date.now(); save(); } } }
+  else if (b.dataset.tool) setTool(b.dataset.tool);
+  else if (b.dataset.w) { inkW = +b.dataset.w; renderDrawbar(); }
+  else if (b.dataset.ci !== undefined) { inkColor = INK_COLORS[+b.dataset.ci]; if (tool !== 'pen') setTool('pen'); else renderDrawbar(); }
+});
+renderDrawbar();
+
+/* ---------- Calendário ---------- */
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const calTrack = $('calTrack'), calView = $('calView');
+let calY = new Date().getFullYear(), calM = new Date().getMonth(), calDrag = null, calAnim = false;
+
+function monthHtml(y, m) {
+  const first = new Date(y, m, 1).getDay(), t = new Date();
+  let h = '';
+  for (let i = 0; i < 42; i++) { // sempre 6 semanas: altura constante ao trocar de mês
+    const d = new Date(y, m, 1 - first + i);
+    const cls = 'd' + (d.getMonth() !== m ? ' out' : '') + (d.getDay() === 0 ? ' sun' : '')
+      + (d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear() ? ' today' : '');
+    h += `<div class="${cls}"><span>${d.getDate()}</span></div>`;
+  }
+  return `<div class="cal-m">${h}</div>`;
+}
+function renderCal() {
+  const p = new Date(calY, calM - 1, 1), n = new Date(calY, calM + 1, 1);
+  calTrack.innerHTML = monthHtml(p.getFullYear(), p.getMonth()) + monthHtml(calY, calM) + monthHtml(n.getFullYear(), n.getMonth());
+  calTrack.style.transition = 'none'; calTrack.style.transform = 'translateX(-33.3333%)';
+  $('calNum').textContent = String(calM + 1).padStart(2, '0');
+  $('calName').textContent = MESES[calM];
+  $('calYear').textContent = calY;
+}
+function calSlide(dir) { // -1 mês anterior, 0 volta, 1 próximo mês
+  calAnim = true;
+  calTrack.style.transition = 'transform .32s cubic-bezier(.32,.72,0,1)';
+  calTrack.style.transform = `translateX(${dir === 0 ? '-33.3333%' : dir === 1 ? '-66.6667%' : '0%'})`;
+  let done = false;
+  const fin = () => {
+    if (done) return; done = true; calAnim = false;
+    if (dir) { const d = new Date(calY, calM + dir, 1); calY = d.getFullYear(); calM = d.getMonth(); }
+    renderCal();
   };
-  var K = {};
-
-  var SECTIONS = ['Personalização', 'Tema', 'Visualização', 'Projeto'];
-  var PERS = [
-    { name: 'Modo de exibição', key: 'view' },
-    { name: 'Tema', key: 'hud' },
-    { name: 'Definir ponteiro', key: 'ptr' }
-  ];
-  var VIS = [
-    { name: 'Objetos do mundo', key: 'world' },
-    { name: 'Câmera de fundo', key: 'cam' },
-    { name: 'Rastreamento da mão', key: 'hand' },
-    { name: 'Ancorar no lugar', key: 'anchor' }
-  ];
-  var PTR_COLORS = [
-    { n: 'Branco', css: '#ffffff' }, { n: 'Preto', css: '#000000' },
-    { n: 'Azul', css: '#3b82f6' }, { n: 'Verde', css: '#22c55e' },
-    { n: 'Vermelho', css: '#ef4444' }, { n: 'Laranja', css: '#f97316' },
-    { n: 'Roxo', css: '#a855f7' }, { n: 'RGB', css: 'rgb' }
-  ];
-  var PTR_SCALE = [0.6, 0.8, 1];
-  var LINKS = [
-    { title: 'MDN Web Docs (pt-BR)', url: 'https://developer.mozilla.org/pt-BR/' },
-    { title: 'Rede de computadores (Wikipédia)', url: 'https://pt.wikipedia.org/wiki/Rede_de_computadores' },
-    { title: 'O que é DNS? (Cloudflare)', url: 'https://www.cloudflare.com/pt-br/learning/dns/what-is-dns/' }
-  ];
-  // Programas que aparecem na Loja
-  var APPS = [
-    { key: 'clock', name: 'Relógio', desc: 'Mostra a hora e a data.' },
-    { key: 'notes', name: 'Notas', desc: 'Dicas de redes para estudar.' }
-  ];
-  var LABEL = { cfg: 'Config', web: 'Web', store: 'Loja', clock: 'Relógio', notes: 'Notas' };
-
-  // Temas do mundo. grid: 'dark' | 'light' | false
-  var TH = {
-    black: {
-      name: 'Preto', bg: 0x000000, fog: 0.018, grid: 'dark', stars: true, floor: false, sun: false, shadow: false,
-      nodeBody: 0x050505, nodeEdge: 0xeaeaea, edge: 0x5a5a5a, stem: 0x3a3a3a,
-      padFill: 0xffffff, padFillOp: 0.1, padRing: 0xffffff, packet: 0xffffff,
-      label: '#f2f2f2', glow: '#000000'
-    },
-    horizon: {
-      name: 'Horizonte', bg: 0x4aa3e8, fog: 0.012, grid: false, stars: false, floor: true, sun: true, shadow: true,
-      nodeBody: 0xf7f7f7, nodeEdge: 0x0b2a40, edge: 0x0f3d63, stem: 0x0f3d63,
-      padFill: 0x000000, padFillOp: 0.16, padRing: 0x111111, packet: 0xffffff,
-      label: '#f2f2f2', glow: '#000000'
-    },
-    white: {
-      name: 'Branco', bg: 0xffffff, fog: 0.018, grid: 'light', stars: false, floor: false, sun: false, shadow: false,
-      nodeBody: 0xf2f2f2, nodeEdge: 0x111111, edge: 0x8a8a8a, stem: 0xb5b5b5,
-      padFill: 0x000000, padFillOp: 0.08, padRing: 0x111111, packet: 0x111111,
-      label: '#111111', glow: '#ffffff'
-    }
-  };
-  var THEME = 'black';
-  var T = TH.black;
-  var THEME_NAMES = ['black', 'horizon', 'white'];
-
-  /* ---------- Estado ---------- */
-  var S = {
-    started: false, gyro: false, waiting: 0, hint: '', vr: false,
-    yaw: 0, pitch: 0, yawOffset: 0, dq: new THREE.Quaternion(),
-    moving: null, cur: null, hover: null,
-    grabbing: false, dAz: 0, dH: -0.4, dist: DIST_DEFAULT, hoverIcon: -1,
-    curved: true, objOn: true, hud: 'dark', psize: 3, ptrColor: '#ffffff',
-    camOn: true, camLive: false, showHand: false, anchorOn: false, anchor: null,
-    handReady: false, hand: null, pinched: false, pinchClick: false,
-    handState: 'none', pinchOn: 0, pinchOff: 0, handPrev: null,
-    installed: { clock: false, notes: false }
-  };
-
-  function setHud(mode) {
-    S.hud = mode;
-    Object.assign(K, HUD[mode]);
-  }
-  setHud('dark');
-
-  /* ---------- Cena ---------- */
-  var scene = new THREE.Scene();
-  scene.background = new THREE.Color(T.bg);
-  scene.fog = new THREE.FogExp2(T.bg, T.fog);
-
-  // Mundo: chão, grade, estrelas e pontos de parada ficam em "world".
-  // Nós, nomes, linhas, pontinhos e sombras ficam em "objs", que pode ser ocultado sozinho.
-  var world = new THREE.Group();
-  scene.add(world);
-  var objs = new THREE.Group();
-  world.add(objs);
-
-  var gridDark = new THREE.GridHelper(80, 80, 0x333333, 0x161616);
-  var gridLight = new THREE.GridHelper(80, 80, 0xbdbdbd, 0xe4e4e4);
-  world.add(gridDark);
-  world.add(gridLight);
-
-  var stars = (function () {
-    var n = 700, pos = new Float32Array(n * 3);
-    for (var i = 0; i < n; i++) {
-      var u = Math.random() * Math.PI * 2, v = Math.acos(Math.random() * 0.96 + 0.04), r = 90;
-      pos[i * 3] = r * Math.sin(v) * Math.cos(u);
-      pos[i * 3 + 1] = r * Math.cos(v) + 2;
-      pos[i * 3 + 2] = r * Math.sin(v) * Math.sin(u);
-    }
-    var g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    var pts = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.7, color: 0x9a9a9a, fog: false, sizeAttenuation: true }));
-    world.add(pts);
-    return pts;
-  })();
-
-  function checkerTex() {
-    var c = document.createElement('canvas');
-    c.width = 256; c.height = 256;
-    var x = c.getContext('2d');
-    var cols = ['#f4f4f4', '#b9b9b9'];
-    for (var i = 0; i < 2; i++) for (var j = 0; j < 2; j++) {
-      x.fillStyle = cols[(i + j) % 2];
-      x.fillRect(i * 128, j * 128, 128, 128);
-    }
-    var t = new THREE.CanvasTexture(c);
-    t.wrapS = t.wrapT = THREE.RepeatWrapping;
-    t.repeat.set(60, 60);
-    return t;
-  }
-  var floor = new THREE.Mesh(new THREE.PlaneGeometry(240, 240), new THREE.MeshBasicMaterial({ map: checkerTex() }));
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.y = -0.005;
-  world.add(floor);
-
-  function sunTex() {
-    var c = document.createElement('canvas');
-    c.width = 256; c.height = 256;
-    var x = c.getContext('2d');
-    var g = x.createRadialGradient(128, 128, 0, 128, 128, 128);
-    g.addColorStop(0, '#fff6a8');
-    g.addColorStop(0.3, '#ffd83a');
-    g.addColorStop(0.42, '#ffd83a');
-    g.addColorStop(0.55, 'rgba(255,216,58,0.28)');
-    g.addColorStop(1, 'rgba(255,216,58,0)');
-    x.fillStyle = g;
-    x.fillRect(0, 0, 256, 256);
-    return new THREE.CanvasTexture(c);
-  }
-  var sun = new THREE.Sprite(new THREE.SpriteMaterial({ map: sunTex(), transparent: true, fog: false, depthWrite: false }));
-  sun.position.set(0, 1.4, -95);
-  sun.scale.set(18, 18, 1);
-  world.add(sun);
-
-  var NODES = [
-    { id: 'router',   name: 'Roteador',     kind: 'router',   x: 0,  y: 2.8, z: -7, r: 1.15,
-      desc: 'Encaminha pacotes entre redes diferentes usando a tabela de rotas.' },
-    { id: 'switch',   name: 'Switch',       kind: 'switch',   x: -6, y: 2.2, z: -3, r: 1.0,
-      desc: 'Liga os dispositivos da mesma rede local e entrega quadros pelo endereço MAC.' },
-    { id: 'firewall', name: 'Firewall',     kind: 'firewall', x: 6,  y: 2.2, z: -3, r: 1.0,
-      desc: 'Filtra o tráfego e permite ou bloqueia conexões conforme regras.' },
-    { id: 'dns',      name: 'Servidor DNS', kind: 'server',   x: -5, y: 2.4, z: 5,  r: 1.0,
-      desc: 'Traduz nomes de sites em endereços IP.' },
-    { id: 'web',      name: 'Servidor Web', kind: 'server',   x: 5,  y: 2.4, z: 5,  r: 1.0,
-      desc: 'Responde às requisições HTTP e HTTPS com páginas e dados.' },
-    { id: 'client',   name: 'Cliente',      kind: 'client',   x: 0,  y: 1.9, z: 8,  r: 0.9,
-      desc: 'O dispositivo do usuário, que inicia as requisições.' }
-  ];
-  var EDGES = [['router', 'switch'], ['router', 'firewall'], ['switch', 'dns'], ['firewall', 'web'], ['switch', 'client'], ['firewall', 'client']];
-  var byId = {};
-  var labels = [];
-  var NODE_BODY_MATS = [], NODE_EDGE_MATS = [], STEM_MATS = [], EDGE_MATS = [], PACKET_MATS = [];
-  var shadows = [];
-
-  function drawLabel(s) {
-    var d = s.userData, x = d.ctx;
-    x.clearRect(0, 0, 512, 128);
-    x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.font = '600 56px ' + SANS;
-    x.shadowColor = T.glow;
-    x.shadowBlur = 14;
-    x.fillStyle = T.label;
-    x.fillText(d.text, 256, 66);
-    d.tex.needsUpdate = true;
-  }
-
-  function labelSprite(text) {
-    var c = document.createElement('canvas');
-    c.width = 512; c.height = 128;
-    var tex = new THREE.CanvasTexture(c);
-    var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, fog: false }));
-    s.scale.set(3.6, 0.9, 1);
-    s.userData = { text: text, ctx: c.getContext('2d'), tex: tex };
-    drawLabel(s);
-    labels.push(s);
-    return s;
-  }
-
-  NODES.forEach(function (d) {
-    var geo;
-    if (d.kind === 'router') geo = new THREE.IcosahedronGeometry(d.r, 1);
-    else if (d.kind === 'switch') geo = new THREE.BoxGeometry(d.r * 1.9, d.r * 0.7, d.r * 1.2);
-    else if (d.kind === 'firewall') geo = new THREE.TorusGeometry(d.r * 0.8, d.r * 0.26, 8, 20);
-    else if (d.kind === 'server') geo = new THREE.CylinderGeometry(d.r * 0.7, d.r * 0.7, d.r * 1.6, 6);
-    else geo = new THREE.OctahedronGeometry(d.r);
-
-    var group = new THREE.Group();
-    group.position.set(d.x, d.y, d.z);
-    var body = new THREE.Group();
-    var bodyMat = new THREE.MeshBasicMaterial({ color: T.nodeBody });
-    var edgeMat = new THREE.LineBasicMaterial({ color: T.nodeEdge });
-    NODE_BODY_MATS.push(bodyMat); NODE_EDGE_MATS.push(edgeMat);
-    body.add(new THREE.Mesh(geo, bodyMat));
-    body.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 20), edgeMat));
-    group.add(body);
-    var label = labelSprite(d.name);
-    label.position.y = d.r + 1.0;
-    group.add(label);
-    objs.add(group);
-
-    var stemMat = new THREE.LineBasicMaterial({ color: T.stem, transparent: true, opacity: 0.5 });
-    STEM_MATS.push(stemMat);
-    var stem = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(d.x, 0, d.z), new THREE.Vector3(d.x, d.y - d.r, d.z)]);
-    objs.add(new THREE.Line(stem, stemMat));
-
-    var sh = new THREE.Mesh(new THREE.CircleGeometry(1, 24), new THREE.MeshBasicMaterial({ color: 0x0b2a40, transparent: true, opacity: 0.28, depthWrite: false }));
-    sh.rotation.x = -Math.PI / 2;
-    sh.scale.set(d.r * 0.9, d.r * 3.4, 1);
-    sh.position.set(d.x, 0.01, d.z + 1.2 + d.y * 0.7);
-    objs.add(sh);
-    shadows.push(sh);
-
-    d.group = group; d.body = body;
-    byId[d.id] = d;
-  });
-
-  var packets = [];
-  EDGES.forEach(function (e) {
-    var a = byId[e[0]], b = byId[e[1]];
-    var g = new THREE.BufferGeometry().setFromPoints([a.group.position, b.group.position]);
-    var em = new THREE.LineBasicMaterial({ color: T.edge, transparent: true, opacity: 0.7 });
-    EDGE_MATS.push(em);
-    objs.add(new THREE.Line(g, em));
-    for (var i = 0; i < 2; i++) {
-      var pm = new THREE.MeshBasicMaterial({ color: T.packet });
-      PACKET_MATS.push(pm);
-      var m = new THREE.Mesh(new THREE.SphereGeometry(0.11, 8, 8), pm);
-      objs.add(m);
-      packets.push({ a: a.group.position, b: b.group.position, t: i * 0.5 + Math.random() * 0.2, s: 0.12 + Math.random() * 0.08, m: m });
-    }
-  });
-
-  /* ---------- Pontos de parada (círculos no chão) ---------- */
-  var pads = [];
-  var padFillGeo = new THREE.CircleGeometry(0.9, 40);
-  var padRingGeo = new THREE.RingGeometry(0.8, 0.9, 48);
-  function makePad(x, z, node) {
-    var g = new THREE.Group();
-    g.position.set(x, 0.02, z);
-    g.rotation.x = -Math.PI / 2;
-    var fillMat = new THREE.MeshBasicMaterial({ color: T.padFill, transparent: true, opacity: T.padFillOp, depthWrite: false });
-    var fill = new THREE.Mesh(padFillGeo, fillMat);
-    var ringMat = new THREE.MeshBasicMaterial({ color: T.padRing, transparent: true, opacity: 0.8, depthWrite: false });
-    var ring = new THREE.Mesh(padRingGeo, ringMat);
-    g.add(fill, ring);
-    world.add(g);
-    var p = { x: x, z: z, node: node, group: g, fill: fill, fillMat: fillMat, ringMat: ringMat };
-    fill.userData.pad = p;
-    pads.push(p);
-    return p;
-  }
-  var startPad = makePad(0, 0, null);
-  S.cur = startPad;
-  NODES.forEach(function (d) { makePad(d.x * 0.6, d.z * 0.6, d); });
-
-  /* ---------- Fundo com câmera (AR simulado) ---------- */
-  // Com a câmera ligada, o fundo é o vídeo da câmera e o chão, a grade, as estrelas e o céu somem.
-  var bgScene = new THREE.Scene();
-  var bgCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 10);
-  var bgMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(2, 2),
-    new THREE.MeshBasicMaterial({ depthTest: false, depthWrite: false })
-  );
-  bgMesh.renderOrder = -1;
-  bgScene.add(bgMesh);
-
-  var video = document.createElement('video');
-  video.muted = true; video.playsInline = true; video.autoplay = true;
-  video.setAttribute('playsinline', ''); video.setAttribute('muted', '');
-  var videoTex = null, camStream = null, camStarting = false;
-
-  function applyBackdrop() {
-    var ar = S.camLive;
-    scene.background = ar ? null : new THREE.Color(T.bg);
-    scene.fog.color.set(T.bg);
-    scene.fog.density = ar ? 0 : T.fog;
-    gridDark.visible = !ar && T.grid === 'dark';
-    gridLight.visible = !ar && T.grid === 'light';
-    stars.visible = !ar && T.stars;
-    floor.visible = !ar && T.floor;
-    sun.visible = !ar && T.sun;
-    shadows.forEach(function (s) { s.visible = !ar && T.shadow; });
-  }
-
-  function startCam() {
-    if (!S.camOn || S.camLive || camStarting) return;
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setStatus('Este navegador não deixa usar a câmera. Fundo escuro.');
-      return;
-    }
-    camStarting = true;
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false })
-      .then(function (stream) {
-        camStarting = false;
-        if (!S.camOn) { stream.getTracks().forEach(function (t) { t.stop(); }); return; }
-        camStream = stream;
-        video.srcObject = stream;
-        return video.play().then(function () {
-          S.camLive = true;
-          videoTex = new THREE.VideoTexture(video);
-          bgMesh.material.map = videoTex;
-          bgMesh.material.needsUpdate = true;
-          applyBackdrop();
-          loadHands();
-          setStatus('Câmera ligada');
-        });
-      })
-      .catch(function () {
-        camStarting = false;
-        S.camLive = false;
-        applyBackdrop();
-        setStatus('Câmera negada ou indisponível. Fundo escuro. (Precisa de https.)');
-      });
-  }
-
-  function stopCam() {
-    S.camOn = false;
-    if (camStream) camStream.getTracks().forEach(function (t) { t.stop(); });
-    camStream = null;
-    video.srcObject = null;
-    S.camLive = false;
-    bgMesh.material.map = null;
-    bgMesh.material.needsUpdate = true;
-    applyBackdrop();
-  }
-
-  function setCam(on) {
-    if (on) { S.camOn = true; startCam(); }
-    else stopCam();
-  }
-
-  // Ajusta o vídeo para cobrir a área da tela sem esticar
-  function setBgUV(aspect) {
-    if (!videoTex || !video.videoWidth) return;
-    var va = video.videoWidth / video.videoHeight;
-    if (va > aspect) {
-      videoTex.repeat.set(aspect / va, 1);
-      videoTex.offset.set((1 - aspect / va) / 2, 0);
-    } else {
-      videoTex.repeat.set(1, va / aspect);
-      videoTex.offset.set(0, (1 - va / aspect) / 2);
-    }
-  }
-
-  /* ---------- Rastreamento da mão (MediaPipe Hands) ---------- */
-  var HANDS_URL = 'https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/';
-  var handsObj = null, handsLoading = false, handBusy = false;
-  var HAND_LINKS = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[0,17],[17,18],[18,19],[19,20]];
-  var TIPS = { 4: 1, 8: 1, 12: 1, 16: 1, 20: 1 };
-
-  var handCv = document.createElement('canvas');
-  handCv.id = 'hand-layer';
-  document.body.appendChild(handCv);
-
-  function loadScript(src) {
-    return new Promise(function (res, rej) {
-      var s = document.createElement('script');
-      s.src = src; s.onload = res; s.onerror = rej;
-      document.head.appendChild(s);
-    });
-  }
-
-  function loadHands() {
-    if (handsObj || handsLoading) return;
-    handsLoading = true;
-    loadScript(HANDS_URL + 'hands.js').then(function () {
-      handsObj = new window.Hands({ locateFile: function (f) { return HANDS_URL + f; } });
-      handsObj.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.5 });
-      handsObj.onResults(onHands);
-      S.handReady = true;
-    }).catch(function () {
-      setStatus('Não consegui carregar o rastreamento da mão (precisa de internet).');
-    });
-  }
-
-  // Limites em proporção do tamanho da mão. Ajustar no celular se necessário.
-  var FIST_MAX = 0.35, OPEN_MIN = 1.1, PINCH_ON = 0.3, PINCH_HOLD = 0.5, STABLE = 3;
-
-  // Mão fechada: as pontas 2, 3 e 4 ficam juntas. Mão aberta: ficam bem separadas.
-  // Pinça: polegar (0) e indicador (1) juntos, com a mão nem fechada nem aberta.
-  function classifyHand(lm) {
-    var size = Math.hypot(lm[0].x - lm[9].x, lm[0].y - lm[9].y) || 1;
-    var t = TIP_IDX.map(function (i) { return lm[i]; });
-    var pairs = [[2, 3], [2, 4], [3, 4]], sum = 0;
-    pairs.forEach(function (p) { sum += Math.hypot(t[p[0]].x - t[p[1]].x, t[p[0]].y - t[p[1]].y) / size; });
-    var spread = sum / pairs.length;
-    var d01 = Math.hypot(t[0].x - t[1].x, t[0].y - t[1].y) / size;
-    if (spread < FIST_MAX) return 'fechada';
-    if (spread > OPEN_MIN) return 'aberta';
-    if (d01 < (S.pinched ? PINCH_HOLD : PINCH_ON)) return 'pinca';
-    return 'livre';
-  }
-
-  // Só muda de estado depois de STABLE quadros seguidos: evita toque fantasma
-  function onHands(results) {
-    var lm = results && results.multiHandLandmarks && results.multiHandLandmarks[0];
-    S.hand = lm || null;
-    if (!lm) {
-      S.handState = 'none';
-      S.pinchOn = 0; S.pinchOff = (S.pinchOff || 0) + 1;
-      if (S.pinched && S.pinchOff >= STABLE) setPinch(false);
-      return;
-    }
-    var state = classifyHand(lm);
-    S.handState = state;
-    if (state === 'pinca') { S.pinchOn = (S.pinchOn || 0) + 1; S.pinchOff = 0; }
-    else { S.pinchOff = (S.pinchOff || 0) + 1; S.pinchOn = 0; }
-    if (!S.pinched && S.pinchOn >= STABLE) setPinch(true);
-    else if (S.pinched && S.pinchOff >= STABLE) setPinch(false);
-  }
-
-  function setPinch(on) {
-    if (on === !!S.pinched) return;
-    S.pinched = on;
-    if (on) handPressStart();
-    else handPressEnd(S.handState !== 'livre' && S.handState !== 'pinca');
-  }
-
-  // Posição do cursor da mão: meio entre os pontos 0 e 1, convertido para a tela
-  function handToScreen(p) {
-    var sw = stage.clientWidth, sh = stage.clientHeight, vw = video.videoWidth, vh = video.videoHeight;
-    var sc = Math.max(sw / vw, sh / vh);
-    return [(sw - vw * sc) / 2 + p.x * vw * sc, (sh - vh * sc) / 2 + p.y * vh * sc];
-  }
-  function handCursor() {
-    var a = S.hand[TIP_IDX[0]], b = S.hand[TIP_IDX[1]];
-    return handToScreen({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
-  }
-
-  function handPressStart() {
-    if (!S.hand || !video.videoWidth) return;
-    var c = handCursor();
-    press = { x: c[0], y: c[1], sx: c[0], sy: c[1], t: performance.now(), moved: 0, maxD: 0,
-              hover: S.hover, timer: 0, hand: true, held: false };
-    S.handPrev = c;
-  }
-
-  // Soltar: se durou menos de 2 s e não saiu do lugar, é clique. Se já foi segurada, não clica.
-  // Entre 2 s e 2,5 s, soltar não faz nada.
-  function handPressEnd(cancelled) {
-    if (!press || !press.hand) return;
-    var p = press;
-    press = null;
-    S.handPrev = null;
-    if (S.grabbing) { S.grabbing = false; setStatus(); return; }
-    var dur = performance.now() - p.t;
-    if (!cancelled && !p.held && dur < CLICK_PINCH_MS && p.maxD < 40) onTap(p.hover);
-  }
-
-  // Pontas numeradas: 0 polegar, 1 indicador, 2 médio, 3 anelar, 4 mindinho
-  var TIP_IDX = [4, 8, 12, 16, 20];
-  var HAND_TXT = { pinca: 'pinça', livre: 'mão livre', aberta: 'mão aberta', fechada: 'mão fechada', none: '' };
-
-  function drawHands() {
-    var hc = handCv.getContext('2d');
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    hc.setTransform(dpr, 0, 0, dpr, 0, 0);
-    hc.clearRect(0, 0, handCv.width, handCv.height);
-    if (!S.showHand || !S.hand || !S.camLive || !video.videoWidth) return;
-    var sw = stage.clientWidth, sh = stage.clientHeight;
-    var vw = video.videoWidth, vh = video.videoHeight;
-    var eyes = S.vr ? [[0, sw / 2], [sw / 2, sw / 2]] : [[0, sw]];
-    eyes.forEach(function (eye) {
-      var ox = eye[0], ww = eye[1];
-      var sc = Math.max(ww / vw, sh / vh);
-      var dx = (ww - vw * sc) / 2, dy = (sh - vh * sc) / 2;
-      var pts = S.hand.map(function (p) { return [ox + dx + p.x * vw * sc, dy + p.y * vh * sc]; });
-      hc.lineCap = 'round';
-      hc.lineWidth = 3;
-      hc.strokeStyle = 'rgba(255,255,255,0.9)';
-      HAND_LINKS.forEach(function (l) {
-        var a = pts[l[0]], b = pts[l[1]];
-        hc.beginPath(); hc.moveTo(a[0], a[1]); hc.lineTo(b[0], b[1]); hc.stroke();
-      });
-      for (var i = 0; i < pts.length; i++) {
-        var q = pts[i];
-        hc.beginPath();
-        hc.arc(q[0], q[1], TIPS[i] ? 8 : 5, 0, Math.PI * 2);
-        hc.fillStyle = TIPS[i] ? '#ffffff' : 'rgba(255,255,255,0.8)';
-        hc.fill();
-        hc.lineWidth = 2; hc.strokeStyle = '#000000'; hc.stroke();
-      }
-      // Números das pontas, de 0 a 4
-      hc.font = '600 15px ' + SANS;
-      hc.textAlign = 'left'; hc.textBaseline = 'middle';
-      TIP_IDX.forEach(function (li, n) {
-        var q = pts[li];
-        hc.lineWidth = 4; hc.strokeStyle = '#000000';
-        hc.strokeText(String(n), q[0] + 11, q[1] - 11);
-        hc.fillStyle = '#ffffff';
-        hc.fillText(String(n), q[0] + 11, q[1] - 11);
-      });
-      // Anel verde entre os pontos 0 e 1 enquanto a pinça está segurada
-      if (S.pinched) {
-        var a0 = pts[TIP_IDX[0]], a1 = pts[TIP_IDX[1]];
-        hc.beginPath();
-        hc.arc((a0[0] + a1[0]) / 2, (a0[1] + a1[1]) / 2, 22, 0, Math.PI * 2);
-        hc.lineWidth = 4; hc.strokeStyle = '#22c55e'; hc.stroke();
-      }
-    });
-    hc.font = '500 14px ' + SANS; hc.fillStyle = '#ffffff';
-    hc.textAlign = 'left'; hc.textBaseline = 'alphabetic';
-    hc.fillText(HAND_TXT[S.handState] || '', 16, 118);
-  }
-
-  function feedHands() {
-    if (!S.handReady || !S.camLive || handBusy || video.readyState < 2) return;
-    handBusy = true;
-    Promise.resolve(handsObj.send({ image: video })).then(function () { handBusy = false; }, function () { handBusy = false; });
-  }
-
-  /* ---------- Barra flutuante ---------- */
-  var DCW = 380, DCH = 150;
-  var dockCanvas = document.createElement('canvas');
-  dockCanvas.width = DCW; dockCanvas.height = DCH;
-  var dctx = dockCanvas.getContext('2d');
-  var dockTex = new THREE.CanvasTexture(dockCanvas);
-  var DOCK_W = 0.66, DOCK_H = DOCK_W * DCH / DCW;
-  var dockMesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(DOCK_W, DOCK_H),
-    new THREE.MeshBasicMaterial({ map: dockTex, transparent: true, depthWrite: false, depthTest: false })
-  );
-  dockMesh.renderOrder = 10;
-
-  var hCanvas = document.createElement('canvas');
-  hCanvas.width = 512; hCanvas.height = 72;
-  var hctx = hCanvas.getContext('2d');
-  var hTex = new THREE.CanvasTexture(hCanvas);
-  var HANDLE_W = 0.36, HANDLE_H = HANDLE_W * 72 / 512;
-  var handle = new THREE.Mesh(
-    new THREE.PlaneGeometry(HANDLE_W, HANDLE_H),
-    new THREE.MeshBasicMaterial({ map: hTex, transparent: true, depthWrite: false, depthTest: false })
-  );
-  handle.position.y = -DOCK_H / 2 - 0.03 - HANDLE_H / 2;
-  handle.renderOrder = 10;
-
-  var dock = new THREE.Group();
-  dock.add(dockMesh, handle);
-  scene.add(dock);
-
-  // Programas na barra: os três fixos e os instalados pela Loja
-  function dockIds() {
-    var ids = ['cfg', 'web', 'store'];
-    ['clock', 'notes'].forEach(function (k) { if (S.installed[k]) ids.push(k); });
-    return ids;
-  }
-  function dockCx(i, n) { return DCW / 2 + (i - (n - 1) / 2) * 72; }
-
-  function drawIcon(c, key) {
-    c.strokeStyle = K.ink; c.fillStyle = K.ink; c.lineWidth = 4; c.lineCap = 'round';
-    if (key === 'cfg') {
-      [-22, 0, 22].forEach(function (y, i) {
-        c.beginPath(); c.moveTo(-28, y); c.lineTo(28, y); c.stroke();
-        var kx = [-12, 14, -4][i];
-        c.beginPath(); c.arc(kx, y, 6, 0, Math.PI * 2); c.fill();
-      });
-    } else if (key === 'web') {
-      c.beginPath(); c.arc(0, 0, 30, 0, Math.PI * 2); c.stroke();
-      c.beginPath(); c.ellipse(0, 0, 13, 30, 0, 0, Math.PI * 2); c.stroke();
-      c.beginPath(); c.moveTo(-30, 0); c.lineTo(30, 0); c.stroke();
-    } else if (key === 'store') {
-      c.strokeRect(-26, -26, 22, 22); c.strokeRect(4, -26, 22, 22);
-      c.strokeRect(-26, 4, 22, 22); c.strokeRect(4, 4, 22, 22);
-    } else if (key === 'clock') {
-      c.beginPath(); c.arc(0, 0, 30, 0, Math.PI * 2); c.stroke();
-      c.beginPath(); c.moveTo(0, 0); c.lineTo(0, -17); c.moveTo(0, 0); c.lineTo(12, 6); c.stroke();
-    } else if (key === 'notes') {
-      c.strokeRect(-22, -28, 44, 56);
-      c.beginPath(); c.moveTo(-14, -10); c.lineTo(14, -10); c.moveTo(-14, 4); c.lineTo(14, 4); c.moveTo(-14, 18); c.lineTo(4, 18); c.stroke();
-    }
-  }
-
-  function drawDock() {
-    var c = dctx, ids = dockIds();
-    c.clearRect(0, 0, DCW, DCH);
-    rrect(c, 4, 4, DCW - 8, DCH - 8, 40);
-    c.fillStyle = K.panel; c.fill();
-    c.lineWidth = 2; c.strokeStyle = K.line; c.stroke();
-
-    ids.forEach(function (id, i) {
-      var open = wins[id].open, hov = S.hoverIcon === i, cx = dockCx(i, ids.length);
-      c.save();
-      c.translate(cx, 70);
-      c.scale(0.62, 0.62);
-      rrect(c, -50, -50, 100, 100, 22);
-      c.fillStyle = hov ? K.hovIcon : K.idle; c.fill();
-      drawIcon(c, id);
-      c.restore();
-
-      // Indicador de programa aberto: fica dentro da barra, logo acima do ícone
-      if (open) {
-        rrect(c, cx - 14, 14, 28, 5, 2.5);
-        c.fillStyle = K.ink; c.fill();
-      }
-      c.font = '500 18px ' + SANS;
-      c.textAlign = 'center'; c.textBaseline = 'alphabetic';
-      c.fillStyle = open ? K.ink : K.muted;
-      c.fillText(LABEL[id], cx, 136);
-    });
-    dockTex.needsUpdate = true;
-  }
-
-  function drawHandle() {
-    var c = hctx, W = 512, H = 72;
-    c.clearRect(0, 0, W, H);
-    rrect(c, 4, 10, W - 8, H - 20, 26);
-    c.fillStyle = S.grabbing ? K.sel : K.handle;
-    c.fill();
-    c.font = '500 26px ' + SANS;
-    c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.fillStyle = S.grabbing ? K.selInk : K.ink;
-    c.fillText(S.grabbing ? 'arraste: baixo aproxima, cima afasta' : 'segure para mover', W / 2, H / 2 + 1);
-    hTex.needsUpdate = true;
-  }
-
-  var lastDockKey = '';
-  function refreshDock() {
-    var ids = dockIds();
-    var key = [ids.join(','), ids.map(function (id) { return wins[id].open ? 1 : 0; }).join(''), S.hoverIcon, S.grabbing, S.hud].join('|');
-    if (key !== lastDockKey) {
-      lastDockKey = key;
-      drawDock();
-      drawHandle();
-    }
-  }
-
-  /* ---------- Janelas 16:9 em arco ao redor do usuário ---------- */
-  var WIN_W = 2.8, WIN_H = WIN_W * 9 / 16, WCW = 1024, WCH = 576, GAP_W = 0.14;
-  var SLOT_ORDER = [0, 1, -1, 2, -2, 3, -3];
-
-  // Plano curvo: as bordas se curvam na direção do usuário
-  function curvedPlane(w, h, R) {
-    var g = new THREE.PlaneGeometry(w, h, 40, 12);
-    var p = g.attributes.position;
-    for (var i = 0; i < p.count; i++) {
-      var th = p.getX(i) / R;
-      p.setX(i, R * Math.sin(th));
-      p.setZ(i, R * (1 - Math.cos(th)));
-    }
-    p.needsUpdate = true;
-    g.computeBoundingSphere();
-    return g;
-  }
-  function winGeometry() {
-    return S.curved ? curvedPlane(WIN_W, WIN_H, CURVE_R) : new THREE.PlaneGeometry(WIN_W, WIN_H);
-  }
-
-  function rrect(c, x, y, w, h, r) {
-    c.beginPath();
-    c.moveTo(x + r, y);
-    c.arcTo(x + w, y, x + w, y + h, r);
-    c.arcTo(x + w, y + h, x, y + h, r);
-    c.arcTo(x, y + h, x, y, r);
-    c.arcTo(x, y, x + w, y, r);
-    c.closePath();
-  }
-
-  function makeWin(key, title, draw) {
-    var c = document.createElement('canvas');
-    c.width = WCW; c.height = WCH;
-    var tex = new THREE.CanvasTexture(c);
-    var mesh = new THREE.Mesh(
-      winGeometry(),
-      new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, depthTest: false })
-    );
-    mesh.renderOrder = 11;
-    mesh.visible = false;
-    var w = { key: key, title: title, canvas: c, ctx: c.getContext('2d'), tex: tex, mesh: mesh,
-              open: false, slot: 0, sel: 0, sub: 0, hov: null, dkey: '', draw: draw, url: null };
-    mesh.userData.win = w;
-    scene.add(mesh);
-    return w;
-  }
-
-  function winFrame(c, w) {
-    c.clearRect(0, 0, WCW, WCH);
-    rrect(c, 3, 3, WCW - 6, WCH - 6, 12);
-    c.fillStyle = K.win; c.fill();
-    c.lineWidth = 3; c.strokeStyle = K.line; c.stroke();
-    c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-    c.font = '600 32px ' + SANS; c.fillStyle = K.ink;
-    c.fillText(w.title, 36, 52);
-    c.beginPath(); c.arc(WCW - 60, 42, 22, 0, Math.PI * 2);
-    c.fillStyle = w.hov === 'close' ? K.line : K.hov;
-    c.fill();
-    c.strokeStyle = K.ink; c.lineWidth = 4; c.lineCap = 'round';
-    c.beginPath(); c.moveTo(WCW - 70, 32); c.lineTo(WCW - 50, 52); c.moveTo(WCW - 50, 32); c.lineTo(WCW - 70, 52); c.stroke();
-    c.beginPath(); c.moveTo(3, 74); c.lineTo(WCW - 3, 74);
-    c.lineWidth = 2; c.strokeStyle = K.line; c.stroke();
-  }
-
-  // Tema: três cartões na área da direita
-  var THEME_CARDS = [
-    { x: 300, y: 200, w: 220, h: 280, name: 'black' },
-    { x: 540, y: 200, w: 220, h: 280, name: 'horizon' },
-    { x: 780, y: 200, w: 220, h: 280, name: 'white' }
-  ];
-
-  // Listas de opções (à esquerda) e botões de subseção (à direita)
-  var OPT_X = 300, OPT_W = 360, OPT_Y0 = 205, OPT_H = 60, OPT_GAP = 72;
-  var SUB_X = 680, SUB_W = 320;
-
-  function drawOptions(c, w, prefix, caption, opts, selIdx) {
-    c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-    c.font = '400 22px ' + SANS; c.fillStyle = K.muted;
-    c.fillText(caption, OPT_X, 190);
-    opts.forEach(function (o, i) {
-      var y = OPT_Y0 + i * OPT_GAP, sel = selIdx === i, hov = w.hov === prefix + ':' + i;
-      rrect(c, OPT_X, y, OPT_W, OPT_H, 10);
-      c.fillStyle = hov ? K.hov : K.card; c.fill();
-      c.lineWidth = sel ? 3 : 2; c.strokeStyle = sel ? K.ink : K.line; c.stroke();
-      c.beginPath(); c.arc(OPT_X + 34, y + OPT_H / 2, 11, 0, Math.PI * 2);
-      c.lineWidth = 3; c.strokeStyle = K.ink; c.stroke();
-      if (sel) { c.beginPath(); c.arc(OPT_X + 34, y + OPT_H / 2, 5, 0, Math.PI * 2); c.fillStyle = K.ink; c.fill(); }
-      c.font = '500 26px ' + SANS; c.fillStyle = K.ink;
-      c.textBaseline = 'middle';
-      c.fillText(o, OPT_X + 70, y + OPT_H / 2 + 1);
-      c.textBaseline = 'alphabetic';
-    });
-  }
-
-  function drawThemeCards(w) {
-    var c = w.ctx;
-    THEME_CARDS.forEach(function (card, i) {
-      var active = THEME === card.name, hov = w.hov === 'theme:' + i;
-      var x = card.x, y = card.y, cw = card.w;
-      rrect(c, x, y, cw, card.h, 12);
-      c.fillStyle = hov ? K.hov : K.card; c.fill();
-      c.lineWidth = active ? 4 : 2;
-      c.strokeStyle = active ? K.ink : K.line; c.stroke();
-
-      c.save();
-      rrect(c, x + 16, y + 16, cw - 32, 190, 8);
-      c.clip();
-      if (card.name === 'black') {
-        c.fillStyle = '#000000'; c.fillRect(x + 16, y + 16, cw - 32, 190);
-        c.strokeStyle = 'rgba(255,255,255,0.14)'; c.lineWidth = 1;
-        for (var gx = 0; gx <= cw - 32; gx += 24) { c.beginPath(); c.moveTo(x + 16 + gx, y + 16); c.lineTo(x + 16 + gx, y + 206); c.stroke(); }
-        c.fillStyle = '#f2f2f2';
-        [[x + cw * 0.3, y + 80], [x + cw * 0.5, y + 130], [x + cw * 0.7, y + 80]].forEach(function (p) {
-          c.beginPath(); c.arc(p[0], p[1], 8, 0, Math.PI * 2); c.fill();
-        });
-      } else if (card.name === 'white') {
-        c.fillStyle = '#ffffff'; c.fillRect(x + 16, y + 16, cw - 32, 190);
-        c.strokeStyle = '#d6d6d6'; c.lineWidth = 1;
-        for (var gw = 0; gw <= cw - 32; gw += 24) { c.beginPath(); c.moveTo(x + 16 + gw, y + 16); c.lineTo(x + 16 + gw, y + 206); c.stroke(); }
-        c.fillStyle = '#111111';
-        [[x + cw * 0.3, y + 80], [x + cw * 0.5, y + 130], [x + cw * 0.7, y + 80]].forEach(function (p) {
-          c.beginPath(); c.arc(p[0], p[1], 8, 0, Math.PI * 2); c.fill();
-        });
-      } else {
-        var sky = c.createLinearGradient(0, y + 16, 0, y + 124);
-        sky.addColorStop(0, '#4aa3e8'); sky.addColorStop(1, '#8cc8f2');
-        c.fillStyle = sky; c.fillRect(x + 16, y + 16, cw - 32, 110);
-        c.fillStyle = '#f4f4f4'; c.fillRect(x + 16, y + 124, cw - 32, 82);
-        for (var r = 0; r < 3; r++) for (var q = 0; q < 8; q++) {
-          if ((r + q) % 2 === 0) { c.fillStyle = '#b9b9b9'; c.fillRect(x + 16 + q * 36, y + 124 + r * 27, 36, 27); }
-        }
-        c.fillStyle = '#ffd83a';
-        c.beginPath(); c.arc(x + cw / 2, y + 124, 16, Math.PI, 0); c.fill();
-      }
-      c.restore();
-
-      c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-      c.font = '600 28px ' + SANS; c.fillStyle = K.ink;
-      c.fillText(TH[card.name].name, x + 24, y + 240);
-      c.font = '400 20px ' + SANS; c.fillStyle = K.muted;
-      c.fillText(active ? 'em uso' : '2x para aplicar', x + 24, y + 268);
-    });
-  }
-
-  // Definir ponteiro: tamanho (3 opções) e cor (paleta)
-  var CHIP_Y = 205, CHIP_W = 110, CHIP_H = 60;
-  var SWATCH_X0 = 343, SWATCH_DX = 87, SWATCH_ROW_Y = [360, 460];
-  var PTR_SIZES = [{ v: 1, t: '1 Pequeno' }, { v: 2, t: '2 Médio' }, { v: 3, t: '3 Normal' }];
-
-  function drawPointer(c, w) {
-    c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-    c.font = '400 22px ' + SANS; c.fillStyle = K.muted;
-    c.fillText('Tamanho do ponteiro', OPT_X, 190);
-    PTR_SIZES.forEach(function (sz, i) {
-      var x = OPT_X + i * 120, y = CHIP_Y, sel = S.psize === sz.v, hov = w.hov === 'psize:' + sz.v;
-      rrect(c, x, y, CHIP_W, CHIP_H, 10);
-      c.fillStyle = sel ? K.sel : (hov ? K.hov : K.card); c.fill();
-      c.lineWidth = sel ? 3 : 2; c.strokeStyle = sel ? K.ink : K.line; c.stroke();
-      c.font = '500 20px ' + SANS; c.fillStyle = sel ? K.selInk : K.ink;
-      c.textAlign = 'center'; c.textBaseline = 'middle';
-      c.fillText(sz.t, x + CHIP_W / 2, y + CHIP_H / 2 + 1);
-    });
-
-    c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-    c.font = '400 22px ' + SANS; c.fillStyle = K.muted;
-    c.fillText('Cor do ponteiro', OPT_X, 320);
-    PTR_COLORS.forEach(function (p, i) {
-      var row = i >= 4 ? 1 : 0, col = i % 4;
-      var cx = SWATCH_X0 + col * SWATCH_DX, cy = SWATCH_ROW_Y[row];
-      var sel = S.ptrColor === p.css;
-      if (sel) {
-        c.beginPath(); c.arc(cx, cy, 36, 0, Math.PI * 2);
-        c.lineWidth = 3; c.strokeStyle = K.ink; c.stroke();
-      }
-      c.beginPath(); c.arc(cx, cy, 28, 0, Math.PI * 2);
-      if (p.css === 'rgb') {
-        var g = c.createLinearGradient(cx - 28, cy, cx + 28, cy);
-        g.addColorStop(0, '#ff3b3b'); g.addColorStop(0.2, '#ffd23b'); g.addColorStop(0.4, '#3bff6a');
-        g.addColorStop(0.6, '#3bd8ff'); g.addColorStop(0.8, '#7a3bff'); g.addColorStop(1, '#ff3bd8');
-        c.fillStyle = g;
-      } else {
-        c.fillStyle = p.css;
-      }
-      c.fill();
-      c.lineWidth = 2; c.strokeStyle = K.line; c.stroke();
-      c.font = '400 17px ' + SANS; c.fillStyle = K.muted;
-      c.textAlign = 'center';
-      c.fillText(p.n, cx, cy + 52);
-    });
-    c.textAlign = 'left';
-  }
-
-  // Coluna da direita com os botões de subseção (mesmo estilo da lista da esquerda)
-  function drawSubs(c, w, list) {
-    c.beginPath(); c.moveTo(660, 75); c.lineTo(660, WCH - 3);
-    c.lineWidth = 2; c.strokeStyle = K.line; c.stroke();
-    list.forEach(function (s, i) {
-      var y = 100 + i * 72, sel = (w.sub || 0) === i, hov = w.hov === 'sub:' + i;
-      rrect(c, SUB_X, y, SUB_W, 66, 10);
-      c.fillStyle = sel ? K.sel : (hov ? K.hov : 'rgba(0,0,0,0)');
-      c.fill();
-      c.font = '500 26px ' + SANS;
-      c.fillStyle = sel ? K.selInk : K.ink;
-      c.textAlign = 'left'; c.textBaseline = 'middle';
-      c.fillText(s.name, SUB_X + 20, y + 34);
-    });
-    c.textBaseline = 'alphabetic';
-  }
-
-  function drawPers(c, w) {
-    drawSubs(c, w, PERS);
-    var key = PERS[w.sub || 0].key;
-    if (key === 'view') {
-      drawOptions(c, w, 'curve', 'Formato da tela', ['Tela curvada', 'Tela reta'], S.curved ? 0 : 1);
-    } else if (key === 'hud') {
-      drawOptions(c, w, 'hud', 'Cor da barra e das janelas', ['Claro', 'Escuro'], S.hud === 'light' ? 0 : 1);
-    } else {
-      drawPointer(c, w);
-    }
-  }
-
-  function drawVis(c, w) {
-    drawSubs(c, w, VIS);
-    var key = VIS[w.sub || 0].key;
-    if (key === 'world') {
-      drawOptions(c, w, 'world', 'Objetos, nomes e linhas', ['Mostrar', 'Ocultar'], S.objOn ? 0 : 1);
-    } else if (key === 'cam') {
-      drawOptions(c, w, 'cam', 'Câmera ao fundo (AR)', ['Ligada', 'Desligada'], S.camOn ? 0 : 1);
-    } else if (key === 'hand') {
-      drawOptions(c, w, 'hand', 'Linhas e bolinhas da mão', ['Mostrar', 'Ocultar'], S.showHand ? 0 : 1);
-      c.font = '400 22px ' + SANS; c.fillStyle = K.muted;
-      c.fillText('O rastreamento segue ativo; isto só mostra o desenho.', OPT_X, 400);
-    } else {
-      drawOptions(c, w, 'anchor', 'Barra e janelas presas no lugar', ['Ativar', 'Desativar'], S.anchorOn ? 0 : 1);
-      c.font = '400 22px ' + SANS; c.fillStyle = K.muted;
-      c.fillText('Ao andar até elas, ficam maiores. Teste: não detecta a parede.', OPT_X, 400);
-    }
-  }
-
-  function drawCfg(w) {
-    var c = w.ctx;
-    winFrame(c, w);
-    c.fillStyle = K.side;
-    c.fillRect(3, 75, 260, WCH - 78);
-    c.beginPath(); c.moveTo(260, 75); c.lineTo(260, WCH - 3); c.lineWidth = 2; c.strokeStyle = K.line; c.stroke();
-
-    SECTIONS.forEach(function (s, i) {
-      var y = 100 + i * 72, sel = w.sel === i, hov = w.hov === 'side:' + i;
-      rrect(c, 20, y, 220, 66, 10);
-      c.fillStyle = sel ? K.sel : (hov ? K.hov : 'rgba(0,0,0,0)');
-      c.fill();
-      c.font = '500 26px ' + SANS;
-      c.fillStyle = sel ? K.selInk : K.ink;
-      c.textAlign = 'left'; c.textBaseline = 'middle';
-      c.fillText(s, 40, y + 34);
-    });
-
-    var sec = SECTIONS[w.sel];
-    c.textBaseline = 'alphabetic'; c.textAlign = 'left';
-    c.font = '600 44px ' + SANS; c.fillStyle = K.ink;
-    c.fillText(sec, 300, 130);
-
-    if (sec === 'Personalização') {
-      drawPers(c, w);
-    } else if (sec === 'Tema') {
-      c.font = '400 22px ' + SANS; c.fillStyle = K.muted;
-      c.fillText('Toque duas vezes num tema para aplicar.', 300, 180);
-      drawThemeCards(w);
-    } else if (sec === 'Visualização') {
-      drawVis(c, w);
-    } else if (sec === 'Projeto') {
-      c.font = '600 30px ' + SANS; c.fillStyle = K.ink;
-      c.fillText('Rede em VR', 300, 200);
-      c.font = '400 24px ' + SANS; c.fillStyle = K.muted;
-      c.fillText('Versão 10', 300, 244);
-      c.fillText('Cena 3D de rede para celular, com câmera e mão.', 300, 282);
-    }
-  }
-
-  function drawWeb(w) {
-    var c = w.ctx;
-    winFrame(c, w);
-    rrect(c, 36, 100, WCW - 72, 70, 10);
-    c.fillStyle = K.idle; c.fill();
-    c.font = '400 26px ' + SANS; c.fillStyle = K.muted;
-    c.textAlign = 'left'; c.textBaseline = 'middle';
-    c.fillText(w.url ? w.url : 'https://  escolha um site abaixo', 66, 136, w.url ? 700 : 1000);
-
-    if (w.url) {
-      rrect(c, WCW - 236, 110, 200, 50, 10);
-      c.fillStyle = w.hov === 'newtab' ? K.hov : K.card; c.fill();
-      c.font = '500 22px ' + SANS; c.fillStyle = K.ink;
-      c.textAlign = 'center';
-      c.fillText('Nova aba', WCW - 136, 136);
-      c.textAlign = 'left';
-    } else {
-      c.font = '400 24px ' + SANS; c.fillStyle = K.muted;
-      c.textBaseline = 'alphabetic';
-      c.fillText('Toque num site para abrir dentro da janela.', 40, 214);
-      LINKS.forEach(function (l, i) {
-        var y = 240 + i * 104, hov = w.hov === 'link:' + i;
-        rrect(c, 36, y, WCW - 72, 88, 10);
-        c.fillStyle = hov ? K.hov : K.card; c.fill();
-        c.lineWidth = 2; c.strokeStyle = K.line; c.stroke();
-        c.font = '600 30px ' + SANS; c.fillStyle = K.ink;
-        c.fillText(l.title, 66, y + 38);
-        c.font = '400 22px ' + SANS; c.fillStyle = K.muted;
-        c.fillText(l.url, 66, y + 70);
-      });
-    }
-  }
-
-  function drawStore(w) {
-    var c = w.ctx;
-    winFrame(c, w);
-    c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-    c.font = '400 24px ' + SANS; c.fillStyle = K.muted;
-    c.fillText('Toque em Baixar para adicionar o programa à barra.', 40, 122);
-    APPS.forEach(function (a, i) {
-      var y = 150 + i * 190, inst = S.installed[a.key], hov = w.hov === 'get:' + a.key;
-      rrect(c, 36, y, WCW - 72, 160, 10);
-      c.fillStyle = K.card; c.fill();
-      c.lineWidth = 2; c.strokeStyle = K.line; c.stroke();
-      c.font = '600 34px ' + SANS; c.fillStyle = K.ink;
-      c.fillText(a.name, 66, y + 64);
-      c.font = '400 24px ' + SANS; c.fillStyle = K.muted;
-      c.fillText(a.desc, 66, y + 110);
-      rrect(c, WCW - 296, y + 50, 220, 60, 10);
-      c.fillStyle = inst ? K.card : (hov ? K.hov : K.sel); c.fill();
-      c.lineWidth = 2; c.strokeStyle = K.line; c.stroke();
-      c.font = '500 24px ' + SANS;
-      c.textAlign = 'center'; c.textBaseline = 'middle';
-      c.fillStyle = inst ? K.muted : K.selInk;
-      c.fillText(inst ? 'Instalado' : 'Baixar', WCW - 186, y + 81);
-      c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-    });
-  }
-
-  function drawClock(w) {
-    var c = w.ctx, d = new Date();
-    winFrame(c, w);
-    var pad = function (n) { return ('0' + n).slice(-2); };
-    c.textAlign = 'center'; c.textBaseline = 'alphabetic';
-    c.font = '600 200px ' + SANS; c.fillStyle = K.ink;
-    c.fillText(pad(d.getHours()) + ':' + pad(d.getMinutes()), WCW / 2, 390);
-    c.font = '400 40px ' + SANS; c.fillStyle = K.muted;
-    c.fillText(pad(d.getSeconds()) + ' · ' + d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }), WCW / 2, 470);
-    c.textAlign = 'left';
-  }
-
-  var NOTES_TIPS = [
-    'Roteador conecta redes diferentes.',
-    'Ele escolhe o caminho dos pacotes.',
-    'Switch liga aparelhos da mesma rede.',
-    'Ele usa o endereço MAC de cada um.',
-    'Firewall filtra o tráfego que entra.',
-    'Regras dizem o que pode e o que não pode.',
-    'DNS transforma nomes em endereços IP.',
-    'Ex.: um nome de site vira um número de IP.',
-    'Servidor Web responde com HTTP ou HTTPS.',
-    'Cliente é quem começa cada pedido.',
-    'Pacote é um pedaço de dado da rede.',
-    'Protocolo é a regra que os dois lados seguem.'
-  ];
-
-  function drawNotes(w) {
-    var c = w.ctx;
-    winFrame(c, w);
-    c.textAlign = 'left'; c.textBaseline = 'alphabetic';
-    c.font = '600 34px ' + SANS; c.fillStyle = K.ink;
-    c.fillText('Dicas de redes', 40, 130);
-    c.save();
-    c.beginPath(); c.rect(3, 150, WCW - 6, WCH - 154); c.clip();
-    c.translate(0, -(w.scroll || 0));
-    NOTES_TIPS.forEach(function (t, i) {
-      c.font = '400 26px ' + SANS; c.fillStyle = K.ink;
-      c.fillText((i + 1) + '.  ' + t, 40, 200 + i * 80);
-    });
-    c.restore();
-  }
-
-  var wins = {
-    cfg: makeWin('cfg', 'Configurações', drawCfg),
-    web: makeWin('web', 'Web', drawWeb),
-    store: makeWin('store', 'Loja', drawStore),
-    clock: makeWin('clock', 'Relógio', drawClock),
-    notes: makeWin('notes', 'Notas', drawNotes)
-  };
-
-  var frameEl = $('web-frame');
-  function setFrame(url) {
-    if (url) {
-      if (frameEl.getAttribute('data-url') !== url) {
-        frameEl.setAttribute('data-url', url);
-        frameEl.src = url;
-      }
-    } else {
-      frameEl.removeAttribute('data-url');
-      frameEl.src = 'about:blank';
-    }
-  }
-
-  function openWin(w) {
-    if (w.open) return;
-    var used = Object.keys(wins).filter(function (k) { return wins[k].open; }).map(function (k) { return wins[k].slot; });
-    var slot = SLOT_ORDER.filter(function (s) { return used.indexOf(s) < 0; })[0];
-    w.slot = slot === undefined ? 0 : slot;
-    w.open = true;
-    w.mesh.visible = true;
-    w.dkey = '';
-  }
-
-  function closeWin(w) {
-    w.open = false;
-    w.mesh.visible = false;
-    w.hov = null;
-    if (w.key === 'web') { w.url = null; setFrame(null); }
-  }
-
-  function toggleWin(key) {
-    var w = wins[key];
-    if (w.open) closeWin(w); else openWin(w);
-  }
-
-  // Cada janela fica num arco ao redor de você, do lado da anterior; a barra é o centro do arco
-  // Sem ancoragem, o arco segue você. Com ancoragem, o arco fica parado no lugar onde foi ligado.
-  function baseArc() {
-    if (S.anchorOn && S.anchor) return S.anchor;
-    return { cx: rig.position.x, cz: rig.position.z, y: EYE + S.dH, az: S.dAz, dist: S.dist };
-  }
-
-  function updateWindows() {
-    var A = baseArc();
-    var y = A.y + DOCK_H / 2 + 0.12 + WIN_H / 2;
-    Object.keys(wins).forEach(function (k) {
-      var w = wins[k];
-      if (!w.open) return;
-      var a = A.az + w.slot * (WIN_W + GAP_W) / A.dist;
-      w.mesh.position.set(A.cx + Math.sin(a) * A.dist, y, A.cz - Math.cos(a) * A.dist);
-      w.mesh.rotation.set(0, -a, 0);
-    });
-  }
-
-  function setAnchor(on) {
-    S.anchorOn = on;
-    S.anchor = on ? { cx: rig.position.x, cz: rig.position.z, y: EYE + S.dH, az: S.dAz, dist: S.dist } : null;
-  }
-
-  function refreshWins() {
-    Object.keys(wins).forEach(function (k) {
-      var w = wins[k];
-      if (!w.open) return;
-      var tick = w.key === 'clock' ? Math.floor(Date.now() / 1000) : '';
-      var key = [w.sel, w.sub || 0, w.hov || '', THEME, S.hud, S.curved ? 1 : 0, S.objOn ? 1 : 0,
-                 S.psize, S.ptrColor, S.camOn ? 1 : 0, S.showHand ? 1 : 0, S.installed.clock ? 1 : 0,
-                 S.installed.notes ? 1 : 0, S.anchorOn ? 1 : 0, w.url || '', S.grabbing ? 1 : 0, tick].join('|');
-      if (key !== w.dkey) {
-        w.dkey = key;
-        w.draw(w);
-        w.tex.needsUpdate = true;
-      }
-    });
-  }
-
-  function setCurved(on) {
-    S.curved = on;
-    Object.keys(wins).forEach(function (k) {
-      var w = wins[k];
-      w.mesh.geometry.dispose();
-      w.mesh.geometry = winGeometry();
-    });
-  }
-
-  function setObjs(on) {
-    S.objOn = on;
-    objs.visible = on;
-  }
-
-  /* ---------- Cabeça (câmeras) ---------- */
-  var rig = new THREE.Group();
-  rig.position.set(0, EYE, 0);
-  scene.add(rig);
-  var cam = new THREE.PerspectiveCamera(70, 1, 0.05, 220);
-  var camL = new THREE.PerspectiveCamera(75, 1, 0.05, 220);
-  var camR = new THREE.PerspectiveCamera(75, 1, 0.05, 220);
-  camL.position.x = -IPD / 2; camR.position.x = IPD / 2;
-  rig.add(cam, camL, camR);
-
-  var reticle = new THREE.Group();
-  reticle.position.z = -2.2;
-  var rRing = new THREE.Mesh(new THREE.RingGeometry(0.045, 0.06, 32), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, depthTest: false, fog: false }));
-  var rDisc = new THREE.Mesh(new THREE.CircleGeometry(0.045, 24), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95, depthTest: false, fog: false }));
-  rRing.renderOrder = 20; rDisc.renderOrder = 21;
-  rDisc.visible = false;
-  reticle.add(rRing, rDisc);
-  reticle.visible = false;
-  rig.add(reticle);
-  var ptrCol = new THREE.Color();
-
-  function updatePointer() {
-    reticle.scale.setScalar(PTR_SCALE[S.psize - 1] || 1);
-    if (S.ptrColor === 'rgb') ptrCol.setHSL((performance.now() / 6000) % 1, 1, 0.6);
-    else ptrCol.set(S.ptrColor);
-    rRing.material.color.copy(ptrCol);
-    rDisc.material.color.copy(ptrCol);
-  }
-
-  var targets = [dockMesh, handle].concat(Object.keys(wins).map(function (k) { return wins[k].mesh; }))
-    .concat(pads.map(function (p) { return p.fill; }));
-  var raycaster = new THREE.Raycaster();
-  var aimDir = new THREE.Vector3();
-  var tmpV = new THREE.Vector3();
-  var tmpE = new THREE.Euler(), q0 = new THREE.Quaternion(), q1 = new THREE.Quaternion(-Math.SQRT1_2, 0, 0, Math.SQRT1_2);
-  var qYaw = new THREE.Quaternion();
-  var Yaxis = new THREE.Vector3(0, 1, 0), Zaxis = new THREE.Vector3(0, 0, 1);
-  var rad = THREE.MathUtils.degToRad;
-
-  function iconAt(x, y) {
-    if (y < 30 || y > 112) return -1;
-    var ids = dockIds();
-    for (var i = 0; i < ids.length; i++) {
-      if (Math.abs(x - dockCx(i, ids.length)) <= 36) return i;
-    }
-    return -1;
-  }
-
-  function optHit(prefix, x, y, n) {
-    if (x < OPT_X || x > OPT_X + OPT_W) return 'body';
-    for (var i = 0; i < n; i++) {
-      var y0 = OPT_Y0 + i * OPT_GAP;
-      if (y >= y0 && y <= y0 + OPT_H) return prefix + ':' + i;
-    }
-    return 'body';
-  }
-
-  function pointerHit(x, y) {
-    if (y >= CHIP_Y && y <= CHIP_Y + CHIP_H) {
-      for (var i = 0; i < PTR_SIZES.length; i++) {
-        var cx = OPT_X + i * 120;
-        if (x >= cx && x <= cx + CHIP_W) return 'psize:' + PTR_SIZES[i].v;
-      }
-    }
-    if (y >= 320 && y <= 535 && x >= SWATCH_X0 - 43 && x <= SWATCH_X0 + 3 * SWATCH_DX + 43) {
-      var row = y < 420 ? 0 : 1;
-      var col = Math.round((x - SWATCH_X0) / SWATCH_DX);
-      var idx = row * 4 + col;
-      if (idx >= 0 && idx < PTR_COLORS.length && Math.abs(x - (SWATCH_X0 + col * SWATCH_DX)) <= 43) return 'pcol:' + idx;
-    }
-    return 'body';
-  }
-
-  function hitWin(w, x, y) {
-    if (y < 74) return (x > WCW - 110) ? 'close' : 'bar';
-    if (w.key === 'cfg') {
-      if (x < 260) {
-        var idx = Math.floor((y - 100) / 72);
-        if (idx >= 0 && idx < SECTIONS.length && y - (100 + idx * 72) <= 66) return 'side:' + idx;
-        return 'body';
-      }
-      var sec = SECTIONS[w.sel];
-      if (sec === 'Tema') {
-        for (var t = 0; t < THEME_CARDS.length; t++) {
-          var cd = THEME_CARDS[t];
-          if (x >= cd.x && x <= cd.x + cd.w && y >= cd.y && y <= cd.y + cd.h) return 'theme:' + t;
-        }
-        return 'body';
-      }
-      if (sec === 'Personalização' || sec === 'Visualização') {
-        var list = sec === 'Personalização' ? PERS : VIS;
-        if (x >= SUB_X) {
-          var si = Math.floor((y - 100) / 72);
-          if (si >= 0 && si < list.length && y - (100 + si * 72) <= 66) return 'sub:' + si;
-          return 'body';
-        }
-        var key = list[w.sub || 0].key;
-        if (sec === 'Personalização') {
-          if (key === 'view') return optHit('curve', x, y, 2);
-          if (key === 'hud') return optHit('hud', x, y, 2);
-          return pointerHit(x, y);
-        }
-        if (key === 'world') return optHit('world', x, y, 2);
-        if (key === 'cam') return optHit('cam', x, y, 2);
-        if (key === 'anchor') return optHit('anchor', x, y, 2);
-        return optHit('hand', x, y, 2);
-      }
-      return 'body';
-    }
-    if (w.key === 'store') {
-      for (var a = 0; a < APPS.length; a++) {
-        var ay = 150 + a * 190;
-        if (x >= WCW - 296 && x <= WCW - 76 && y >= ay + 50 && y <= ay + 110) return 'get:' + APPS[a].key;
-      }
-      return 'body';
-    }
-    if (w.key !== 'web') return 'body';
-    // janela Web
-    if (y >= 100 && y <= 170 && x >= 36 && x <= WCW - 36) {
-      if (!w.url) return 'body';
-      return x >= WCW - 236 ? 'newtab' : 'back';
-    }
-    if (!w.url) {
-      for (var i = 0; i < LINKS.length; i++) {
-        var ly = 240 + i * 104;
-        if (x >= 36 && x <= WCW - 36 && y >= ly && y <= ly + 88) return 'link:' + i;
-      }
-    }
-    return 'body';
-  }
-
-  function aim() {
-    aimDir.set(0, 0, -1).applyQuaternion(rig.quaternion);
-    raycaster.set(rig.position, aimDir);
-    var hits = raycaster.intersectObjects(targets, false);
-    for (var i = 0; i < hits.length; i++) {
-      var o = hits[i].object;
-      var uv = hits[i].uv;
-      if (o === dockMesh) {
-        return { kind: 'dock', i: iconAt(uv.x * DCW, (1 - uv.y) * DCH) };
-      }
-      if (o === handle) return { kind: 'handle' };
-      if (o.userData.win) {
-        var w = o.userData.win;
-        if (!w.open) continue;
-        return { kind: 'win', win: w, item: hitWin(w, uv.x * WCW, (1 - uv.y) * WCH) };
-      }
-      var p = o.userData.pad;
-      if (p && p !== S.cur && o.parent && o.parent.visible) return { kind: 'pad', pad: p };
-    }
-    return null;
-  }
-
-  function screenAngle() {
-    var a = 0;
-    if (window.screen && screen.orientation && typeof screen.orientation.angle === 'number') a = screen.orientation.angle;
-    else if (typeof window.orientation === 'number') a = window.orientation;
-    return rad(a);
-  }
-
-  var statusTimer = 0;
-  function setStatus(msg) {
-    var el = $('status');
-    el.textContent = msg || (S.gyro ? 'Giroscópio ativo' : 'Arraste para olhar');
-    el.classList.toggle('live', S.gyro);
-  }
-
-  function recenter() {
-    if (S.gyro) {
-      tmpE.setFromQuaternion(S.dq, 'YXZ');
-      S.yawOffset = -tmpE.y;
-      S.yaw = 0;
-    } else {
-      S.yaw = 0; S.pitch = 0;
-    }
-  }
-
-  function onOrient(e) {
-    if (e.beta == null && e.gamma == null) return;
-    tmpE.set(rad(e.beta || 0), rad(e.alpha || 0), -rad(e.gamma || 0), 'YXZ');
-    S.dq.setFromEuler(tmpE);
-    S.dq.multiply(q1);
-    S.dq.multiply(q0.setFromAxisAngle(Zaxis, -screenAngle()));
-    if (!S.gyro) { S.gyro = true; S.waiting = 0; recenter(); setStatus(); }
-  }
-
-  function applyHead() {
-    if (S.gyro) {
-      qYaw.setFromAxisAngle(Yaxis, S.yawOffset + S.yaw);
-      rig.quaternion.copy(qYaw).multiply(S.dq);
-    } else {
-      tmpE.set(S.pitch, S.yaw, 0, 'YXZ');
-      rig.quaternion.setFromEuler(tmpE);
-    }
-  }
-
-  async function enableGyro() {
-    try {
-      if (window.isSecureContext === false) {
-        setStatus('O giroscópio exige endereço https. Hospede o arquivo (ex.: Netlify Drop). Arraste para olhar.');
-        return;
-      }
-      var D = window.DeviceOrientationEvent;
-      try {
-        if (window.top !== window.self) S.hint = 'Esta página está dentro de outra (visualizador), que bloqueia o giroscópio. Abra o arquivo direto no navegador.';
-      } catch (x) { S.hint = 'Esta página está dentro de outra, que bloqueia o giroscópio. Abra o arquivo direto no navegador.'; }
-      if (!D) { setStatus('Sem giroscópio neste aparelho. Arraste para olhar.'); return; }
-      if (typeof D.requestPermission === 'function') {
-        var r = await D.requestPermission();
-        if (r !== 'granted') { setStatus('Permissão negada. Arraste para olhar.'); return; }
-      }
-      window.addEventListener('deviceorientation', onOrient, true);
-      S.waiting = performance.now();
-      setStatus('Procurando o giroscópio…');
-    } catch (err) {
-      setStatus('Giroscópio bloqueado aqui. Arraste para olhar.');
-    }
-  }
-
-  /* ---------- Movimento e ações ---------- */
-  function go(pad) {
-    S.moving = { from: rig.position.clone(), to: new THREE.Vector3(pad.x, EYE, pad.z), t: 0 };
-    S.cur = pad;
-  }
-
-  function bring() {
-    tmpV.set(0, 0, -1).applyQuaternion(rig.quaternion);
-    S.dAz = Math.atan2(tmpV.x, -tmpV.z);
-    S.dH = -0.4;
-    if (S.anchorOn) setAnchor(true);
-  }
-
-  function openLink(url) {
-    try { window.open(url, '_blank', 'noopener'); } catch (e) {}
-  }
-
-  function appName(key) {
-    for (var i = 0; i < APPS.length; i++) if (APPS[i].key === key) return APPS[i].name;
-    return key;
-  }
-
-  function winAct(w, item) {
-    if (!item) return;
-    if (item === 'close') { closeWin(w); return; }
-    var sep = item.indexOf(':');
-    var kind = sep < 0 ? item : item.slice(0, sep);
-    var val = sep < 0 ? '' : item.slice(sep + 1);
-    if (kind === 'side') { w.sel = +val; w.sub = 0; w.dkey = ''; return; }
-    if (kind === 'sub') { w.sub = +val; w.dkey = ''; return; }
-    if (kind === 'curve') { setCurved(val === '0'); return; }
-    if (kind === 'hud') { setHud(val === '0' ? 'light' : 'dark'); return; }
-    if (kind === 'world') { setObjs(val === '0'); return; }
-    if (kind === 'cam') { setCam(val === '0'); return; }
-    if (kind === 'hand') { S.showHand = val === '0'; return; }
-    if (kind === 'anchor') { setAnchor(val === '0'); return; }
-    if (kind === 'psize') { S.psize = +val; return; }
-    if (kind === 'pcol') { S.ptrColor = PTR_COLORS[+val].css; return; }
-    if (kind === 'get') {
-      if (!S.installed[val]) {
-        S.installed[val] = true;
-        setStatus(appName(val) + ' instalado. Toque na barra para abrir.');
-        clearTimeout(statusTimer);
-        statusTimer = setTimeout(function () { setStatus(); }, 2200);
-      }
-      return;
-    }
-    if (kind === 'link') { w.url = LINKS[+val].url; w.dkey = ''; setFrame(w.url); return; }
-    if (item === 'back') { w.url = null; w.dkey = ''; setFrame(null); return; }
-    if (item === 'newtab') { if (w.url) openLink(w.url); return; }
-    // toque único num tema não faz nada: o tema só aplica com toque duplo
-  }
-
-  function act(h) {
-    if (!h) return;
-    if (h.kind === 'dock' && h.i >= 0) toggleWin(dockIds()[h.i]);
-    else if (h.kind === 'handle') bring();
-    else if (h.kind === 'win') winAct(h.win, h.item);
-    else if (h.kind === 'pad' && h.pad !== S.cur) go(h.pad);
-  }
-
-  var pendingTap = null;
-  function cancelAll() {
-    S.grabbing = false;
-    pendingTap = null;
-    setStatus('Seleção cancelada');
-    clearTimeout(statusTimer);
-    statusTimer = setTimeout(function () { if (!S.grabbing) setStatus(); }, 1400);
-  }
-
-  // Dois toques no mesmo cartão de tema aplicam o tema; dois toques em outro lugar cancelam
-  function onTap(hover) {
-    var now = performance.now();
-    if (pendingTap && now - pendingTap.t < DOUBLE_MS) {
-      clearTimeout(pendingTap.timer);
-      var prev = pendingTap.hover;
-      pendingTap = null;
-      if (prev && hover && prev.kind === 'win' && hover.kind === 'win' &&
-          prev.win === hover.win && prev.item === hover.item &&
-          typeof prev.item === 'string' && prev.item.indexOf('theme:') === 0) {
-        applyTheme(THEME_NAMES[+prev.item.slice(6)]);
-        return;
-      }
-      cancelAll();
-      return;
-    }
-    var item = { t: now, hover: hover, timer: 0 };
-    item.timer = setTimeout(function () {
-      if (pendingTap === item) { pendingTap = null; act(item.hover); }
-    }, DOUBLE_MS);
-    pendingTap = item;
-  }
-
-  var press = null;
-  stage.addEventListener('pointerdown', function (e) {
-    press = { x: e.clientX, y: e.clientY, t: performance.now(), moved: 0, hover: S.hover, timer: 0 };
-    if (S.hover && S.hover.kind === 'handle') {
-      var mine = press;
-      mine.timer = setTimeout(function () {
-        if (press === mine && mine.moved < TAP_MOVE) S.grabbing = true;
-      }, HOLD_MS);
-    }
-    try { stage.setPointerCapture(e.pointerId); } catch (x) {}
-  });
-
-  // Movimento com toque, mouse ou pinça segurada. Serve para barra, rolagem e olhar.
-  var NOTES_SCROLL_MAX = 560;
-  function pressMove(dx, dy) {
-    if (!press) return;
-    press.moved += Math.abs(dx) + Math.abs(dy);
-    if (S.grabbing) {
-      // Segurando a barra: arrastar para baixo traz para perto, para cima leva para longe
-      S.dist = THREE.MathUtils.clamp(S.dist - dy * 0.012, DIST_MIN, DIST_MAX);
-      if (!S.gyro) S.dAz += dx * 0.004;
-      return;
-    }
-    var t = press.hover;
-    if (t && t.kind === 'win' && t.win.key === 'notes') {
-      // Rolagem: arrastar para cima mostra o conteúdo de baixo
-      t.win.scroll = THREE.MathUtils.clamp((t.win.scroll || 0) - dy, 0, NOTES_SCROLL_MAX);
-      t.win.dkey = '';
-      return;
-    }
-    S.yaw += dx * 0.0045;
-    if (!S.gyro) S.pitch = Math.max(-1.35, Math.min(1.35, S.pitch + dy * 0.0045));
-  }
-
-  stage.addEventListener('pointermove', function (e) {
-    if (!press || press.hand) return;
-    var dx = e.clientX - press.x, dy = e.clientY - press.y;
-    press.x = e.clientX; press.y = e.clientY;
-    pressMove(dx, dy);
-  });
-
-  function endPress(e, cancelled) {
-    if (!press) return;
-    var p = press;
-    press = null;
-    clearTimeout(p.timer);
-    if (S.grabbing) {
-      S.grabbing = false;
-      setStatus();
-      return;
-    }
-    if (!cancelled && p.moved < TAP_MOVE && performance.now() - p.t < TAP_MAX_MS) onTap(p.hover);
-  }
-  stage.addEventListener('pointerup', function (e) { endPress(e, false); });
-  stage.addEventListener('pointercancel', function (e) { endPress(e, true); });
-
-  /* ---------- Atualização por quadro ---------- */
-  function updatePads() {
-    var hp = S.hover && S.hover.kind === 'pad' ? S.hover.pad : null;
-    pads.forEach(function (p) {
-      p.group.visible = p !== S.cur;
-      p.fillMat.opacity = p === hp ? 0.45 : T.padFillOp;
-    });
-  }
-
-  function updateHover() {
-    var ids = dockIds();
-    S.hoverIcon = S.hover && S.hover.kind === 'dock' ? S.hover.i : -1;
-    var wh = S.hover && S.hover.kind === 'win' ? S.hover : null;
-    Object.keys(wins).forEach(function (k) {
-      wins[k].hov = wh && wh.win === wins[k] ? wh.item : null;
-    });
-    if (ids.length === 0) S.hoverIcon = -1;
-  }
-
-  function updateDock() {
-    if (S.grabbing && S.gyro) {
-      tmpV.set(0, 0, -1).applyQuaternion(rig.quaternion);
-      S.dAz = Math.atan2(tmpV.x, -tmpV.z);
-      S.dH = THREE.MathUtils.clamp(tmpV.y * S.dist, -1.4, 1.0);
-    }
-    S.dH = THREE.MathUtils.clamp(S.dH, -1.4, 1.0);
-    if (S.anchorOn && S.anchor) {
-      // Ao segurar a barra, a ancoragem acompanha o arrasto
-      if (S.grabbing) { S.anchor.az = S.dAz; S.anchor.dist = S.dist; S.anchor.y = EYE + S.dH; }
-      var A = S.anchor;
-      dock.position.set(A.cx + Math.sin(A.az) * A.dist, A.y, A.cz - Math.cos(A.az) * A.dist);
-    } else {
-      var az = S.dAz;
-      dock.position.set(rig.position.x + Math.sin(az) * S.dist, EYE + S.dH, rig.position.z - Math.cos(az) * S.dist);
-    }
-    dock.lookAt(rig.position.x, dock.position.y, rig.position.z);
-    refreshDock();
-  }
-
-  // Posiciona o iframe da janela Web sobre a área de conteúdo dela (só no modo normal)
-  function updateWebFrame() {
-    var w = wins.web;
-    if (!w.open || !w.url || S.vr) { frameEl.hidden = true; return; }
-    var pts = [[36, 186], [WCW - 36, 186], [36, 566], [WCW - 36, 566]];
-    var minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9, ok = true;
-    var sw = stage.clientWidth, sh = stage.clientHeight;
-    pts.forEach(function (q) {
-      var lx = (q[0] / WCW - 0.5) * WIN_W, ly = (0.5 - q[1] / WCH) * WIN_H;
-      var X = lx, Z = 0;
-      if (S.curved) { var th = lx / CURVE_R; X = CURVE_R * Math.sin(th); Z = CURVE_R * (1 - Math.cos(th)); }
-      var v = new THREE.Vector3(X, ly, Z).applyMatrix4(w.mesh.matrixWorld);
-      var d = v.clone().applyMatrix4(cam.matrixWorldInverse);
-      if (d.z > -0.05) ok = false;
-      v.project(cam);
-      var px = (v.x + 1) / 2 * sw, py = (1 - v.y) / 2 * sh;
-      minX = Math.min(minX, px); maxX = Math.max(maxX, px);
-      minY = Math.min(minY, py); maxY = Math.max(maxY, py);
-    });
-    if (!ok) { frameEl.hidden = true; return; }
-    frameEl.hidden = false;
-    frameEl.style.left = minX + 'px';
-    frameEl.style.top = minY + 'px';
-    frameEl.style.width = (maxX - minX) + 'px';
-    frameEl.style.height = (maxY - minY) + 'px';
-  }
-
-  var clock = new THREE.Clock();
-  function frame() {
-    requestAnimationFrame(frame);
-    var dt = Math.min(clock.getDelta(), 0.05);
-
-    if (S.waiting && !S.gyro && performance.now() - S.waiting > 2200) {
-      S.waiting = 0;
-      setStatus(S.hint || 'Sem sinal do giroscópio. No Chrome: Configurações do site > Sensores de movimento > Permitir. Arraste para olhar.');
-    }
-
-    if (S.moving) {
-      S.moving.t = Math.min(1, S.moving.t + dt / 0.7);
-      var k = S.moving.t, e = k * k * (3 - 2 * k);
-      rig.position.lerpVectors(S.moving.from, S.moving.to, e);
-      if (k >= 1) S.moving = null;
-    }
-
-    applyHead();
-    S.hover = aim();
-    updateHover();
-    rDisc.visible = !!S.hover;
-    updatePointer();
-    updatePads();
-    updateDock();
-    updateWindows();
-    refreshWins();
-
-    // Pinça: depois de 2,5 s segurada, o cursor da mão move a barra ou rola a janela
-    if (S.pinched && press && press.hand && S.hand && S.handPrev && video.videoWidth) {
-      var hc2 = handCursor();
-      var hdx = hc2[0] - S.handPrev[0], hdy = hc2[1] - S.handPrev[1];
-      S.handPrev = hc2;
-      press.maxD = Math.max(press.maxD, Math.hypot(hc2[0] - press.sx, hc2[1] - press.sy));
-      if (!press.held && performance.now() - press.t >= HOLD_PINCH_MS) {
-        press.held = true;
-        if (press.hover && press.hover.kind === 'handle') S.grabbing = true;
-      }
-      if (press.held) pressMove(hdx, hdy);
-    }
-
-    feedHands();
-    drawHands();
-
-    if (!reduceMotion) {
-      NODES.forEach(function (d) { d.body.rotation.y += dt * 0.35; });
-    }
-    packets.forEach(function (p) {
-      p.t += dt * p.s;
-      if (p.t > 1) p.t -= 1;
-      p.m.position.lerpVectors(p.a, p.b, p.t);
-    });
-
-    render();
-    updateWebFrame();
-  }
-
-  function drawEye(camera, vx, vy, vw, vh) {
-    renderer.setScissorTest(true);
-    renderer.setViewport(vx, vy, vw, vh);
-    renderer.setScissor(vx, vy, vw, vh);
-    renderer.clear(true, true, true);
-    if (S.camLive && videoTex && video.videoWidth) {
-      setBgUV(vw / vh);
-      renderer.render(bgScene, bgCam);
-      renderer.clear(false, true, false);
-    }
-    renderer.render(scene, camera);
-  }
-
-  function render() {
-    var w = stage.clientWidth, h = stage.clientHeight;
-    if (!w || !h) return;
-    if (!S.vr) {
-      cam.aspect = w / h;
-      cam.fov = cam.aspect < 1 ? 92 : 70;
-      cam.updateProjectionMatrix();
-      drawEye(cam, 0, 0, w, h);
-    } else {
-      var hw = Math.floor(w / 2);
-      camL.aspect = camR.aspect = hw / h;
-      camL.updateProjectionMatrix(); camR.updateProjectionMatrix();
-      drawEye(camL, 0, 0, hw, h);
-      drawEye(camR, hw, 0, w - hw, h);
-    }
-    renderer.setScissorTest(false);
-  }
-
-  function resize() {
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    renderer.setPixelRatio(dpr);
-    renderer.setSize(stage.clientWidth, stage.clientHeight, false);
-    handCv.width = Math.round(stage.clientWidth * dpr);
-    handCv.height = Math.round(stage.clientHeight * dpr);
-    $('rotate').hidden = !(S.vr && window.innerHeight > window.innerWidth);
-  }
-  window.addEventListener('resize', resize);
-  window.addEventListener('orientationchange', function () { setTimeout(resize, 200); });
-
-  /* ---------- Interface ---------- */
-  var wakeLock = null;
-  function keepAwake() {
-    try {
-      if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function (l) { wakeLock = l; }, function () {});
-    } catch (e) {}
-  }
-  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && S.started) keepAwake(); });
-
-  function begin() {
-    S.started = true;
-    $('intro').hidden = true;
-    reticle.visible = true;
-    dock.visible = true;
-    bring();
-    keepAwake();
-    startCam();
-    setStatus();
-  }
-
-  function setVR(on) {
-    S.vr = on;
-    document.body.classList.toggle('vr', on);
-    $('divider').hidden = !on;
-    $('btn-vr').setAttribute('aria-pressed', String(on));
-    if (on) {
-      startCam();
-      try {
-        var root = document.documentElement;
-        var req = root.requestFullscreen || root.webkitRequestFullscreen;
-        if (req) { var p = req.call(root); if (p && p.catch) p.catch(function () {}); }
-        if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function () {});
-      } catch (e) {}
-    } else {
-      try { if (document.fullscreenElement) document.exitFullscreen(); } catch (e) {}
-    }
-    resize();
-  }
-
-  $('go-gyro').addEventListener('click', function () { begin(); enableGyro(); });
-  $('go-touch').addEventListener('click', function () { begin(); setStatus(); });
-  $('btn-vr').addEventListener('click', function () { setVR(!S.vr); });
-  $('exit-vr').addEventListener('click', function () { setVR(false); });
-  $('btn-full').addEventListener('click', function () {
-    try {
-      if (document.fullscreenElement) document.exitFullscreen();
-      else { var r = document.documentElement.requestFullscreen; if (r) r.call(document.documentElement).catch(function () {}); }
-    } catch (e) {}
-  });
-  document.addEventListener('fullscreenchange', function () {
-    if (!document.fullscreenElement && S.vr) setVR(false);
-  });
-
-  // Ganchos para teste automático (não afetam o uso normal)
-  window.__vr = {
-    state: S, rig: rig, pads: pads, dock: dock, wins: wins, world: world, objs: objs,
-    dockCanvas: dockCanvas, cfgCanvas: wins.cfg.canvas, webCanvas: wins.web.canvas, storeCanvas: wins.store.canvas,
-    go: go, act: act, tap: onTap, cancel: cancelAll, bring: bring, toggle: toggleWin,
-    theme: applyTheme, getTheme: function () { return THEME; }, frame: frameEl, K: K,
-    onHands: onHands, setPinch: setPinch, pressMove: pressMove, dockIds: dockIds,
-    press: function () { return press; }, handState: function () { return S.handState; },
-    handCanvas: handCv
-  };
-
-  applyTheme('black');
-  resize();
-  setStatus();
-  frame();
-
-  // Aplica o fundo do tema (sem câmera ainda)
-  function applyTheme(name) {
-    if (!TH[name]) return;
-    THEME = name;
-    T = TH[name];
-    gridDark.visible = T.grid === 'dark';
-    gridLight.visible = T.grid === 'light';
-    NODE_BODY_MATS.forEach(function (m) { m.color.set(T.nodeBody); });
-    NODE_EDGE_MATS.forEach(function (m) { m.color.set(T.nodeEdge); });
-    STEM_MATS.forEach(function (m) { m.color.set(T.stem); });
-    EDGE_MATS.forEach(function (m) { m.color.set(T.edge); });
-    PACKET_MATS.forEach(function (m) { m.color.set(T.packet); });
-    labels.forEach(drawLabel);
-    pads.forEach(function (p) {
-      p.fillMat.color.set(T.padFill);
-      p.fillMat.opacity = T.padFillOp;
-      p.ringMat.color.set(T.padRing);
-    });
-    applyBackdrop();
-    setStatus('Tema: ' + T.name);
-    clearTimeout(statusTimer);
-    statusTimer = setTimeout(function () { setStatus(); }, 1400);
-  }
-})();
+  calTrack.addEventListener('transitionend', fin, { once:true });
+  setTimeout(fin, 420);
+}
+calView.addEventListener('pointerdown', e => {
+  if (calDrag || calAnim) return;
+  calDrag = { id:e.pointerId, x:e.clientX, y:e.clientY, t:performance.now(), dx:0, on:false };
+});
+calView.addEventListener('pointermove', e => {
+  const d = calDrag; if (!d || e.pointerId !== d.id) return;
+  const dx = e.clientX - d.x, dy = e.clientY - d.y;
+  if (!d.on) {
+    if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.2) { d.on = true; try { calView.setPointerCapture(e.pointerId); } catch (_) {} calTrack.style.transition = 'none'; }
+    else return;
+  }
+  d.dx = dx; calTrack.style.transform = `translateX(calc(-33.3333% + ${dx}px))`;
+});
+function calEnd(e) {
+  const d = calDrag; if (!d || e.pointerId !== d.id) return;
+  calDrag = null; if (!d.on) return;
+  const w = calView.clientWidth, v = d.dx / Math.max(1, performance.now() - d.t);
+  const go = e.type === 'pointerup' && (Math.abs(d.dx) > w * 0.25 || (Math.abs(v) > 0.5 && Math.abs(d.dx) > 30));
+  calSlide(go ? (d.dx < 0 ? 1 : -1) : 0);
+}
+calView.addEventListener('pointerup', calEnd);
+calView.addEventListener('pointercancel', calEnd);
+$('calName').onclick = () => { const t = new Date(); calY = t.getFullYear(); calM = t.getMonth(); renderCal(); };
+
+applyTheme(); applyPalette(); render(); renderAppearance(); showCurrent();
 </script>
-</body></html>
+</body>
+</html>
