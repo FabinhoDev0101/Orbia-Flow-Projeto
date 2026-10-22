@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f2f2f7">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Notas</title>
+<title>N+</title>
 <style>
   :root {
     --accent-l:#6a5af9; --accent-d:#8b7dff; --on-l:#fff; --on-d:#fff;
@@ -74,11 +74,21 @@
   .topbar.sub .tb-back { display:flex; }
   .tb-back svg.i { width:26px; height:26px; }
 
+  .screen:not(#home):not(#calendar):not(#settings) h1.large { font-size:27px; margin-top:48px; }
+  .plus { color:var(--accent); }
+  .sec-title { font-size:22px; font-weight:700; margin:2px 4px 10px; letter-spacing:.2px; }
+  .sec-title.none { display:none; }
   h1.large { font-size:34px; font-weight:700; letter-spacing:.3px; margin:44px 0 10px; line-height:1.15; }
 
   .search { display:flex; align-items:center; gap:9px; border-radius:24px; padding:0 18px; height:48px; color:var(--muted); margin-bottom:18px; }
   .search.glass { box-shadow:inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.12), 0 4px 14px var(--glass-shadow); }
   .search.glass:active { transform:none; }
+  .sscreen { position:fixed; inset:0; z-index:30; background:var(--bg); display:none; overflow-y:auto; padding:calc(env(safe-area-inset-top) + 10px) 16px 40px; }
+  .sscreen.open { display:block; animation:fadeIn .22s ease; }
+  .srow { display:flex; align-items:center; gap:10px; max-width:720px; margin:0 auto 16px; }
+  .srow .search { flex:1; margin:0; }
+  #scancel { border:0; background:none; color:var(--accent); font-size:17px; padding:8px 2px; }
+  #sres { max-width:720px; margin:0 auto; }
   .search svg { width:20px; height:20px; flex:none; }
   .search input { flex:1; border:0; background:transparent; font-size:18px; color:var(--text); outline:none; }
   .search input::placeholder { color:var(--muted); }
@@ -170,7 +180,7 @@
   .dock { transition:transform .38s cubic-bezier(.32,.72,0,1), opacity .25s, visibility 0s; }
   .dock.away { transform:translateY(160%); opacity:0; visibility:hidden; transition:transform .38s cubic-bezier(.32,.72,0,1), opacity .25s, visibility 0s .38s; }
   .dock.away > * { pointer-events:none; }
-  .pill { display:flex; padding:5px; border-radius:999px; --tw:78px; touch-action:none; -webkit-user-select:none; user-select:none; }
+  .pill { display:flex; overflow:hidden; padding:5px; border-radius:999px; --tw:78px; touch-action:none; -webkit-user-select:none; user-select:none; }
   .bubble { position:absolute; top:5px; bottom:5px; left:5px; width:var(--tw); border-radius:999px; z-index:0;
     background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.18));
     box-shadow:inset 0 1px 1px rgba(255,255,255,.7), inset 0 -2px 6px rgba(255,255,255,.15), 0 4px 14px rgba(0,0,0,.12);
@@ -181,18 +191,21 @@
   .bubble::after { content:""; position:absolute; inset:0; border-radius:inherit; background:radial-gradient(120% 140% at 50% 0%, rgba(255,255,255,.7), rgba(255,255,255,0) 70%); opacity:0; transition:opacity .25s; pointer-events:none; }
   .pill.dragging .bubble { transition:transform .11s ease-out, box-shadow .25s; box-shadow:inset 0 1px 1px rgba(255,255,255,.9), inset 0 -2px 8px rgba(255,255,255,.3), 0 10px 26px rgba(0,0,0,.22); }
   .pill.dragging .bubble::after { opacity:1; }
+  /* olho de peixe: centro da lente amplia, bordas se curvam/comprimem */
+  .tab > * { transform:translateX(var(--fx,0px)) scale(var(--fsx,1), var(--fsy,1)); transition:transform .12s ease-out; will-change:transform; }
+  .pill.dragging .bubble { background:radial-gradient(ellipse 62% 78% at 50% 50%, rgba(255,255,255,.62) 0%, rgba(255,255,255,.22) 55%, rgba(255,255,255,.04) 78%, rgba(120,120,160,.28) 100%);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.55), inset 7px 0 12px -5px rgba(255,255,255,.55), inset -7px 0 12px -5px rgba(255,255,255,.55), inset 0 -9px 14px -8px rgba(0,0,0,.18), 0 10px 26px rgba(0,0,0,.22); }
+  :root[data-theme="dark"] .pill.dragging .bubble { background:radial-gradient(ellipse 62% 78% at 50% 50%, rgba(255,255,255,.34) 0%, rgba(255,255,255,.12) 55%, rgba(255,255,255,.02) 78%, rgba(0,0,0,.3) 100%); }
+  @media (prefers-color-scheme: dark) { :root[data-theme="auto"] .pill.dragging .bubble { background:radial-gradient(ellipse 62% 78% at 50% 50%, rgba(255,255,255,.34) 0%, rgba(255,255,255,.12) 55%, rgba(255,255,255,.02) 78%, rgba(0,0,0,.3) 100%); } }
   .pill.glass.dragging { transform:scale(1.07); }
 
   .tab { position:relative; z-index:1; width:var(--tw); height:56px; border:0; background:none; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:10.5px; font-weight:600; color:var(--muted); transition:color .3s; }
   .tab.active { color:var(--accent); }
   .tab .ico { position:relative; width:26px; height:26px; display:grid; place-items:center; }
-  .tab svg.i { width:25px; height:25px; position:relative; transition:filter .3s, opacity .3s, transform .3s; }
-  .tab .ico::before { content:""; position:absolute; inset:-4px; border-radius:50%; background:currentColor; filter:blur(10px); opacity:0; transition:opacity .35s; }
-  .tab.active .ico::before { opacity:.38; }
-  .tab:not(.active) svg.i { filter:blur(.35px); opacity:.85; }
+  .tab svg.i { width:25px; height:25px; position:relative; transition:opacity .3s, transform .3s; }
+  .tab:not(.active) svg.i { opacity:.85; }
   .tab.active svg.i { fill:currentColor; fill-opacity:.2; }
-  .tab:active svg.i { filter:blur(2px); transform:scale(.9); }
-  .tab.blur-in svg.i { animation:blurIn .45s ease; }
+  .tab:active svg.i { transform:scale(.9); }
   @keyframes blurIn { 0% { filter:blur(7px); opacity:.2; transform:scale(.8); } 100% { filter:blur(0); opacity:1; transform:scale(1); } }
 
   .fab { width:66px; height:66px; border-radius:50%; border:0; display:grid; place-items:center; color:var(--accent); transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .25s, visibility .25s, width .35s cubic-bezier(.32,.72,0,1), margin .35s cubic-bezier(.32,.72,0,1); }
@@ -202,7 +215,9 @@
 
   /* ---------- Início: botões do topo, grade, seleção ---------- */
   .home-actions { position:fixed; top:calc(env(safe-area-inset-top) + 8px); right:14px; z-index:16; display:none; }
-  .home-actions.show { display:block; }
+  .home-actions.show { display:block; transition:opacity .22s, transform .3s cubic-bezier(.32,.72,0,1); }
+  .home-actions[data-mode="sel"].show.away { opacity:1; transform:none; pointer-events:auto; }
+  .home-actions.show.away { opacity:0; transform:translateY(-14px) scale(.9); pointer-events:none; }
   .hpill { display:flex; height:42px; border-radius:21px; padding:0 4px; }
   .hpill button { width:46px; height:42px; border:0; background:none; color:var(--accent); display:grid; place-items:center; }
   .hpill svg.i { width:22px; height:22px; }
@@ -210,13 +225,17 @@
   .home-actions[data-mode="sel"] .hpill { display:none; }
   .home-actions[data-mode="sel"] .hcancel { display:block; }
   .nitem { transition:background .18s, color .18s; }
-  .ngrid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-  @media (min-width:640px) { .ngrid { grid-template-columns:repeat(3,1fr); } }
-  .gcard { background:var(--card); border-radius:16px; padding:14px; min-height:144px; display:flex; flex-direction:column; overflow:hidden; }
+  .ngrid { display:grid; grid-template-columns:repeat(var(--gc, 2),1fr); gap:10px; }
+  .ngrid.c3 { gap:8px; }
+  .ngrid.c3 .gcard { padding:9px 9px 8px; border-radius:10px; }
+  .ngrid.c3 .gcard h3 { font-size:13px; }
+  .ngrid.c3 .gcard p { font-size:11px; margin-top:3px; }
+  .ngrid.c3 .gcard small { font-size:10px; margin-top:5px; padding-top:4px; }
+  .gcard { background:var(--card); border-radius:12px; padding:14px 14px 12px; aspect-ratio:1 / 1.4142; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 1px 3px var(--glass-shadow); }
   .gcard:active { background:var(--field); }
   .gcard h3 { font-size:16px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .gcard p { font-size:14px; color:var(--muted); margin-top:4px; flex:1; word-break:break-word; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; }
-  .gcard small { font-size:12px; color:var(--muted); margin-top:8px; }
+  .gcard p { font-size:14px; color:var(--muted); margin-top:4px; flex:1; min-height:0; word-break:break-word; overflow:hidden; line-height:1.35; -webkit-mask-image:linear-gradient(#000 78%, transparent); mask-image:linear-gradient(#000 78%, transparent); }
+  .gcard small { font-size:12px; color:var(--muted); margin-top:8px; padding-top:6px; border-top:.5px solid var(--sep); }
   .nitem.sel { background:var(--danger); color:#fff; }
   .nitem.sel h3, .nitem.sel .sub, .nitem.sel .sub b, .nitem.sel p, .nitem.sel small { color:#fff; }
   .selbar { position:fixed; left:0; right:0; margin:0 auto; width:max-content; bottom:calc(18px + env(safe-area-inset-bottom)); z-index:21; border-radius:999px;
@@ -299,6 +318,11 @@
   .pop .pi { display:flex; align-items:center; justify-content:space-between; gap:14px; width:100%; padding:9px 10px; border:0; background:none; border-radius:9px; color:var(--text); font-size:16px; text-align:left; }
   .pop .pi:active { background:var(--field); }
   .pop .pi svg.i { width:18px; height:18px; color:var(--accent); stroke-width:3; }
+  .pop .pi svg.i.ic { width:21px; height:21px; stroke-width:2; }
+  .pop.up { transform-origin:bottom right; }
+  .pop.glass { position:fixed; border-radius:22px; padding:7px; min-width:190px; background:linear-gradient(135deg, var(--glass-hi), var(--glass) 55%, var(--glass)); -webkit-backdrop-filter:blur(22px) saturate(190%) brightness(1.05); backdrop-filter:blur(22px) saturate(190%) brightness(1.05); }
+  .pop.glass:active { transform:none; }
+  .pop.glass .pi { border-radius:15px; padding:11px 12px; }
   .pop .sizes { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; min-width:190px; }
   .pop .sizes .pi { justify-content:center; padding:9px 4px; }
   .pop .sizes .pi.on, .pop .aligns .pi.on { background:var(--accent); color:var(--on-accent); }
@@ -340,6 +364,7 @@
   <symbol id="i-layout" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
   <symbol id="i-chevd" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+  <symbol id="i-task" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
   <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></symbol>
   <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
   <symbol id="i-eraser" viewBox="0 0 24 24"><path d="M20 20H9l-5-5a2 2 0 0 1 0-2.8l9.2-9.2a2 2 0 0 1 2.8 0l5.2 5.2a2 2 0 0 1 0 2.8L12 20"/><path d="M7 11l6 6"/></symbol>
@@ -354,13 +379,14 @@
 
 <div class="topbar" id="topbar">
   <button class="tb-back" id="tbBack"><svg class="i"><use href="#i-back"/></svg><span id="tbBackLbl">Ajustes</span></button>
-  <span id="tbTitle">Notas</span>
+  <span id="tbTitle">N<span class="plus">+</span></span>
 </div>
 
 <!-- Notas -->
 <main id="home" class="screen active">
-  <h1 class="large" id="homeTitle">Notas</h1>
-  <label class="search glass"><svg class="i"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Buscar"></label>
+  <h1 class="large" id="homeTitle">N<span class="plus">+</span></h1>
+  <label class="search glass"><svg class="i"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Buscar" readonly inputmode="none"></label>
+  <div class="sec-title" id="recentTitle">Recentes</div>
   <div id="list"></div>
   <div class="count" id="count"></div>
 </main>
@@ -420,9 +446,17 @@
   <div class="group">
     <button class="nav-row" data-go="set-palette"><span class="lbl">Paleta de cores</span><span class="val"><i class="dot" id="palDot"></i><span id="palName"></span></span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row" data-go="set-homestyle"><span class="lbl">Estilo de nota na tela de início</span><span class="val" id="homeStyleName">Lista</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row" data-go="set-gridscale"><span class="lbl">Escala da grade</span><span class="val" id="gridScaleName"></span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row" data-go="set-notestyle"><span class="lbl">Estilo de nota</span><span class="val" id="noteStyleName"></span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row" data-go="set-scroll"><span class="lbl">Tipo de rolagem</span><span class="val" id="scrollName"></span><svg class="i chev"><use href="#i-chev"/></svg></button>
   </div>
+</main>
+
+<!-- Ajustes › Tema e Aparência › Escala da grade -->
+<main id="set-gridscale" class="screen sub">
+  <h1 class="large">Escala da grade</h1>
+  <div class="group" id="gsList"></div>
+  <p class="note-help">Quantas notas aparecem lado a lado quando o estilo da tela de início é Grade.</p>
 </main>
 
 <!-- Ajustes › Tema e Aparência › Estilo de nota na tela de início -->
@@ -467,8 +501,8 @@
   <h1 class="large">Contas e backups</h1>
   <div class="group">
     <button class="item act" id="exportBtn"><span>Exportar notas</span><span class="val" id="exportCount"></span></button>
-    <label class="item act" style="cursor:pointer"><span>Importar notas</span><span class="val">.json</span>
-      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    <label class="item act" style="cursor:pointer"><span>Importar notas</span><span class="val">.nplus</span>
+      <input type="file" id="importFile" accept=".nplus,.json,application/json,application/octet-stream" hidden>
     </label>
   </div>
   <div class="group" style="margin-top:22px">
@@ -516,6 +550,15 @@
     <div class="item"><span>Armazenamento</span><span class="val">Neste aparelho</span></div>
   </div>
 </main>
+
+<!-- Tela de pesquisa -->
+<div class="sscreen" id="sscreen" aria-hidden="true">
+  <div class="srow">
+    <label class="search glass"><svg class="i"><use href="#i-search"/></svg><input id="sinput" type="search" placeholder="Buscar" enterkeyhint="search" autocomplete="off"></label>
+    <button id="scancel">Cancelar</button>
+  </div>
+  <div id="sres"></div>
+</div>
 
 <!-- Botões do topo (tela de início) -->
 <div class="home-actions" id="homeActions" data-mode="normal">
@@ -608,12 +651,14 @@ const PALETTES = {
   blue:   { name:'Azul',     l:'#007aff', d:'#0a84ff', onL:'#ffffff', onD:'#ffffff' },
   purple: { name:'Roxo',     l:'#6a5af9', d:'#8b7dff', onL:'#ffffff', onD:'#ffffff' },
   red:    { name:'Vermelho', l:'#ff3b30', d:'#ff453a', onL:'#ffffff', onD:'#ffffff' },
-  green:  { name:'Verde',    l:'#2fb457', d:'#30d158', onL:'#ffffff', onD:'#ffffff' }
+  green:  { name:'Verde',    l:'#2fb457', d:'#30d158', onL:'#ffffff', onD:'#ffffff' },
+  orange: { name:'Laranja',  l:'#ff8a00', d:'#ff9f0a', onL:'#ffffff', onD:'#ffffff' }
 };
 const TABS = ['home', 'calendar', 'settings'];
-const TITLES = { home:'Notas', calendar:'Calendário', settings:'Ajustes', 'set-theme':'Tema e Aparência', 'set-palette':'Paleta de cores', 'set-data':'Contas e backups', 'set-about':'Sobre', 'set-sound':'Sons e vibrações', 'set-update':'Atualização do software', 'set-guide':'Guia do usuário', 'set-access':'Acessibilidade', 'set-privacy':'Segurança e privacidade', 'set-devices':'Aparelhos conectados', 'set-homestyle':'Estilo de nota na tela de início', 'set-notestyle':'Estilo de nota', 'set-scroll':'Tipo de rolagem' };
+const NPLUS = 'N<span class="plus">+</span>';
+const TITLES = { home:NPLUS, calendar:'Calendário', settings:'Ajustes', 'set-theme':'Tema e Aparência', 'set-palette':'Paleta de cores', 'set-data':'Contas e backups', 'set-about':'Sobre', 'set-sound':'Sons e vibrações', 'set-update':'Atualização do software', 'set-guide':'Guia do usuário', 'set-access':'Acessibilidade', 'set-privacy':'Segurança e privacidade', 'set-devices':'Aparelhos conectados', 'set-homestyle':'Estilo de nota na tela de início', 'set-gridscale':'Escala da grade', 'set-notestyle':'Estilo de nota', 'set-scroll':'Tipo de rolagem' };
 
-let notes = [], cfg = { auto:true, theme:'light', palette:'purple', home:'list', noteStyle:'a4', scroll:'v' }, current = null;
+let notes = [], cfg = { auto:true, theme:'light', palette:'purple', home:'list', cols:2, noteStyle:'a4', scroll:'v' }, current = null;
 let stack = ['settings'];
 try { notes = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
 try {
@@ -622,6 +667,7 @@ try {
   Object.assign(cfg, s);
   if (!PALETTES[cfg.palette]) cfg.palette = 'purple';
   if (!['list', 'grid'].includes(cfg.home)) cfg.home = 'list';
+  if (![2, 3].includes(cfg.cols)) cfg.cols = 2;
   if (!['a4', 'caderno'].includes(cfg.noteStyle)) cfg.noteStyle = 'a4';
   if (!['v', 'h'].includes(cfg.scroll)) cfg.scroll = 'v';
 } catch (e) {}
@@ -648,6 +694,9 @@ function renderAppearance() {
   const ck = '<svg class="i ck"><use href="#i-check"/></svg>';
   $('noteStyleName').textContent = STY[cfg.noteStyle];
   $('scrollName').textContent = DIRS[cfg.scroll];
+  const GS = { 2:'Padrão · 2 notas por linha', 3:'Compacta · 3 notas por linha' };
+  $('gridScaleName').textContent = cfg.cols + ' por linha';
+  $('gsList').innerHTML = [2, 3].map(k => `<button class="item" data-gs="${k}"><span>${GS[k]}</span>${k === cfg.cols ? ck : ''}</button>`).join('');
   $('nsList').innerHTML = Object.keys(STY).map(k => `<button class="item" data-ns="${k}"><span>${STY[k]}</span>${k === cfg.noteStyle ? ck : ''}</button>`).join('');
   $('scList').innerHTML = Object.keys(DIRS).map(k => `<button class="item" data-sc="${k}"><span>${DIRS[k]}</span>${k === cfg.scroll ? ck : ''}</button>`).join('');
   $('autoSw').checked = cfg.auto;
@@ -673,6 +722,7 @@ $('palList').onclick = e => {
   const b = e.target.closest('.pal-row'); if (!b) return;
   cfg.palette = b.dataset.p; saveCfg(); applyPalette(); renderAppearance();
 };
+$('gsList').onclick = e => { const b = e.target.closest('[data-gs]'); if (!b) return; cfg.cols = +b.dataset.gs; saveCfg(); render(); renderAppearance(); };
 $('nsList').onclick = e => {
   const b = e.target.closest('[data-ns]'); if (!b) return;
   cfg.noteStyle = b.dataset.ns; saveCfg(); renderAppearance();
@@ -698,13 +748,14 @@ function render() {
   const cls = n => 'nitem' + (selected.has(n.id) ? ' sel' : '');
   const prev = n => esc(n.body.replace(/\s+/g, ' ')) || 'Sem texto adicional';
   if (!items.length) $('list').innerHTML = `<div class="empty">${q ? 'Nenhum resultado.' : 'Nenhuma nota ainda.<br>Toque no botão de escrever para criar a primeira.'}</div>`;
-  else if (cfg.home === 'grid') $('list').innerHTML = `<div class="ngrid">${items.map(n => `
+  else if (cfg.home === 'grid') $('list').innerHTML = `<div class="ngrid c${cfg.cols}" style="--gc:${cfg.cols}">${items.map(n => `
       <div class="gcard ${cls(n)}" data-id="${esc(n.id)}"><h3>${esc(n.title) || 'Nova nota'}</h3><p>${prev(n)}</p><small>${fmt(n.updated)}</small></div>`).join('')}</div>`;
   else $('list').innerHTML = `<div class="group">${items.map(n => `
       <div class="row ${cls(n)}" data-id="${esc(n.id)}">
         <h3>${esc(n.title) || 'Nova nota'}</h3>
         <div class="sub"><b>${fmt(n.updated)}</b>${prev(n)}</div>
       </div>`).join('')}</div>`;
+  $('recentTitle').classList.toggle('none', !items.length || !!q);
   $('count').textContent = notes.length ? `${notes.length} ${notes.length === 1 ? 'Nota' : 'Notas'}` : '';
   $('exportCount').textContent = notes.length;
   $('aboutCount').textContent = notes.length;
@@ -746,6 +797,16 @@ document.querySelectorAll('.tab').forEach(b => b.onclick = () => goTab(b.dataset
     if (on && !b.classList.contains('active')) { b.classList.remove('blur-in'); void b.offsetWidth; b.classList.add('blur-in'); }
     b.classList.toggle('active', on);
   });
+  // olho de peixe: cada aba é ampliada perto do centro da bolha e comprimida/empurrada para fora nas bordas
+  const lens = (off, tw) => tabs.forEach((b, k) => {
+    const st = b.style;
+    if (off == null) { ['--fx', '--fsx', '--fsy'].forEach(p => st.removeProperty(p)); return; }
+    const u = (k * tw - off) / tw, a = Math.abs(u), sg = u < 0 ? -1 : 1;
+    const z = a < 1 ? 1 + .5 * Math.pow(1 - a, 1.4) : Math.max(.82, 1 - .18 * Math.min(1, a - 1));
+    const sx = a < 1 ? z : z * (1 - .1 * Math.min(1, a - 1));
+    st.setProperty('--fsx', sx.toFixed(3)); st.setProperty('--fsy', z.toFixed(3));
+    st.setProperty('--fx', (a < 1 ? sg * tw * .16 * Math.sin(a * Math.PI) : sg * tw * .05 * Math.max(0, 2 - a)).toFixed(1) + 'px');
+  });
   pill.addEventListener('pointerdown', e => {
     if (d || (e.pointerType === 'mouse' && e.button !== 0)) return;
     const r = pill.getBoundingClientRect();
@@ -760,13 +821,14 @@ document.querySelectorAll('.tab').forEach(b => b.onclick = () => goTab(b.dataset
       pill.classList.add('dragging');
     }
     const raw = d.cx + (e.clientX - d.cx) / SC - d.left - d.tw / 2, max = (TABS.length - 1) * d.tw;
-    const off = raw < 0 ? raw * .3 : raw > max ? max + (raw - max) * .3 : raw; // resistência elástica nas pontas
+    const off = raw < 0 ? Math.max(raw * .3, -2) : raw > max ? Math.min(max + (raw - max) * .3, max + 2) : raw; // pontas: quase não passa do limite
     const now = performance.now(), v = (e.clientX - d.lastX) / Math.max(1, now - d.lastT);
     d.lastX = e.clientX; d.lastT = now;
     pill.style.setProperty('--bx', off + 'px');
-    pill.style.setProperty('--bsx', 1.1 + Math.min(.24, Math.abs(v) * .22));
-    pill.style.setProperty('--bsy', 1.1 - Math.min(.08, Math.abs(v) * .07));
-    clearTimeout(relax); relax = setTimeout(() => { pill.style.setProperty('--bsx', 1.1); pill.style.setProperty('--bsy', 1.1); }, 90);
+    lens(off, d.tw);
+    pill.style.setProperty('--bsx', 1.08 + Math.min(.05, Math.abs(v) * .05));
+    pill.style.setProperty('--bsy', 1.08 - Math.min(.04, Math.abs(v) * .04));
+    clearTimeout(relax); relax = setTimeout(() => { pill.style.setProperty('--bsx', 1.08); pill.style.setProperty('--bsy', 1.08); }, 90);
     const i = Math.max(0, Math.min(TABS.length - 1, Math.round(raw / d.tw)));
     if (i !== d.idx) { d.idx = i; preview(i); }
   });
@@ -777,6 +839,7 @@ document.querySelectorAll('.tab').forEach(b => b.onclick = () => goTab(b.dataset
     quiet = performance.now() + 350; // ignora o "click" gerado ao soltar
     pill.classList.remove('dragging');
     ['--bx', '--bsx', '--bsy'].forEach(p => pill.style.removeProperty(p));
+    lens(null);
     const t = TABS[was.idx];
     if (e.type === 'pointercancel' || t === tabNow()) preview(TABS.indexOf(tabNow()));
     else goTab(t);
@@ -802,7 +865,8 @@ function updateTopbar() {
   tb.classList.toggle('sub', sub);
   tb.classList.toggle('scrolled', scrolled);
   tb.classList.toggle('show', sub || scrolled);
-  $('tbTitle').textContent = TITLES[screenNow()];
+  $('homeActions').classList.toggle('away', window.scrollY > 12 && $('homeActions').dataset.mode !== 'sel');
+  $('tbTitle').innerHTML = TITLES[screenNow()];
   if (sub) {
     $('tbBackLbl').textContent = TITLES[stack[stack.length - 2]];
     // título comprido: o rótulo de voltar encolhe para "Voltar" em vez de ficar em cima do título
@@ -843,14 +907,19 @@ function onEdit() {
 }
 const leave = () => history.back();
 window.addEventListener('popstate', () => {
+  if (closeSearch()) { if (pendingOpen) { const id = pendingOpen; pendingOpen = null; openNote(id); } return; }
   if (closeEditor()) return;
   if (stack.length > 1) { stack.pop(); showCurrent(); updateTopbar(); }
 });
 
-$('fab').onclick = () => {
-  const n = { id: String(Date.now()), title:'', body:'', updated: Date.now() };
-  notes.push(n); openNote(n.id);
-};
+$('fab').onclick = e => openPop(e.currentTarget,
+  '<button class="pi" data-v="note"><span>Criar nota</span><svg class="i ic"><use href="#i-compose"/></svg></button>' +
+  '<button class="pi" data-v="task"><span>Criar tarefa</span><svg class="i ic"><use href="#i-task"/></svg></button>',
+  v => {
+    if (v !== 'note') return; // tarefas: ainda sem função
+    const n = { id: String(Date.now()), title:'', body:'', updated: Date.now() };
+    notes.push(n); openNote(n.id);
+  });
 
 $('back').onclick = leave;
 $('done').onclick = leave;
@@ -860,15 +929,43 @@ $('del').onclick = () => {
   }
 };
 $('title').oninput = onEdit;
-$('search').oninput = render;
+/* ---------- Tela de pesquisa ---------- */
+let pendingOpen = null;
+function renderSearch() {
+  const q = $('sinput').value.trim().toLowerCase();
+  if (!q) { $('sres').innerHTML = '<div class="empty">Digite para buscar nas suas notas.</div>'; return; }
+  const items = notes.filter(n => n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q)).sort((a, b) => b.updated - a.updated);
+  $('sres').innerHTML = items.length ? `<div class="group">${items.map(n => `
+    <div class="row" data-id="${esc(n.id)}"><h3>${esc(n.title) || 'Nova nota'}</h3>
+    <div class="sub"><b>${fmt(n.updated)}</b>${esc(n.body.replace(/\s+/g, ' ')) || 'Sem texto adicional'}</div></div>`).join('')}</div>`
+    : '<div class="empty">Nenhum resultado.</div>';
+}
+function openSearch() {
+  if (selMode || $('sscreen').classList.contains('open')) return;
+  $('sinput').value = ''; renderSearch();
+  $('sscreen').classList.add('open'); $('sscreen').setAttribute('aria-hidden', 'false');
+  history.pushState({ search:1 }, '');
+  setTimeout(() => $('sinput').focus(), 60);
+}
+function closeSearch() {
+  if (!$('sscreen').classList.contains('open')) return false;
+  $('sscreen').classList.remove('open'); $('sscreen').setAttribute('aria-hidden', 'true');
+  $('sinput').blur();
+  return true;
+}
+document.querySelector('#home .search').addEventListener('click', e => { e.preventDefault(); openSearch(); });
+$('sinput').oninput = renderSearch;
+$('scancel').onclick = () => history.back();
+$('sres').onclick = e => { const r = e.target.closest('.row'); if (r) { pendingOpen = r.dataset.id; history.back(); } };
 
 /* ---------- Dados: exportar / importar / apagar ---------- */
 $('exportBtn').onclick = () => {
   if (!notes.length) return alert('Não há notas para exportar.');
-  const blob = new Blob([JSON.stringify(notes, null, 2)], { type:'application/json' });
+  const pack = { app:'N+', format:'nplus', version:1, exported:new Date().toISOString(), notes };
+  const blob = new Blob([JSON.stringify(pack)], { type:'application/octet-stream' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'notas-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.download = 'notas-' + new Date().toISOString().slice(0, 10) + '.nplus';
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 };
@@ -877,8 +974,9 @@ $('importFile').onchange = e => {
   const r = new FileReader();
   r.onload = () => {
     try {
-      const data = JSON.parse(r.result);
-      if (!Array.isArray(data)) throw 0;
+      let data = JSON.parse(r.result);
+      if (data && data.format === 'nplus' && Array.isArray(data.notes)) data = data.notes; // formato .nplus
+      if (!Array.isArray(data)) throw 0;                                                   // .json antigo (lista de notas)
       const valid = data.map(cleanNote).filter(Boolean);
       if (!valid.length) throw 0;
       const ids = new Set(notes.map(n => n.id));
@@ -1069,13 +1167,20 @@ function setLH(v) {
 function openPop(btn, html, onPick) {
   if (popFor === btn) return closePop();
   closePop();
-  pop.innerHTML = html; pop.className = 'pop show'; popFor = btn; popPick = onPick;
+  pop.innerHTML = html; pop.className = 'pop show' + (btn.id === 'fab' || btn.id === 'moreBtn' ? ' glass' : ''); popFor = btn; popPick = onPick;
   btn.classList.add('open');
   placePop();
 }
 function placePop() {
   if (!popFor) return;
   const r = popFor.getBoundingClientRect();
+  if (popFor.id === 'fab') { // acima do botão de escrever, alinhado à direita
+    pop.classList.add('up'); pop.style.left = '0px';
+    pop.style.top = Math.max(8, r.top - pop.offsetHeight - 10) + 'px';
+    pop.style.left = Math.max(8, r.right - pop.offsetWidth) + 'px';
+    return;
+  }
+  pop.classList.remove('up');
   pop.style.top = (r.bottom + 8) + 'px'; pop.style.left = '0px';
   pop.style.left = Math.max(8, Math.min(r.left, innerWidth - pop.offsetWidth - 8)) + 'px';
 }
@@ -1363,7 +1468,7 @@ let rz = 0; window.addEventListener('resize', () => { cancelAnimationFrame(rz); 
 /* ---------- Início: lista/grade, menu ⋯ e seleção com animação ---------- */
 let selMode = false, selected = new Set(), shattering = false;
 function updateSelUI() {
-  $('homeTitle').textContent = selMode ? (selected.size ? `${selected.size} ${selected.size === 1 ? 'selecionada' : 'selecionadas'}` : 'Selecionar') : 'Notas';
+  $('homeTitle').innerHTML = selMode ? (selected.size ? `${selected.size} ${selected.size === 1 ? 'selecionada' : 'selecionadas'}` : 'Selecionar') : NPLUS;
   $('selCount').textContent = selected.size; $('selDelete').disabled = !selected.size;
   $('homeActions').dataset.mode = selMode ? 'sel' : 'normal';
   $('selbar').classList.toggle('show', selMode);
