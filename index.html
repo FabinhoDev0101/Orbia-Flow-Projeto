@@ -68,7 +68,8 @@
     background:var(--glass); border-bottom:.5px solid var(--sep); }
   .topbar.show { opacity:1; pointer-events:auto; }
   .topbar.sub:not(.scrolled) { background:transparent; border-bottom-color:transparent; -webkit-backdrop-filter:none; backdrop-filter:none; }
-  .topbar.sub:not(.scrolled) #tbTitle { opacity:0; }
+  .screen.sub h1.large { display:none; }
+  .screen.sub { padding-top:calc(env(safe-area-inset-top) + 52px); }
   #tbTitle { transition:opacity .2s; max-width:55%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; pointer-events:none; }
   .tb-back { display:none; position:absolute; left:4px; bottom:0; height:44px; align-items:center; gap:0; background:none; border:0; color:var(--accent); font-size:17px; padding:0 10px 0 4px; }
   .topbar.sub .tb-back { display:flex; }
@@ -109,6 +110,9 @@
   .nav-row + .nav-row::before, .item + .item::before, .item + label.item::before, label.item + .item::before { content:""; position:absolute; top:0; left:16px; right:0; height:.5px; background:var(--sep); }
   .nav-row.t + .nav-row.t::before { left:58px; }
   .nav-row:active, button.item:active, label.item:active { background:var(--field); }
+  [hidden] { display:none !important; }
+  .gcap { font-size:13px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin:22px 16px 7px; }
+  .gcap:first-of-type { margin-top:4px; }
   .tile { width:30px; height:30px; border-radius:7px; background:var(--accent); color:var(--on-accent); display:grid; place-items:center; flex:none; }
   .tile svg.i { width:18px; height:18px; }
   .lbl { flex:1; }
@@ -157,21 +161,54 @@
   .pal-row .ck { width:22px; height:22px; color:var(--accent); stroke-width:3; }
 
   /* ---------- Calendário ---------- */
-  .cal-head { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; margin:44px 4px 14px; }
-  .cal-num { font-size:20px; font-weight:600; color:var(--accent); font-variant-numeric:tabular-nums; }
-  .cal-name { font-size:30px; font-weight:700; letter-spacing:.2px; text-align:center; background:none; border:0; color:var(--text); padding:0 6px; }
-  .cal-year { font-size:20px; font-weight:600; color:var(--muted); text-align:right; font-variant-numeric:tabular-nums; }
-  .cal-card { background:var(--card); border-radius:16px; padding:12px 8px 8px; -webkit-user-select:none; user-select:none; }
+  .cal-head { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; margin:2px 6px 8px; }
+  .cal-num { font-size:16px; font-weight:600; color:var(--accent); font-variant-numeric:tabular-nums; }
+  .cal-name { font-size:21px; font-weight:700; letter-spacing:.2px; text-align:center; background:none; border:0; color:var(--text); padding:0 6px; }
+  .cal-year { font-size:16px; font-weight:600; color:var(--muted); text-align:right; font-variant-numeric:tabular-nums; }
+  .cal-card { background:var(--card); border-radius:16px; padding:10px 8px 6px; -webkit-user-select:none; user-select:none; }
   .cal-wd { display:grid; grid-template-columns:repeat(7,1fr); padding-bottom:8px; border-bottom:.5px solid var(--sep); margin-bottom:6px; }
   .cal-wd span { text-align:center; font-size:13px; font-weight:600; color:var(--muted); }
   .cal-wd span:first-child { color:var(--danger); }
   .cal-view { overflow:hidden; touch-action:pan-y; }
   .cal-track { display:flex; width:300%; will-change:transform; }
   .cal-m { flex:none; width:33.3333%; display:grid; grid-template-columns:repeat(7,1fr); row-gap:4px; }
-  .cal-m .d { height:46px; display:grid; place-items:center; font-size:19px; font-variant-numeric:tabular-nums; }
-  .cal-m .d span { width:40px; height:40px; border-radius:50%; display:grid; place-items:center; }
+  .cal-m .d { height:37px; display:grid; place-items:center; font-size:16px; font-variant-numeric:tabular-nums; position:relative; }
+  .cal-m .d span { width:32px; height:32px; border-radius:50%; display:grid; place-items:center; }
   .cal-m .d.out { color:var(--muted); opacity:.45; }
   .cal-m .d.sun { color:var(--danger); }
+  .cal-m .d.has::after { content:""; position:absolute; bottom:1px; left:50%; width:5px; height:5px; margin-left:-2.5px; border-radius:50%; background:var(--accent); }
+  .cal-m .d.today.has::after { background:var(--accent); }
+  .cal-m .d:active span { background:var(--field); }
+  .evrow { display:flex; align-items:center; gap:14px; width:100%; border:0; background:none; text-align:left; color:var(--text); padding:11px 16px; position:relative; }
+  .evrow + .evrow::before { content:""; position:absolute; top:0; left:70px; right:0; height:.5px; background:var(--sep); }
+  .evrow:active { background:var(--field); }
+  .evrow .eday { width:42px; text-align:center; flex:none; line-height:1.1; }
+  .evrow .eday b { display:block; font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .evrow .eday small { font-size:11px; font-weight:600; text-transform:uppercase; color:var(--muted); }
+  .evrow .eday.sun b { color:var(--danger); }
+  .evrow .einfo { flex:1; min-width:0; }
+  .evrow .einfo h3 { font-size:17px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .evrow .einfo div { font-size:14px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+  .evrow .etime { color:var(--accent); font-weight:600; font-size:16px; font-variant-numeric:tabular-nums; }
+  /* tela de evento */
+  .ev-body { flex:1; min-height:0; overflow-y:auto; padding:6px 16px 40px; width:100%; max-width:560px; margin:0 auto; }
+  .ev-group { background:var(--card); border-radius:14px; padding:10px 14px; margin-bottom:12px; }
+  .ev-group label { display:block; font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.3px; margin-bottom:4px; }
+  .ev-group input, .ev-group textarea, .ev-group select { width:100%; border:0; background:transparent; color:var(--text); font:inherit; font-size:17px; outline:none; padding:4px 0; -webkit-appearance:none; appearance:none; }
+  .ev-group textarea { min-height:84px; resize:none; line-height:1.4; }
+  .ev-group input[type=date] { min-height:30px; }
+  .ev-two { display:grid; grid-template-columns:1.35fr 1fr; gap:12px; }
+  .ev-time { display:flex; align-items:center; gap:4px; }
+  .ev-time select { width:auto; flex:1; text-align:center; text-align-last:center; background:var(--field); border-radius:9px; padding:5px 2px; font-variant-numeric:tabular-nums; }
+  .ev-group select#evAlarm { background:var(--field); border-radius:9px; padding:8px 10px; }
+  .seg { display:flex; gap:6px; background:var(--field); border-radius:11px; padding:3px; }
+  .seg button { flex:1; height:34px; border:0; border-radius:9px; background:none; color:var(--text); font-size:16px; font-weight:600; }
+  .seg button.on { background:var(--accent); color:var(--on-accent); }
+  .ev-del { width:100%; height:48px; border:0; border-radius:14px; background:var(--card); color:var(--danger); font-size:17px; font-weight:600; margin-top:6px; }
+  .evalert { position:fixed; left:12px; right:12px; top:calc(env(safe-area-inset-top) + 10px); z-index:120; display:none; align-items:center; gap:12px; padding:14px 16px; border-radius:22px; }
+  .evalert.show { display:flex; animation:fadeIn .25s ease; }
+  .evalert .t { flex:1; min-width:0; } .evalert b { display:block; font-size:16px; } .evalert span { font-size:14px; color:var(--muted); }
+  .evalert button { border:0; background:var(--accent); color:var(--on-accent); border-radius:14px; height:36px; padding:0 16px; font-weight:600; font-size:15px; }
   .cal-m .d.today span { background:var(--accent); color:var(--on-accent); font-weight:700; }
 
   /* ---------- Dock (barra de navegação) ---------- */
@@ -299,10 +336,44 @@
   .grp .dotc { margin:0 3px; }
   .etoast { position:absolute; left:50%; bottom:calc(env(safe-area-inset-bottom) + 70px); transform:translate(-50%, 10px); max-width:88%; padding:9px 16px; border-radius:16px; font-size:15px; font-weight:600; background:rgba(30,30,34,.88); color:#fff; opacity:0; pointer-events:none; transition:opacity .2s, transform .25s; z-index:6; text-align:center; }
   .etoast.show { opacity:1; transform:translate(-50%, 0); }
+  /* pastas */
+  #folders .group { margin-bottom:6px; }
+  .frow { display:flex; align-items:center; gap:12px; width:100%; border:0; background:none; text-align:left; color:var(--text); font-size:17px; padding:11px 16px; position:relative; }
+  .frow + .frow::before { content:""; position:absolute; top:0; left:54px; right:0; height:.5px; background:var(--sep); }
+  .frow:active { background:var(--field); }
+  .frow svg.fi { width:26px; height:26px; color:var(--accent); flex:none; fill:currentColor; fill-opacity:.18; }
+  .frow .fn { flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; }
+  .frow .fc { color:var(--muted); font-size:16px; }
+  .frow svg.chev { width:16px; height:16px; color:var(--muted); opacity:.6; flex:none; }
+  .fscreen { position:fixed; inset:0; z-index:25; background:var(--bg); display:none; flex-direction:column; }
+  .fscreen.open { display:flex; animation:slideIn .32s cubic-bezier(.32,.72,0,1); }
+  .f-body { flex:1; overflow-y:auto; padding:6px 16px 120px; width:100%; max-width:720px; margin:0 auto; }
+  .f-add { position:fixed; right:20px; bottom:calc(22px + env(safe-area-inset-bottom)); width:62px; height:62px; border-radius:50%; border:0; display:grid; place-items:center; color:var(--accent); z-index:26; }
+  .f-add svg.i { width:26px; height:26px; }
+  .modal { position:fixed; inset:0; z-index:80; background:rgba(0,0,0,.32); display:none; align-items:flex-end; justify-content:center; padding:16px; padding-bottom:calc(16px + env(safe-area-inset-bottom)); }
+  .modal.open { display:flex; animation:fadeIn .2s ease; }
+  .msheet { width:100%; max-width:440px; border-radius:26px; padding:18px 14px 10px; max-height:78vh; overflow:auto; background:linear-gradient(135deg, var(--glass-hi), var(--glass) 55%, var(--glass)); }
+  .msheet:active { transform:none; }
+  .msheet h3 { font-size:17px; text-align:center; margin-bottom:4px; }
+  .msheet p { font-size:14px; color:var(--muted); text-align:center; margin:0 8px 10px; line-height:1.35; }
+  .msheet input { width:100%; margin:10px 0 6px; border:0; border-radius:14px; padding:13px 14px; font-size:17px; background:var(--field); color:var(--text); outline:none; }
+  .mrow { display:flex; align-items:center; gap:12px; width:100%; border:0; background:none; border-radius:14px; padding:12px 12px; font-size:17px; color:var(--text); text-align:left; }
+  .mrow:active { background:var(--field); }
+  .mrow svg.fi { width:24px; height:24px; color:var(--accent); flex:none; fill:currentColor; fill-opacity:.18; }
+  .mrow .fn { flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .mrow .ck { width:20px; height:20px; color:var(--accent); stroke-width:3; }
+  .mrow.dim { color:var(--muted); }
+  .mrow.danger { color:var(--danger); }
+  .msep { height:.5px; background:var(--sep); margin:6px 8px; }
+  .mbtns { display:flex; gap:10px; margin-top:8px; }
+  .mbtns button { flex:1; height:46px; border:0; border-radius:15px; font-size:17px; font-weight:600; background:var(--field); color:var(--accent); }
+  .mbtns button.pri { background:var(--accent); color:var(--on-accent); }
+  .mbtns button:disabled { opacity:.4; }
   /* telas sobrepostas */
   .ov { position:fixed; inset:0; z-index:60; background:var(--bg); display:none; flex-direction:column; padding-bottom:env(safe-area-inset-bottom); }
   .ov.open { display:flex; animation:fadeIn .25s ease; }
-  .ov-top { display:flex; align-items:center; justify-content:space-between; padding:calc(env(safe-area-inset-top) + 8px) 12px 8px; min-height:calc(env(safe-area-inset-top) + 52px); }
+  .ov-top > :first-child { justify-self:start; } .ov-top > :last-child { justify-self:end; }
+  .ov-top { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; padding:calc(env(safe-area-inset-top) + 8px) 12px 8px; min-height:calc(env(safe-area-inset-top) + 52px); }
   .ov-title { font-size:17px; font-weight:600; }
   .ov-x, .ov-ok { background:none; border:0; color:var(--accent); font-size:17px; padding:8px; min-width:60px; }
   .ov-ok { font-weight:700; text-align:right; }
@@ -363,7 +434,7 @@
   .th i { display:block; border-radius:50%; background:currentColor; }
 
   /* popovers */
-  .pop { position:fixed; z-index:70; display:none; background:var(--card); border-radius:14px; padding:6px; min-width:150px; max-height:min(60vh,420px); overflow:auto; box-shadow:0 12px 36px rgba(0,0,0,.28), 0 0 0 .5px var(--sep); transform-origin:top left; }
+  .pop { position:fixed; z-index:90; display:none; background:var(--card); border-radius:14px; padding:6px; min-width:150px; max-height:min(60vh,420px); overflow:auto; box-shadow:0 12px 36px rgba(0,0,0,.28), 0 0 0 .5px var(--sep); transform-origin:top left; }
   .pop.show { display:block; animation:popIn .18s cubic-bezier(.34,1.4,.64,1); }
   @keyframes popIn { from { opacity:0; transform:scale(.92) translateY(-4px); } to { opacity:1; transform:none; } }
   .pop .pi { display:flex; align-items:center; justify-content:space-between; gap:14px; width:100%; padding:9px 10px; border:0; background:none; border-radius:9px; color:var(--text); font-size:16px; text-align:left; }
@@ -417,6 +488,8 @@
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
   <symbol id="i-chevd" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
   <symbol id="i-task" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-folderplus" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></symbol>
   <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></symbol>
   <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3"/><path d="M16 4h3a1 1 0 0 1 1 1v3"/><path d="M20 16v3a1 1 0 0 1-1 1h-3"/><path d="M8 20H5a1 1 0 0 1-1-1v-3"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="15" x2="13" y2="15"/></symbol>
   <symbol id="i-mathpen" viewBox="0 0 24 24"><path d="M15 3.5a2.12 2.12 0 0 1 3 3L6.5 18l-4 1 1-4z"/><line x1="17" y1="17" x2="23" y2="17"/><line x1="20" y1="14" x2="20" y2="20"/></symbol>
@@ -441,6 +514,8 @@
 <main id="home" class="screen active">
   <h1 class="large" id="homeTitle">N<span class="plus">+</span></h1>
   <label class="search glass"><svg class="i"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Buscar" readonly inputmode="none"></label>
+  <div class="sec-title" id="foldTitle">Pastas</div>
+  <div id="folders"></div>
   <div class="sec-title" id="recentTitle">Recentes</div>
   <div id="list"></div>
   <div class="count" id="count"></div>
@@ -448,6 +523,7 @@
 
 <!-- Calendário -->
 <main id="calendar" class="screen">
+  <h1 class="large">Calendário</h1>
   <div class="cal-head">
     <span class="cal-num" id="calNum"></span>
     <button class="cal-name" id="calName" aria-label="Voltar para hoje"></button>
@@ -457,22 +533,35 @@
     <div class="cal-wd"><span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span></div>
     <div class="cal-view" id="calView"><div class="cal-track" id="calTrack"></div></div>
   </div>
+  <div class="sec-title" id="evTitle" style="margin-top:22px"></div>
+  <div id="evList"></div>
 </main>
 
 <!-- Ajustes (raiz) -->
 <main id="settings" class="screen">
   <h1 class="large">Ajustes</h1>
+  <div class="gcap">Geral</div>
   <div class="group">
-    <button class="nav-row t" data-go="set-sound"><span class="tile"><svg class="i"><use href="#i-sound"/></svg></span><span class="lbl">Sons e vibrações</span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row t" data-go="set-theme"><span class="tile"><svg class="i"><use href="#i-contrast"/></svg></span><span class="lbl">Tema e Aparência</span><svg class="i chev"><use href="#i-chev"/></svg></button>
-    <button class="nav-row t" data-go="set-data"><span class="tile"><svg class="i"><use href="#i-cloud"/></svg></span><span class="lbl">Contas e backups</span><svg class="i chev"><use href="#i-chev"/></svg></button>
-    <button class="nav-row t" data-go="set-update"><span class="tile"><svg class="i"><use href="#i-download"/></svg></span><span class="lbl">Atualização do software</span><svg class="i chev"><use href="#i-chev"/></svg></button>
-    <button class="nav-row t" data-go="set-guide"><span class="tile"><svg class="i"><use href="#i-book"/></svg></span><span class="lbl">Guia do usuário</span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row t" data-go="set-access"><span class="tile"><svg class="i"><use href="#i-access"/></svg></span><span class="lbl">Acessibilidade</span><svg class="i chev"><use href="#i-chev"/></svg></button>
-    <button class="nav-row t" data-go="set-privacy"><span class="tile"><svg class="i"><use href="#i-shield"/></svg></span><span class="lbl">Segurança e privacidade</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-guide"><span class="tile"><svg class="i"><use href="#i-book"/></svg></span><span class="lbl">Guia do usuário</span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row t" data-go="set-devices"><span class="tile"><svg class="i"><use href="#i-device"/></svg></span><span class="lbl">Aparelhos conectados</span><svg class="i chev"><use href="#i-chev"/></svg></button>
   </div>
-  <div class="group" style="margin-top:22px">
+  <div class="gcap">Recursos de IA</div>
+  <div class="group">
+    <button class="nav-row t" data-go="set-aivoice"><span class="tile"><svg class="i"><use href="#i-mic"/></svg></span><span class="lbl">Voz para texto</span><span class="val" id="aiVoiceName"></span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-aipen"><span class="tile"><svg class="i"><use href="#i-pen"/></svg></span><span class="lbl">Escrever com caneta</span><span class="val" id="aiPenName"></span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-aiscan"><span class="tile"><svg class="i"><use href="#i-scan"/></svg></span><span class="lbl">Imagem para texto</span><span class="val" id="aiScanName"></span><svg class="i chev"><use href="#i-chev"/></svg></button>
+  </div>
+  <div class="gcap">Som</div>
+  <div class="group">
+    <button class="nav-row t" data-go="set-sound"><span class="tile"><svg class="i"><use href="#i-sound"/></svg></span><span class="lbl">Sons e vibrações</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+  </div>
+  <div class="gcap">Sistema</div>
+  <div class="group">
+    <button class="nav-row t" data-go="set-update"><span class="tile"><svg class="i"><use href="#i-download"/></svg></span><span class="lbl">Atualização do software</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-data"><span class="tile"><svg class="i"><use href="#i-cloud"/></svg></span><span class="lbl">Contas e backups</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-privacy"><span class="tile"><svg class="i"><use href="#i-shield"/></svg></span><span class="lbl">Segurança e privacidade</span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row t" data-go="set-about"><span class="tile"><svg class="i"><use href="#i-info"/></svg></span><span class="lbl">Sobre</span><svg class="i chev"><use href="#i-chev"/></svg></button>
   </div>
 </main>
@@ -505,6 +594,24 @@
     <button class="nav-row" data-go="set-notestyle"><span class="lbl">Estilo de nota</span><span class="val" id="noteStyleName"></span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row" data-go="set-scroll"><span class="lbl">Tipo de rolagem</span><span class="val" id="scrollName"></span><svg class="i chev"><use href="#i-chev"/></svg></button>
   </div>
+</main>
+
+<main id="set-aivoice" class="screen sub">
+  <h1 class="large">Voz para texto</h1>
+  <div class="group" id="aiVoiceList"></div>
+  <p class="note-help">Mostra no editor o botão de microfone. Você fala e o texto é escrito na nota. Precisa de microfone e internet.</p>
+</main>
+
+<main id="set-aipen" class="screen sub">
+  <h1 class="large">Escrever com caneta</h1>
+  <div class="group" id="aiPenList"></div>
+  <p class="note-help">Converte a sua letra, feita com a caneta, em texto digitado. Ainda não está disponível.</p>
+</main>
+
+<main id="set-aiscan" class="screen sub">
+  <h1 class="large">Imagem para texto</h1>
+  <div class="group" id="aiScanList"></div>
+  <p class="note-help">Mostra no editor o botão da câmera. Fotografe um texto e ele é escrito na nota. Precisa de câmera e, na primeira vez, de internet.</p>
 </main>
 
 <!-- Ajustes › Tema e Aparência › Escala da grade -->
@@ -677,7 +784,7 @@
       <button class="fb" data-f="lh" aria-label="Espaço entre linhas"><svg class="i"><use href="#i-lh"/></svg><span id="fLhL">1.5</span><svg class="i cv"><use href="#i-chevd"/></svg></button>
       <span class="sepv"></span>
       <button class="fb" id="f-draw" data-f="draw" aria-label="Desenhar"><svg class="i"><use href="#i-pencil"/></svg></button>
-      <span class="sepv"></span>
+      <span class="sepv" id="aiSep"></span>
       <button class="fb" data-f="audio" aria-label="Gravar áudio e transcrever"><svg class="i"><use href="#i-mic"/></svg></button>
       <button class="fb" data-f="scan" aria-label="Imagem para texto"><svg class="i"><use href="#i-scan"/></svg></button>
     </div>
@@ -700,6 +807,33 @@
   </div>
   <div class="etoast" id="etoast" role="status"></div>
 </section>
+
+<!-- Tela de uma pasta -->
+<div class="fscreen" id="fscreen" aria-hidden="true">
+  <div class="ov-top"><button id="fBack" class="ov-x" aria-label="Voltar"><svg class="i" style="width:22px;height:22px;vertical-align:-5px"><use href="#i-back"/></svg>Voltar</button><span class="ov-title" id="fTitle"></span><button id="fMore" class="ov-x" aria-label="Mais opções" style="text-align:right"><svg class="i" style="width:24px;height:24px"><use href="#i-dots"/></svg></button></div>
+  <div class="f-body"><div id="fList"></div><div class="count" id="fCount"></div></div>
+  <button class="f-add glass" id="fNew" aria-label="Nova nota nesta pasta"><svg class="i"><use href="#i-compose"/></svg></button>
+</div>
+<!-- Janela de diálogo / escolha de pasta -->
+<div class="modal" id="modal" aria-hidden="true"><div class="msheet glass" id="msheet"></div></div>
+
+<!-- Evento do calendário -->
+<div class="ov" id="evScreen" aria-hidden="true">
+  <div class="ov-top"><button id="evBack" class="ov-x" aria-label="Voltar"><svg class="i" style="width:22px;height:22px;vertical-align:-5px"><use href="#i-back"/></svg>Calendário</button><span class="ov-title">Evento</span><button id="evOk" class="ov-ok">OK</button></div>
+  <div class="ev-body">
+    <div class="ev-group"><input id="evName" placeholder="Nome do evento" maxlength="80" autocomplete="off"></div>
+    <div class="ev-two">
+      <div class="ev-group"><label for="evDate">Data do evento</label><input type="date" id="evDate"></div>
+      <div class="ev-group"><label>Hora (24h)</label><div class="ev-time"><select id="evH" aria-label="Hora"></select>:<select id="evM" aria-label="Minuto"></select></div></div>
+    </div>
+    <div class="ev-group"><label for="evDesc">Descrição</label><textarea id="evDesc" placeholder="Opcional"></textarea></div>
+    <div class="ev-group"><label for="evAlarm">Tipo de alarme</label>
+      <select id="evAlarm"><option value="none">Nenhum</option><option value="sound">Som</option><option value="vibrate">Vibração</option><option value="both">Som e vibração</option></select></div>
+    <div class="ev-group"><label>Notificação que quer receber</label><div class="seg" id="evNotify"><button data-n="1">Sim</button><button data-n="0">Não</button></div></div>
+    <button class="ev-del" id="evDel" hidden>Excluir evento</button>
+  </div>
+</div>
+<div class="evalert glass" id="evAlert"><div class="t"><b id="evAlertT"></b><span id="evAlertS"></span></div><button id="evAlertOk">OK</button></div>
 
 <!-- Telas: áudio, câmera, texto detectado -->
 <div class="ov" id="audioScreen" aria-hidden="true">
@@ -737,7 +871,12 @@
 <div class="pop" id="pop"></div>
 
 <script>
-const KEY = 'bloco-de-notas-v1', CFG = 'bloco-de-notas-cfg';
+const KEY = 'bloco-de-notas-v1', CFG = 'bloco-de-notas-cfg', FKEY = 'bloco-de-notas-folders';
+let folders = [], events = [];
+const EKEY = 'bloco-de-notas-events';
+const saveEvents = () => { try { localStorage.setItem(EKEY, JSON.stringify(events)); } catch (e) {} };
+const saveFolders = () => { try { localStorage.setItem(FKEY, JSON.stringify(folders)); } catch (e) {} };
+const folderOf = id => folders.find(f => f.id === id);
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -751,11 +890,15 @@ const PALETTES = {
 };
 const TABS = ['home', 'calendar', 'settings'];
 const NPLUS = 'N<span class="plus">+</span>';
-const TITLES = { home:NPLUS, calendar:'Calendário', settings:'Ajustes', 'set-theme':'Tema e Aparência', 'set-palette':'Paleta de cores', 'set-data':'Contas e backups', 'set-about':'Sobre', 'set-sound':'Sons e vibrações', 'set-update':'Atualização do software', 'set-guide':'Guia do usuário', 'set-access':'Acessibilidade', 'set-privacy':'Segurança e privacidade', 'set-devices':'Aparelhos conectados', 'set-homestyle':'Estilo de nota na tela de início', 'set-gridscale':'Escala da grade', 'set-notestyle':'Estilo de nota', 'set-scroll':'Tipo de rolagem' };
+const TITLES = { home:NPLUS, calendar:'Calendário', settings:'Ajustes', 'set-theme':'Tema e Aparência', 'set-palette':'Paleta de cores', 'set-data':'Contas e backups', 'set-about':'Sobre', 'set-sound':'Sons e vibrações', 'set-update':'Atualização do software', 'set-guide':'Guia do usuário', 'set-access':'Acessibilidade', 'set-privacy':'Segurança e privacidade', 'set-devices':'Aparelhos conectados', 'set-homestyle':'Estilo de nota na tela de início', 'set-gridscale':'Escala da grade', 'set-aivoice':'Voz para texto', 'set-aipen':'Escrever com caneta', 'set-aiscan':'Imagem para texto', 'set-notestyle':'Estilo de nota', 'set-scroll':'Tipo de rolagem' };
 
-let notes = [], cfg = { auto:true, theme:'light', palette:'purple', home:'list', cols:2, noteStyle:'a4', scroll:'v' }, current = null;
+let notes = [], cfg = { auto:true, theme:'light', palette:'purple', home:'list', cols:2, noteStyle:'a4', scroll:'v', aiVoice:true, aiPen:false, aiScan:true }, current = null;
 let stack = ['settings'];
 try { notes = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
+try { const f = JSON.parse(localStorage.getItem(FKEY)); folders = Array.isArray(f) ? f.filter(x => x && typeof x.id === 'string' && typeof x.name === 'string') : null; } catch (e) { folders = null; }
+try { const ev = JSON.parse(localStorage.getItem(EKEY)); events = Array.isArray(ev) ? ev.filter(x => x && typeof x.id === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.date)) : []; } catch (e) { events = []; }
+if (!folders) { folders = [{ id:'f-' + Date.now().toString(36), name:'Minhas notas' }]; saveFolders(); } // primeira vez: já existe uma pasta
+notes.forEach(n => { if (n.folder && !folderOf(n.folder)) delete n.folder; });
 try {
   const s = JSON.parse(localStorage.getItem(CFG)) || {};
   if (s.theme && s.auto === undefined) { s.auto = s.theme === 'auto'; if (s.theme === 'auto') s.theme = 'light'; } // migra versão anterior
@@ -765,6 +908,8 @@ try {
   if (![2, 3].includes(cfg.cols)) cfg.cols = 2;
   if (!['a4', 'caderno'].includes(cfg.noteStyle)) cfg.noteStyle = 'a4';
   if (!['v', 'h'].includes(cfg.scroll)) cfg.scroll = 'v';
+  ['aiVoice', 'aiScan'].forEach(k => { if (typeof cfg[k] !== 'boolean') cfg[k] = true; });
+  if (typeof cfg.aiPen !== 'boolean') cfg.aiPen = false;
 } catch (e) {}
 
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(notes)); } catch (e) { alert('Não foi possível salvar as notas.'); } };
@@ -793,6 +938,9 @@ function renderAppearance() {
   $('gridScaleName').textContent = cfg.cols + ' por linha';
   $('gsList').innerHTML = [2, 3].map(k => `<button class="item" data-gs="${k}"><span>${GS[k]}</span>${k === cfg.cols ? ck : ''}</button>`).join('');
   $('nsList').innerHTML = Object.keys(STY).map(k => `<button class="item" data-ns="${k}"><span>${STY[k]}</span>${k === cfg.noteStyle ? ck : ''}</button>`).join('');
+  const YN = (k, key) => `<button class="item" data-ai="${key}" data-v="1"><span>Sim</span>${cfg[key] ? ck : ''}</button><button class="item" data-ai="${key}" data-v="0"><span>Não</span>${cfg[key] ? '' : ck}</button>`;
+  [['aiVoice', 'aiVoiceList', 'aiVoiceName'], ['aiPen', 'aiPenList', 'aiPenName'], ['aiScan', 'aiScanList', 'aiScanName']].forEach(([key, lst, nm]) => { $(lst).innerHTML = YN(0, key); $(nm).textContent = cfg[key] ? 'Sim' : 'Não'; });
+  applyAI();
   $('scList').innerHTML = Object.keys(DIRS).map(k => `<button class="item" data-sc="${k}"><span>${DIRS[k]}</span>${k === cfg.scroll ? ck : ''}</button>`).join('');
   $('autoSw').checked = cfg.auto;
   $('palName').textContent = PALETTES[cfg.palette].name;
@@ -822,6 +970,12 @@ $('nsList').onclick = e => {
   const b = e.target.closest('[data-ns]'); if (!b) return;
   cfg.noteStyle = b.dataset.ns; saveCfg(); renderAppearance();
 };
+document.addEventListener('click', e => { const b = e.target.closest('[data-ai]'); if (!b) return; cfg[b.dataset.ai] = b.dataset.v === '1'; saveCfg(); renderAppearance(); });
+function applyAI() { // mostra/esconde os botões do editor conforme "Recursos de IA"
+  document.querySelector('[data-f="audio"]').hidden = !cfg.aiVoice;
+  document.querySelector('[data-f="scan"]').hidden = !cfg.aiScan;
+  $('aiSep').hidden = !cfg.aiVoice && !cfg.aiScan;
+}
 $('scList').onclick = e => {
   const b = e.target.closest('[data-sc]'); if (!b) return;
   cfg.scroll = b.dataset.sc; saveCfg(); renderAppearance();
@@ -834,22 +988,30 @@ function fmt(ts) {
   if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
   return d.toLocaleDateString('pt-BR');
 }
+function noteListHtml(items, sel) {
+  const cls = n => 'nitem' + (sel && selected.has(n.id) ? ' sel' : '');
+  const prev = n => esc(n.body.replace(/\s+/g, ' ')) || 'Sem texto adicional';
+  if (cfg.home === 'grid') return `<div class="ngrid c${cfg.cols}" style="--gc:${cfg.cols}">${items.map(n => `
+      <div class="gcard ${cls(n)}" data-id="${esc(n.id)}"><h3>${esc(n.title) || 'Nova nota'}</h3><p>${prev(n)}</p><small>${fmt(n.updated)}</small></div>`).join('')}</div>`;
+  return `<div class="group">${items.map(n => `
+      <div class="row ${cls(n)}" data-id="${esc(n.id)}">
+        <h3>${esc(n.title) || 'Nova nota'}</h3>
+        <div class="sub"><b>${fmt(n.updated)}</b>${prev(n)}</div>
+      </div>`).join('')}</div>`;
+}
 function render() {
   const q = $('search').value.trim().toLowerCase();
   const items = notes
     .filter(n => !q || n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q))
     .sort((a, b) => b.updated - a.updated);
   if (selMode) selected = new Set([...selected].filter(id => items.some(n => n.id === id)));
-  const cls = n => 'nitem' + (selected.has(n.id) ? ' sel' : '');
-  const prev = n => esc(n.body.replace(/\s+/g, ' ')) || 'Sem texto adicional';
   if (!items.length) $('list').innerHTML = `<div class="empty">${q ? 'Nenhum resultado.' : 'Nenhuma nota ainda.<br>Toque no botão de escrever para criar a primeira.'}</div>`;
-  else if (cfg.home === 'grid') $('list').innerHTML = `<div class="ngrid c${cfg.cols}" style="--gc:${cfg.cols}">${items.map(n => `
-      <div class="gcard ${cls(n)}" data-id="${esc(n.id)}"><h3>${esc(n.title) || 'Nova nota'}</h3><p>${prev(n)}</p><small>${fmt(n.updated)}</small></div>`).join('')}</div>`;
-  else $('list').innerHTML = `<div class="group">${items.map(n => `
-      <div class="row ${cls(n)}" data-id="${esc(n.id)}">
-        <h3>${esc(n.title) || 'Nova nota'}</h3>
-        <div class="sub"><b>${fmt(n.updated)}</b>${prev(n)}</div>
-      </div>`).join('')}</div>`;
+  else $('list').innerHTML = noteListHtml(items, true);
+  const showF = folders.length && !selMode;
+  $('foldTitle').classList.toggle('none', !showF);
+  $('folders').innerHTML = !showF ? '' : `<div class="group">${folders.map(f => `
+      <button class="frow" data-fid="${esc(f.id)}"><svg class="i fi"><use href="#i-folder"/></svg><span class="fn">${esc(f.name)}</span><span class="fc">${notes.filter(n => n.folder === f.id).length}</span><svg class="i chev"><use href="#i-chev"/></svg></button>`).join('')}</div>`;
+  renderFolderScreen();
   $('recentTitle').classList.toggle('none', !items.length || !!q);
   $('count').textContent = notes.length ? `${notes.length} ${notes.length === 1 ? 'Nota' : 'Notas'}` : '';
   $('exportCount').textContent = notes.length;
@@ -966,7 +1128,7 @@ function updateTopbar() {
     $('tbBackLbl').textContent = TITLES[stack[stack.length - 2]];
     // título comprido: o rótulo de voltar encolhe para "Voltar" em vez de ficar em cima do título
     const tw = Math.min($('tbTitle').scrollWidth, innerWidth * 0.55);
-    if (scrolled && $('tbBack').getBoundingClientRect().right + 8 > (innerWidth - tw) / 2) $('tbBackLbl').textContent = 'Voltar';
+    if ($('tbBack').getBoundingClientRect().right + 8 > (innerWidth - tw) / 2) $('tbBackLbl').textContent = 'Voltar';
   }
 }
 window.addEventListener('scroll', updateTopbar, { passive:true });
@@ -1002,23 +1164,29 @@ function onEdit() {
 }
 const leave = () => history.back();
 window.addEventListener('popstate', () => {
+  if (hideModal()) return;
   if (hideOvs()) return;
   if (closeSearch()) { if (pendingOpen) { const id = pendingOpen; pendingOpen = null; openNote(id); } return; }
   if (closeEditor()) return;
+  if (closeFolder()) return;
   if (stack.length > 1) { stack.pop(); showCurrent(); updateTopbar(); }
 });
 
 $('fab').onclick = e => openPop(e.currentTarget,
   '<button class="pi" data-v="note"><span>Criar nota</span><svg class="i ic"><use href="#i-compose"/></svg></button>' +
+  '<button class="pi" data-v="folder"><span>Criar pasta</span><svg class="i ic"><use href="#i-folderplus"/></svg></button>' +
   '<button class="pi" data-v="task"><span>Criar tarefa</span><svg class="i ic"><use href="#i-task"/></svg></button>',
   v => {
-    if (v !== 'note') return; // tarefas: ainda sem função
-    const n = { id: String(Date.now()), title:'', body:'', updated: Date.now() };
-    notes.push(n); openNote(n.id);
+    if (v === 'note') newNote(null);
+    else if (v === 'folder') askName('Nova pasta', '', 'Criar', name => createFolder(name));
+    // tarefas: ainda sem função
   });
 
 $('back').onclick = leave;
-$('done').onclick = leave;
+$('done').onclick = () => {
+  const has = current && (current.title.trim() || current.body.trim() || (current.ink && current.ink.length) || (current.inkh && current.inkh.length));
+  if (has) chooseFolder(); else leave();
+};
 $('del').onclick = () => {
   if (current && confirm('Excluir esta nota?')) {
     notes = notes.filter(n => n.id !== current.id); save(); current = null; leave();
@@ -1054,10 +1222,107 @@ $('sinput').oninput = renderSearch;
 $('scancel').onclick = () => history.back();
 $('sres').onclick = e => { const r = e.target.closest('.row'); if (r) { pendingOpen = r.dataset.id; history.back(); } };
 
+/* ---------- Pastas ---------- */
+let curFolder = null;
+const newNote = folderId => {
+  const n = { id: String(Date.now()), title:'', body:'', updated: Date.now() };
+  if (folderId) n.folder = folderId;
+  notes.push(n); openNote(n.id);
+};
+function createFolder(name) {
+  const f = { id:'f-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name:name.trim().slice(0, 40) };
+  folders.push(f); saveFolders(); render(); return f;
+}
+function renderFolderScreen() {
+  if (curFolder === null) return;
+  const f = folderOf(curFolder); if (!f) return;
+  const items = notes.filter(n => n.folder === f.id).sort((a, b) => b.updated - a.updated);
+  $('fTitle').textContent = f.name;
+  $('fList').innerHTML = items.length ? noteListHtml(items, false) : '<div class="empty">Pasta vazia.<br>Toque no botão de escrever para criar uma nota aqui.</div>';
+  $('fCount').textContent = items.length ? `${items.length} ${items.length === 1 ? 'Nota' : 'Notas'}` : '';
+}
+function openFolder(id) {
+  if (!folderOf(id) || curFolder !== null) return;
+  curFolder = id; renderFolderScreen();
+  $('fscreen').classList.add('open'); $('fscreen').setAttribute('aria-hidden', 'false');
+  history.pushState({ folder:1 }, '');
+}
+function closeFolder() {
+  if (curFolder === null) return false;
+  curFolder = null; $('fscreen').classList.remove('open'); $('fscreen').setAttribute('aria-hidden', 'true');
+  return true;
+}
+$('folders').onclick = e => { const b = e.target.closest('[data-fid]'); if (b) openFolder(b.dataset.fid); };
+$('fBack').onclick = () => history.back();
+$('fList').onclick = e => { const r = e.target.closest('.nitem'); if (r) openNote(r.dataset.id); };
+$('fNew').onclick = () => newNote(curFolder);
+$('fMore').onclick = e => openPop(e.currentTarget,
+  '<button class="pi" data-v="rename"><span>Renomear pasta</span></button><button class="pi" data-v="del" style="color:var(--danger)"><span>Excluir pasta</span></button>',
+  v => {
+    const f = folderOf(curFolder); if (!f) return;
+    if (v === 'rename') askName('Renomear pasta', f.name, 'Salvar', name => { f.name = name.slice(0, 40); saveFolders(); render(); });
+    else {
+      const cnt = notes.filter(n => n.folder === f.id).length;
+      showModal(`<h3>Excluir pasta?</h3><p>“${esc(f.name)}” será excluída.${cnt ? ` As ${cnt} ${cnt === 1 ? 'nota dentro dela não será apagada e fica' : 'notas dentro dela não serão apagadas e ficam'} sem pasta.` : ''}</p>
+        <div class="mbtns"><button data-m="cancel">Cancelar</button><button class="pri" style="background:var(--danger)" data-m="del">Excluir</button></div>`,
+        a => { if (a === 'cancel') return closeModal(); closeModal(() => {
+          notes.forEach(n => { if (n.folder === f.id) delete n.folder; });
+          folders = folders.filter(x => x.id !== f.id); save(); saveFolders(); render(); history.back();
+        }); });
+    }
+  });
+
+/* janela (diálogo / escolha de pasta), integrada ao botão voltar */
+let modalOpen = false, modalAfter = null, modalH = null;
+function showModal(html, handler) {
+  $('msheet').innerHTML = html; modalH = handler;
+  if (!modalOpen) { modalOpen = true; history.pushState({ modal:1 }, ''); }
+  $('modal').classList.add('open'); $('modal').setAttribute('aria-hidden', 'false');
+}
+function closeModal(after) { if (modalOpen) { modalAfter = after || null; history.back(); } }
+function hideModal() {
+  if (!modalOpen) return false;
+  modalOpen = false; $('modal').classList.remove('open'); $('modal').setAttribute('aria-hidden', 'true');
+  const f = modalAfter; modalAfter = null; if (f) f();
+  return true;
+}
+$('modal').addEventListener('click', e => {
+  if (e.target === $('modal')) return closeModal();
+  const b = e.target.closest('[data-m]'); if (b && modalH) modalH(b.dataset.m, b);
+});
+function askName(title, initial, okLabel, cb) {
+  showModal(`<h3>${esc(title)}</h3><input id="mInput" maxlength="40" placeholder="Nome da pasta" autocomplete="off" value="${esc(initial)}">
+    <div class="mbtns"><button data-m="cancel">Cancelar</button><button class="pri" data-m="ok" id="mOk">${esc(okLabel)}</button></div>`,
+    a => { if (a === 'cancel') return closeModal(); const v = $('mInput').value.trim(); if (v) closeModal(() => cb(v)); });
+  const inp = $('mInput'), upd = () => { $('mOk').disabled = !inp.value.trim(); };
+  inp.oninput = upd; upd();
+  inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); $('mOk').click(); } };
+  setTimeout(() => { inp.focus(); inp.select(); }, 80);
+}
+function finishSave(folderId) {
+  if (current) { if (folderId) current.folder = folderId; else delete current.folder; save(); }
+  render(); leave();
+}
+function chooseFolder() { // ao tocar em OK no editor: em qual pasta salvar?
+  const cur = (current && current.folder) || '';
+  const ck = '<svg class="i ck"><use href="#i-check"/></svg>';
+  showModal(`<h3>Salvar em…</h3><p>Escolha a pasta desta nota.</p>
+    ${folders.map(f => `<button class="mrow" data-m="f:${esc(f.id)}"><svg class="i fi"><use href="#i-folder"/></svg><span class="fn">${esc(f.name)}</span>${f.id === cur ? ck : ''}</button>`).join('')}
+    <button class="mrow dim" data-m="f:"><svg class="i fi" style="color:var(--muted)"><use href="#i-folder"/></svg><span class="fn">Sem pasta</span>${!cur ? ck : ''}</button>
+    <div class="msep"></div>
+    <button class="mrow" data-m="new"><svg class="i fi"><use href="#i-folderplus"/></svg><span class="fn">Nova pasta…</span></button>
+    <div class="mbtns"><button data-m="cancel">Continuar editando</button></div>`,
+    a => {
+      if (a === 'cancel') return closeModal();
+      if (a === 'new') return askName('Nova pasta', '', 'Criar e salvar', name => finishSave(createFolder(name).id));
+      if (a.startsWith('f:')) { const id = a.slice(2); closeModal(() => finishSave(id)); }
+    });
+}
+
 /* ---------- Dados: exportar / importar / apagar ---------- */
 $('exportBtn').onclick = () => {
-  if (!notes.length) return alert('Não há notas para exportar.');
-  const pack = { app:'N+', format:'nplus', version:1, exported:new Date().toISOString(), notes };
+  if (!notes.length && !events.length) return alert('Não há notas nem eventos para exportar.');
+  const pack = { app:'N+', format:'nplus', version:1, exported:new Date().toISOString(), folders, events, notes };
   const blob = new Blob([JSON.stringify(pack)], { type:'application/octet-stream' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -1071,13 +1336,25 @@ $('importFile').onchange = e => {
   r.onload = () => {
     try {
       let data = JSON.parse(r.result);
-      if (data && data.format === 'nplus' && Array.isArray(data.notes)) data = data.notes; // formato .nplus
+      let impF = [], impE = [];
+      if (data && data.format === 'nplus' && Array.isArray(data.notes)) { impF = Array.isArray(data.folders) ? data.folders : []; impE = Array.isArray(data.events) ? data.events : []; data = data.notes; } // formato .nplus
       if (!Array.isArray(data)) throw 0;                                                   // .json antigo (lista de notas)
       const valid = data.map(cleanNote).filter(Boolean);
-      if (!valid.length) throw 0;
+      if (!valid.length && !impE.length && !impF.length) throw 0;
       const ids = new Set(notes.map(n => n.id));
       const novas = valid.filter(n => !ids.has(n.id));
-      notes = notes.concat(novas); save(); render();
+      const fmap = {}; // pasta importada -> pasta daqui (mesmo id ou mesmo nome = a mesma pasta)
+      impF.forEach(f => {
+        if (!f || typeof f.id !== 'string' || typeof f.name !== 'string') return;
+        const nm = f.name.slice(0, 40), ex = folders.find(x => x.id === f.id) || folders.find(x => x.name.toLowerCase() === nm.toLowerCase());
+        if (ex) fmap[f.id.slice(0, 60)] = ex.id;
+        else { folders.push({ id:f.id.slice(0, 60), name:nm }); fmap[f.id.slice(0, 60)] = f.id.slice(0, 60); }
+      });
+      novas.forEach(n => { if (n.folder) { if (fmap[n.folder]) n.folder = fmap[n.folder]; else delete n.folder; } });
+      const eids = new Set(events.map(x => x.id));
+      (impE || []).forEach(x => { if (x && typeof x.id === 'string' && !eids.has(x.id) && /^\d{4}-\d{2}-\d{2}$/.test(x.date) && typeof x.title === 'string') { events.push({ id:x.id.slice(0, 40), title:x.title.slice(0, 80), date:x.date, time:/^\d{2}:\d{2}$/.test(x.time) ? x.time : '09:00', desc:typeof x.desc === 'string' ? x.desc.slice(0, 500) : '', alarm:ALARMS[x.alarm] ? x.alarm : 'none', notify:!!x.notify, fired:true }); eids.add(x.id); } });
+      saveEvents();
+      notes = notes.concat(novas); save(); saveFolders(); render();
       alert(`${novas.length} nota(s) importada(s).`);
     } catch (err) { alert('Arquivo inválido.'); }
     e.target.value = '';
@@ -1150,6 +1427,7 @@ function cleanInk(a) {
 function cleanNote(n) {
   if (!n || typeof n.id !== 'string' || typeof n.title !== 'string' || typeof n.body !== 'string' || typeof n.updated !== 'number') return null;
   const o = { id:n.id, title:n.title, body:n.body, updated:n.updated };
+  if (typeof n.folder === 'string') o.folder = n.folder.slice(0, 60);
   if (typeof n.html === 'string') o.html = sanitizeHtml(n.html.slice(0, 1000000));
   if (LHS.includes(n.lh)) o.lh = n.lh;
   if (typeof n.size === 'number' && n.size >= 8 && n.size <= 80) o.size = n.size;
@@ -1263,7 +1541,7 @@ function setLH(v) {
 function openPop(btn, html, onPick) {
   if (popFor === btn) return closePop();
   closePop();
-  pop.innerHTML = html; pop.className = 'pop show' + (btn.id === 'fab' || btn.id === 'moreBtn' ? ' glass' : ''); popFor = btn; popPick = onPick;
+  pop.innerHTML = html; pop.className = 'pop show' + (['fab', 'moreBtn', 'fMore'].includes(btn.id) ? ' glass' : ''); popFor = btn; popPick = onPick;
   btn.classList.add('open');
   placePop();
 }
@@ -1679,7 +1957,7 @@ function insertIntoNote(text, para) {
 
 /* ---------- Telas sobrepostas (áudio, câmera, texto detectado) ---------- */
 let ovOpen = null, ovAfter = null;
-const OVS = ['audioScreen', 'camScreen', 'ocrScreen'];
+const OVS = ['audioScreen', 'camScreen', 'ocrScreen', 'evScreen'];
 function showOv(id) { OVS.forEach(o => { $(o).classList.toggle('open', o === id); $(o).setAttribute('aria-hidden', o === id ? 'false' : 'true'); }); }
 function openOv(id) { if (!ovOpen) history.pushState({ ov:1 }, ''); ovOpen = id; showOv(id); }
 function closeOv(after) { if (!ovOpen) return; ovAfter = after || null; history.back(); }
@@ -1836,6 +2114,8 @@ const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Ag
 const calTrack = $('calTrack'), calView = $('calView');
 let calY = new Date().getFullYear(), calM = new Date().getMonth(), calDrag = null, calAnim = false;
 
+const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+let evByDay = {};
 function monthHtml(y, m) {
   const first = new Date(y, m, 1).getDay(), t = new Date();
   let h = '';
@@ -1843,17 +2123,20 @@ function monthHtml(y, m) {
     const d = new Date(y, m, 1 - first + i);
     const cls = 'd' + (d.getMonth() !== m ? ' out' : '') + (d.getDay() === 0 ? ' sun' : '')
       + (d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear() ? ' today' : '');
-    h += `<div class="${cls}"><span>${d.getDate()}</span></div>`;
+    const key = ymd(d);
+    h += `<div class="${cls}${evByDay[key] ? ' has' : ''}" data-date="${key}"><span>${d.getDate()}</span></div>`;
   }
   return `<div class="cal-m">${h}</div>`;
 }
 function renderCal() {
+  evByDay = {}; events.forEach(e => { evByDay[e.date] = (evByDay[e.date] || 0) + 1; });
   const p = new Date(calY, calM - 1, 1), n = new Date(calY, calM + 1, 1);
   calTrack.innerHTML = monthHtml(p.getFullYear(), p.getMonth()) + monthHtml(calY, calM) + monthHtml(n.getFullYear(), n.getMonth());
   calTrack.style.transition = 'none'; calTrack.style.transform = 'translateX(-33.3333%)';
   $('calNum').textContent = String(calM + 1).padStart(2, '0');
   $('calName').textContent = MESES[calM];
   $('calYear').textContent = calY;
+  renderEvents();
 }
 function calSlide(dir) { // -1 mês anterior, 0 volta, 1 próximo mês
   calAnim = true;
@@ -1891,6 +2174,96 @@ function calEnd(e) {
 calView.addEventListener('pointerup', calEnd);
 calView.addEventListener('pointercancel', calEnd);
 $('calName').onclick = () => { const t = new Date(); calY = t.getFullYear(); calM = t.getMonth(); renderCal(); };
+
+/* ---------- Eventos do calendário ---------- */
+const WD = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+const ALARMS = { none:'Sem alarme', sound:'Som', vibrate:'Vibração', both:'Som e vibração' };
+const evTime = e => new Date(e.date + 'T' + (e.time || '09:00') + ':00');
+function renderEvents() {
+  const pre = calY + '-' + String(calM + 1).padStart(2, '0') + '-';
+  const list = events.filter(e => e.date.startsWith(pre)).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  $('evTitle').textContent = 'Eventos de ' + MESES[calM];
+  $('evList').innerHTML = !list.length
+    ? '<div class="empty" style="margin-top:10px">Nenhum evento neste mês.<br>Toque em um dia para criar.</div>'
+    : '<div class="group">' + list.map(e => {
+        const d = new Date(e.date + 'T00:00:00');
+        return `<button class="evrow" data-eid="${esc(e.id)}"><span class="eday${d.getDay() === 0 ? ' sun' : ''}"><b>${d.getDate()}</b><small>${WD[d.getDay()]}</small></span>
+          <span class="einfo"><h3>${esc(e.title)}</h3><div>${esc(e.desc || ALARMS[e.alarm] || '')}</div></span><span class="etime">${esc(e.time)}</span></button>`;
+      }).join('') + '</div>';
+}
+$('evList').onclick = e => { const b = e.target.closest('[data-eid]'); if (b) openEvent(null, b.dataset.eid); };
+calView.addEventListener('click', e => { const d = e.target.closest('.d'); if (d && d.dataset.date) openEvent(d.dataset.date); });
+
+let evEdit = null, evNotify = true;
+(() => { // selects de hora/minuto: sempre 24h
+  const opt = n => Array.from({ length:n }, (_, i) => `<option>${String(i).padStart(2, '0')}</option>`).join('');
+  $('evH').innerHTML = opt(24); $('evM').innerHTML = opt(60);
+})();
+function setNotify(v) { evNotify = v; document.querySelectorAll('#evNotify button').forEach(b => b.classList.toggle('on', (b.dataset.n === '1') === v)); }
+$('evNotify').onclick = e => { const b = e.target.closest('button'); if (b) setNotify(b.dataset.n === '1'); };
+function openEvent(date, id) {
+  const ex = id ? events.find(x => x.id === id) : null;
+  evEdit = ex || null;
+  $('evName').value = ex ? ex.title : '';
+  $('evDate').value = ex ? ex.date : date;
+  const [h, m] = (ex ? ex.time : '09:00').split(':'); $('evH').value = h; $('evM').value = m;
+  $('evDesc').value = ex ? (ex.desc || '') : '';
+  $('evAlarm').value = ex ? ex.alarm : 'sound';
+  setNotify(ex ? ex.notify : true);
+  $('evDel').hidden = !ex;
+  openOv('evScreen');
+  if (!ex) setTimeout(() => $('evName').focus(), 350);
+}
+$('evBack').onclick = () => closeOv();
+$('evOk').onclick = () => {
+  const date = $('evDate').value; if (!date) { $('evDate').focus(); return; }
+  const ev = { id:evEdit ? evEdit.id : 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+    title:$('evName').value.trim() || 'Evento', date, time:$('evH').value + ':' + $('evM').value, desc:$('evDesc').value.trim().slice(0, 500),
+    alarm:$('evAlarm').value, notify:evNotify, fired:false };
+  if (evEdit) events[events.indexOf(evEdit)] = ev; else events.push(ev);
+  saveEvents();
+  if (ev.notify && 'Notification' in window && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (e) {} }
+  const d = new Date(date + 'T00:00:00'); calY = d.getFullYear(); calM = d.getMonth();
+  closeOv(() => { renderCal(); });
+};
+$('evDel').onclick = () => {
+  if (!evEdit) return;
+  showModal(`<h3>Excluir evento?</h3><p>“${esc(evEdit.title)}” será excluído.</p><div class="mbtns"><button data-m="cancel">Cancelar</button><button class="pri" style="background:var(--danger)" data-m="del">Excluir</button></div>`,
+    a => { if (a === 'cancel') return closeModal(); closeModal(() => { events = events.filter(x => x !== evEdit); saveEvents(); closeOv(() => renderCal()); }); });
+};
+
+/* alarme / notificação: só dispara com o app aberto (ver LEIA-ME para notificações com o app fechado) */
+let audCtx = null;
+function beep() {
+  try {
+    audCtx = audCtx || new (window.AudioContext || window.webkitAudioContext)();
+    [0, .35, .7].forEach(t => { const o = audCtx.createOscillator(), g = audCtx.createGain(); o.frequency.value = 880; o.connect(g); g.connect(audCtx.destination);
+      g.gain.setValueAtTime(.0001, audCtx.currentTime + t); g.gain.exponentialRampToValueAtTime(.35, audCtx.currentTime + t + .02); g.gain.exponentialRampToValueAtTime(.0001, audCtx.currentTime + t + .28);
+      o.start(audCtx.currentTime + t); o.stop(audCtx.currentTime + t + .3); });
+  } catch (e) {}
+}
+function fireEvent(e) {
+  if (e.alarm === 'sound' || e.alarm === 'both') beep();
+  if ((e.alarm === 'vibrate' || e.alarm === 'both') && navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]);
+  if (e.notify) {
+    $('evAlertT').textContent = e.title; $('evAlertS').textContent = e.time + (e.desc ? ' · ' + e.desc : '');
+    $('evAlert').classList.add('show');
+    if ('Notification' in window && Notification.permission === 'granted') { try { new Notification(e.title, { body:e.time + (e.desc ? ' · ' + e.desc : '') }); } catch (er) {} }
+  }
+}
+$('evAlertOk').onclick = () => $('evAlert').classList.remove('show');
+function checkEvents() {
+  const now = Date.now(); let ch = false;
+  events.forEach(e => {
+    if (e.fired) return;
+    const t = evTime(e).getTime(); if (t > now) return;
+    e.fired = true; ch = true;
+    if (now - t <= 5 * 60000) fireEvent(e); // perdeu há mais de 5 min: só marca como passado
+  });
+  if (ch) saveEvents();
+}
+setInterval(checkEvents, 15000); document.addEventListener('visibilitychange', () => { if (!document.hidden) checkEvents(); });
+checkEvents();
 
 /* ---------- Layout do editor: estilo (A4 / Caderno) e direção da rolagem ---------- */
 const ed = $('editor'), sheet = $('sheet'), scroller = $('scroller'), snaps = $('snaps');
