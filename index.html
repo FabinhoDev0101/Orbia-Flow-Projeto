@@ -291,7 +291,58 @@
   #editor.drawing[data-tool="pen"] #ink, #editor.drawing[data-tool="eraser"] #ink { pointer-events:auto; touch-action:none; cursor:crosshair; }
 
   /* barra de formatação */
-  .tools { background:var(--card); border-top:.5px solid var(--sep); border-bottom:.5px solid var(--sep); }
+  .tools { background:var(--card); border-top:.5px solid var(--sep); padding-bottom:env(safe-area-inset-bottom); flex:none; }
+  #editor { bottom:var(--kb, 0px); }
+  .grp { flex:none; display:flex; align-items:center; gap:2px; padding:3px; border-radius:14px; background:var(--field); }
+  .grp .fb { background:transparent; height:34px; }
+  .grp .fb.on { background:var(--accent); color:var(--on-accent); }
+  .grp .dotc { margin:0 3px; }
+  .etoast { position:absolute; left:50%; bottom:calc(env(safe-area-inset-bottom) + 70px); transform:translate(-50%, 10px); max-width:88%; padding:9px 16px; border-radius:16px; font-size:15px; font-weight:600; background:rgba(30,30,34,.88); color:#fff; opacity:0; pointer-events:none; transition:opacity .2s, transform .25s; z-index:6; text-align:center; }
+  .etoast.show { opacity:1; transform:translate(-50%, 0); }
+  /* telas sobrepostas */
+  .ov { position:fixed; inset:0; z-index:60; background:var(--bg); display:none; flex-direction:column; padding-bottom:env(safe-area-inset-bottom); }
+  .ov.open { display:flex; animation:fadeIn .25s ease; }
+  .ov-top { display:flex; align-items:center; justify-content:space-between; padding:calc(env(safe-area-inset-top) + 8px) 12px 8px; min-height:calc(env(safe-area-inset-top) + 52px); }
+  .ov-title { font-size:17px; font-weight:600; }
+  .ov-x, .ov-ok { background:none; border:0; color:var(--accent); font-size:17px; padding:8px; min-width:60px; }
+  .ov-ok { font-weight:700; text-align:right; }
+  .ov-ok:disabled { opacity:.35; }
+  .a-body { flex:1; min-height:0; display:flex; flex-direction:column; padding:8px 20px; gap:8px; }
+  .a-status { text-align:center; color:var(--muted); font-size:15px; min-height:20px; }
+  .a-time { text-align:center; font-size:34px; font-weight:300; font-variant-numeric:tabular-nums; min-height:44px; }
+  .a-text { flex:1; min-height:0; overflow:auto; background:var(--card); border-radius:18px; padding:16px; font-size:18px; line-height:1.45; box-shadow:0 1px 3px var(--glass-shadow); }
+  .a-text .interim { color:var(--muted); }
+  .a-rec { display:flex; justify-content:center; padding:18px 0 8px; }
+  .a-btn { width:84px; height:84px; border-radius:50%; border:0; color:#ff3b30; display:grid; place-items:center; }
+  .a-btn .a-ico { grid-area:1/1; transition:opacity .2s, transform .2s; }
+  .a-btn .mic svg.i { width:34px; height:34px; }
+  .a-btn .stop { width:28px; height:28px; border-radius:7px; background:#ff3b30; opacity:0; transform:scale(.6); }
+  .a-btn.rec .mic { opacity:0; transform:scale(.6); }
+  .a-btn.rec .stop { opacity:1; transform:none; animation:recPulse 1.2s ease-in-out infinite; }
+  @keyframes recPulse { 50% { transform:scale(.86); } }
+  .a-bottom { display:flex; justify-content:space-between; align-items:center; padding:6px 22px 18px; }
+  .a-side { height:56px; min-width:56px; border-radius:28px; border:0; color:var(--accent); display:grid; place-items:center; font-size:18px; font-weight:700; padding:0 22px; }
+  .a-side svg.i { width:24px; height:24px; color:#ff3b30; }
+  .a-side:disabled { opacity:.4; }
+  .ov.dark { background:#000; color:#fff; }
+  #camVideo { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#000; }
+  .cam-top { position:relative; z-index:1; padding:calc(env(safe-area-inset-top) + 8px) 12px; }
+  .cam-top .ov-x { color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.6); }
+  .cam-msg { position:relative; z-index:1; margin:20px 24px; padding:14px 16px; border-radius:16px; background:rgba(0,0,0,.6); font-size:15px; line-height:1.4; display:none; }
+  .cam-msg.show { display:block; }
+  .cam-bottom { position:relative; z-index:1; margin-top:auto; display:flex; align-items:center; justify-content:space-between; padding:20px 24px 28px; }
+  .cam-file { width:90px; font-size:15px; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.7); }
+  .shutter { width:76px; height:76px; border-radius:50%; border:4px solid #fff; background:none; display:grid; place-items:center; padding:0; }
+  .shutter i { width:58px; height:58px; border-radius:50%; background:#fff; transition:transform .12s; }
+  .shutter:active i { transform:scale(.88); }
+  .shutter:disabled { opacity:.4; }
+  .ocr-body { flex:1; min-height:0; overflow:auto; padding:6px 16px 20px; display:flex; flex-direction:column; gap:12px; }
+  #ocrImg { width:100%; max-height:26vh; object-fit:contain; border-radius:14px; background:#000; flex:none; }
+  .ocr-work { background:var(--card); border-radius:16px; padding:18px; text-align:center; flex:none; }
+  .ocr-state { color:var(--muted); font-size:15px; margin-bottom:12px; }
+  .ocr-prog { height:6px; border-radius:3px; background:var(--field); overflow:hidden; }
+  .ocr-prog i { display:block; height:100%; width:0; background:var(--accent); transition:width .25s; }
+  #ocrText { flex:1; min-height:200px; width:100%; border:0; border-radius:16px; padding:14px; background:var(--card); color:var(--text); font:inherit; font-size:17px; line-height:1.45; resize:none; outline:none; }
   .fmt, .drawbar { display:flex; align-items:center; gap:6px; padding:7px 10px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
   .fmt::-webkit-scrollbar, .drawbar::-webkit-scrollbar { display:none; }
   .drawbar { display:none; }
@@ -312,7 +363,7 @@
   .th i { display:block; border-radius:50%; background:currentColor; }
 
   /* popovers */
-  .pop { position:fixed; z-index:50; display:none; background:var(--card); border-radius:14px; padding:6px; min-width:150px; max-height:min(60vh,420px); overflow:auto; box-shadow:0 12px 36px rgba(0,0,0,.28), 0 0 0 .5px var(--sep); transform-origin:top left; }
+  .pop { position:fixed; z-index:70; display:none; background:var(--card); border-radius:14px; padding:6px; min-width:150px; max-height:min(60vh,420px); overflow:auto; box-shadow:0 12px 36px rgba(0,0,0,.28), 0 0 0 .5px var(--sep); transform-origin:top left; }
   .pop.show { display:block; animation:popIn .18s cubic-bezier(.34,1.4,.64,1); }
   @keyframes popIn { from { opacity:0; transform:scale(.92) translateY(-4px); } to { opacity:1; transform:none; } }
   .pop .pi { display:flex; align-items:center; justify-content:space-between; gap:14px; width:100%; padding:9px 10px; border:0; background:none; border-radius:9px; color:var(--text); font-size:16px; text-align:left; }
@@ -320,6 +371,7 @@
   .pop .pi svg.i { width:18px; height:18px; color:var(--accent); stroke-width:3; }
   .pop .pi svg.i.ic { width:21px; height:21px; stroke-width:2; }
   .pop.up { transform-origin:bottom right; }
+  .pop.upl { transform-origin:bottom left; }
   .pop.glass { position:fixed; border-radius:22px; padding:7px; min-width:190px; background:linear-gradient(135deg, var(--glass-hi), var(--glass) 55%, var(--glass)); -webkit-backdrop-filter:blur(22px) saturate(190%) brightness(1.05); backdrop-filter:blur(22px) saturate(190%) brightness(1.05); }
   .pop.glass:active { transform:none; }
   .pop.glass .pi { border-radius:15px; padding:11px 12px; }
@@ -365,6 +417,9 @@
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
   <symbol id="i-chevd" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
   <symbol id="i-task" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3"/><path d="M16 4h3a1 1 0 0 1 1 1v3"/><path d="M20 16v3a1 1 0 0 1-1 1h-3"/><path d="M8 20H5a1 1 0 0 1-1-1v-3"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="15" x2="13" y2="15"/></symbol>
+  <symbol id="i-mathpen" viewBox="0 0 24 24"><path d="M15 3.5a2.12 2.12 0 0 1 3 3L6.5 18l-4 1 1-4z"/><line x1="17" y1="17" x2="23" y2="17"/><line x1="20" y1="14" x2="20" y2="20"/></symbol>
   <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></symbol>
   <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
   <symbol id="i-eraser" viewBox="0 0 24 24"><path d="M20 20H9l-5-5a2 2 0 0 1 0-2.8l9.2-9.2a2 2 0 0 1 2.8 0l5.2 5.2a2 2 0 0 1 0 2.8L12 20"/><path d="M7 11l6 6"/></symbol>
@@ -595,6 +650,19 @@
       <button id="done" style="font-weight:600">OK</button>
     </div>
   </div>
+  <div id="wrap">
+    <div class="edate" id="edate"></div>
+    <div id="sheet">
+      <input id="title" placeholder="Título">
+      <div id="scroller">
+        <div id="paper">
+          <div id="body" contenteditable="true" data-ph="Escreva aqui..."></div>
+          <div id="snaps"></div>
+          <canvas id="ink"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="tools" id="tools">
     <div class="fmt" id="fmt">
       <button class="fb wide" data-f="font" aria-label="Fonte"><span id="fFontL">Sistema</span><svg class="i cv"><use href="#i-chevd"/></svg></button>
@@ -609,36 +677,63 @@
       <button class="fb" data-f="lh" aria-label="Espaço entre linhas"><svg class="i"><use href="#i-lh"/></svg><span id="fLhL">1.5</span><svg class="i cv"><use href="#i-chevd"/></svg></button>
       <span class="sepv"></span>
       <button class="fb" id="f-draw" data-f="draw" aria-label="Desenhar"><svg class="i"><use href="#i-pencil"/></svg></button>
+      <span class="sepv"></span>
+      <button class="fb" data-f="audio" aria-label="Gravar áudio e transcrever"><svg class="i"><use href="#i-mic"/></svg></button>
+      <button class="fb" data-f="scan" aria-label="Imagem para texto"><svg class="i"><use href="#i-scan"/></svg></button>
     </div>
     <div class="drawbar" id="drawbar">
       <button class="fb on" data-d="exit" aria-label="Voltar para o texto"><svg class="i"><use href="#i-pencil"/></svg></button>
-      <span class="sepv"></span>
-      <button class="fb" data-tool="pen" aria-label="Caneta"><svg class="i"><use href="#i-pen"/></svg></button>
-      <button class="fb" data-tool="eraser" aria-label="Borracha"><svg class="i"><use href="#i-eraser"/></svg></button>
-      <button class="fb" data-tool="hand" aria-label="Mover a página"><svg class="i"><use href="#i-move"/></svg></button>
-      <button class="fb" data-d="undo" aria-label="Desfazer traço"><svg class="i"><use href="#i-undo"/></svg></button>
-      <span class="sepv"></span>
-      <span id="inkColors" style="display:flex"></span>
-      <span class="sepv"></span>
-      <button class="fb th" data-w="2" aria-label="Fina"><i style="width:4px;height:4px"></i></button>
-      <button class="fb th" data-w="4" aria-label="Média"><i style="width:8px;height:8px"></i></button>
-      <button class="fb th" data-w="8" aria-label="Grossa"><i style="width:13px;height:13px"></i></button>
-    </div>
-  </div>
-  <div id="wrap">
-    <div class="edate" id="edate"></div>
-    <div id="sheet">
-      <input id="title" placeholder="Título">
-      <div id="scroller">
-        <div id="paper">
-          <div id="body" contenteditable="true" data-ph="Escreva aqui..."></div>
-          <div id="snaps"></div>
-          <canvas id="ink"></canvas>
-        </div>
+      <div class="grp">
+        <button class="fb" data-tool="pen" aria-label="Caneta"><svg class="i"><use href="#i-pen"/></svg></button>
+        <button class="fb" data-tool="eraser" aria-label="Borracha"><svg class="i"><use href="#i-eraser"/></svg></button>
+        <button class="fb" data-tool="hand" aria-label="Mover a página"><svg class="i"><use href="#i-move"/></svg></button>
+        <button class="fb" data-d="undo" aria-label="Desfazer traço"><svg class="i"><use href="#i-undo"/></svg></button>
       </div>
+      <div class="grp" id="inkColors" aria-label="Cores"></div>
+      <div class="grp" aria-label="Tamanho">
+        <button class="fb th" data-w="2" aria-label="Fina"><i style="width:4px;height:4px"></i></button>
+        <button class="fb th" data-w="4" aria-label="Média"><i style="width:8px;height:8px"></i></button>
+        <button class="fb th" data-w="8" aria-label="Grossa"><i style="width:13px;height:13px"></i></button>
+      </div>
+      <button class="fb" id="mathBtn" data-d="math" aria-label="Contas por gesto"><svg class="i"><use href="#i-mathpen"/></svg></button>
     </div>
   </div>
+  <div class="etoast" id="etoast" role="status"></div>
 </section>
+
+<!-- Telas: áudio, câmera, texto detectado -->
+<div class="ov" id="audioScreen" aria-hidden="true">
+  <div class="ov-top"><button id="aClose" class="ov-x" aria-label="Fechar">Fechar</button><span class="ov-title">Gravar áudio</span><span style="width:60px"></span></div>
+  <div class="a-body">
+    <div class="a-status" id="aStatus"></div>
+    <div class="a-time" id="aTime"></div>
+    <div class="a-text" id="aText"></div>
+  </div>
+  <div class="a-rec"><button class="a-btn glass" id="aRec"><span class="a-ico mic"><svg class="i"><use href="#i-mic"/></svg></span><span class="a-ico stop"></span></button></div>
+  <div class="a-bottom">
+    <button class="a-side glass" id="aTrash" aria-label="Descartar"><svg class="i"><use href="#i-trash"/></svg></button>
+    <button class="a-side ok glass" id="aOk" aria-label="Confirmar" disabled>OK</button>
+  </div>
+</div>
+<div class="ov dark" id="camScreen" aria-hidden="true">
+  <video id="camVideo" playsinline muted></video>
+  <div class="cam-top"><button id="camClose" class="ov-x">Cancelar</button></div>
+  <div class="cam-msg" id="camMsg"></div>
+  <div class="cam-bottom">
+    <label class="cam-file" role="button">Escolher foto<input type="file" id="camFile" accept="image/*" hidden></label>
+    <button class="shutter" id="camShot" aria-label="Tirar foto" disabled><i></i></button>
+    <span style="width:90px"></span>
+  </div>
+</div>
+<div class="ov" id="ocrScreen" aria-hidden="true">
+  <div class="ov-top"><button id="ocrRetake" class="ov-x">Refazer</button><span class="ov-title">Texto detectado</span><button id="ocrOk" class="ov-ok" disabled>OK</button></div>
+  <div class="ocr-body">
+    <img id="ocrImg" alt="Foto">
+    <div class="ocr-work" id="ocrWork"><div class="ocr-state" id="ocrState"></div><div class="ocr-prog"><i id="ocrBar"></i></div></div>
+    <textarea id="ocrText" hidden spellcheck="false" placeholder="Texto detectado"></textarea>
+    <p class="note-help" style="margin:8px 4px">Confira e corrija o que for preciso. Ao tocar em OK, o texto vai para a nota.</p>
+  </div>
+</div>
 <div class="pop" id="pop"></div>
 
 <script>
@@ -907,6 +1002,7 @@ function onEdit() {
 }
 const leave = () => history.back();
 window.addEventListener('popstate', () => {
+  if (hideOvs()) return;
   if (closeSearch()) { if (pendingOpen) { const id = pendingOpen; pendingOpen = null; openNote(id); } return; }
   if (closeEditor()) return;
   if (stack.length > 1) { stack.pop(); showCurrent(); updateTopbar(); }
@@ -1173,16 +1269,14 @@ function openPop(btn, html, onPick) {
 }
 function placePop() {
   if (!popFor) return;
-  const r = popFor.getBoundingClientRect();
-  if (popFor.id === 'fab') { // acima do botão de escrever, alinhado à direita
-    pop.classList.add('up'); pop.style.left = '0px';
-    pop.style.top = Math.max(8, r.top - pop.offsetHeight - 10) + 'px';
-    pop.style.left = Math.max(8, r.right - pop.offsetWidth) + 'px';
-    return;
-  }
-  pop.classList.remove('up');
-  pop.style.top = (r.bottom + 8) + 'px'; pop.style.left = '0px';
-  pop.style.left = Math.max(8, Math.min(r.left, innerWidth - pop.offsetWidth - 8)) + 'px';
+  const r = popFor.getBoundingClientRect(), h = pop.offsetHeight;
+  pop.style.left = '0px';
+  const w = pop.offsetWidth;
+  const up = popFor.id === 'fab' || (r.bottom + 8 + h > innerHeight - 8 && r.top - 8 - h > 8);
+  pop.style.top = (up ? Math.max(8, r.top - h - 10) : r.bottom + 8) + 'px';
+  if (popFor.id === 'fab') pop.style.left = Math.max(8, r.right - w) + 'px';
+  else pop.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + 'px';
+  pop.classList.toggle('up', popFor.id === 'fab'); pop.classList.toggle('upl', up && popFor.id !== 'fab');
 }
 function closePop() { pop.className = 'pop'; if (popFor) popFor.classList.remove('open'); popFor = null; }
 const menuFont = () => { const c = curFontIdx(); return FONTS.map((f, i) => `<button class="pi" data-v="${i}" style="font-family:${f.v.replace(/"/g, '&quot;')}"><span>${f.n}</span>${i === c ? CHK : ''}</button>`).join(''); };
@@ -1204,6 +1298,8 @@ function toolClick(f, btn) {
     case 'lh':    openPop(btn, menuLH(),    v => setLH(v)); break;
     case 'bold': case 'italic': case 'underline': closePop(); cmd(f); break;
     case 'draw':  closePop(); setDrawMode(true); break;
+    case 'audio': closePop(); openAudio(); break;
+    case 'scan':  closePop(); openScan(); break;
   }
 }
 $('tools').addEventListener('mousedown', e => e.preventDefault()); // não tira o foco/seleção do texto
@@ -1288,7 +1384,7 @@ ink.addEventListener('pointerdown', e => {
   if (!drawMode || tool === 'hand' || activeId !== null || !current) return;
   e.preventDefault();
   try { ink.setPointerCapture(e.pointerId); } catch (_) {}
-  activeId = e.pointerId;
+  activeId = e.pointerId; clearTimeout(mathTimer);
   const er = tool === 'eraser';
   const s = { c: er ? null : inkColor, w: er ? inkW * 3 + 6 : inkW, e: er, p: pos(e) };
   strokes.push(s); if (!current[inkKey()]) current[inkKey()] = strokes;
@@ -1309,19 +1405,20 @@ function endStroke(e) {
   if (e.pointerId !== activeId) return;
   activeId = null;
   finishSeg(strokes[strokes.length - 1]);
+  if (mathOn && tool === 'pen') mathPush(strokes[strokes.length - 1]);
   if (current) { current.updated = Date.now(); save(); }
 }
 ink.addEventListener('pointerup', endStroke);
 ink.addEventListener('pointercancel', endStroke);
 
-function setTool(t) { tool = t; $('editor').dataset.tool = t; renderDrawbar(); }
+function setTool(t) { tool = t; mathSess = []; $('editor').dataset.tool = t; renderDrawbar(); }
 function setDrawMode(on) {
   drawMode = on; $('editor').classList.toggle('drawing', on);
   $('f-draw').classList.toggle('on', on);
   bodyEl.contentEditable = on ? 'false' : 'true';
   closePop();
   if (on) { const s = getSelection(); s.removeAllRanges(); if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur(); setTool('pen'); }
-  else { $('editor').dataset.tool = 'pen'; refreshFmt(); }
+  else { $('editor').dataset.tool = 'pen'; if (mathOn) setMath(false); refreshFmt(); }
 }
 function renderDrawbar() {
   $('inkColors').innerHTML = INK_COLORS.map((c, i) => `<button class="dotc${c === inkColor ? ' on' : ''}" data-ci="${i}" style="background:${c || 'linear-gradient(135deg,#000 50%,#fff 50%)'}" aria-label="Cor"></button>`).join('');
@@ -1331,12 +1428,408 @@ function renderDrawbar() {
 $('drawbar').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.d === 'exit') setDrawMode(false);
-  else if (b.dataset.d === 'undo') { if (strokes.length) { strokes.pop(); redrawInk(); if (current) { current.updated = Date.now(); save(); } } }
+  else if (b.dataset.d === 'math') openPop(b, '<button class="pi" data-v="math"><span>Fazer contas com gesto</span>' + (mathOn ? CHK : '') + '</button>', () => setMath(!mathOn));
+  else if (b.dataset.d === 'undo') { if (strokes.length) { const g = strokes[strokes.length - 1].g; strokes.pop(); if (g) while (strokes.length && strokes[strokes.length - 1].g === g) strokes.pop(); mathSess = []; redrawInk(); if (current) { current.updated = Date.now(); save(); } } }
   else if (b.dataset.tool) setTool(b.dataset.tool);
   else if (b.dataset.w) { inkW = +b.dataset.w; renderDrawbar(); }
   else if (b.dataset.ci !== undefined) { inkColor = INK_COLORS[+b.dataset.ci]; if (tool !== 'pen') setTool('pen'); else renderDrawbar(); }
 });
 renderDrawbar();
+
+/* ---------- Contas por gesto (reconhecimento de escrita à mão, tudo dentro do app) ---------- */
+const NET = {"w1":[[13,-7,-11,-10,-7,9,18,5,16,11,10,18,2,-16,-10,4,26,12,0,8,-3,-6,-6,14,23,22,12,-12,-2,4,10,8,-6,15,33,33,15,8,2,7,-41,-14,6,20,14,20,6,6,-43,-51,-59,-53,-35,-22,-7,14,2,23,19,4,0,-14,-34,-32],[-3,-14,-8,19,29,30,4,5,6,-19,-14,-12,14,10,0,-30,7,4,-4,0,0,10,-14,-48,9,16,8,12,1,9,-29,-21,0,12,13,11,3,16,-26,-18,-24,11,16,-29,-19,-13,-25,-14,0,4,17,-21,-31,4,-9,-23,-1,4,16,3,-2,10,-4,-19],[-4,-5,4,4,8,3,-6,3,-7,-1,-8,-1,1,-15,-3,-2,4,4,17,13,4,-8,1,5,6,4,9,9,6,-5,4,-2,1,9,6,-5,2,5,10,-6,4,-5,-1,1,5,6,-2,-3,4,-10,-7,-1,2,2,-6,1,-1,-12,3,3,-5,-6,-3,-6],[10,22,23,6,1,-5,0,11,4,31,18,9,-7,2,11,-1,9,35,22,6,-24,10,2,-6,12,19,12,-2,-16,9,4,-2,17,15,4,-7,-12,12,3,-3,23,13,-6,-7,-2,5,-3,-10,5,-2,7,13,0,-11,4,-26,0,-8,-12,-10,-12,-6,-4,-10],[-8,-8,-14,4,1,-1,-7,0,10,5,5,11,6,9,9,2,12,9,10,-4,8,11,16,-3,-10,-10,-6,-5,-6,-10,5,0,-3,1,-3,6,-1,-19,-4,-7,-3,7,10,-4,-2,1,11,-7,-3,15,-3,-2,12,14,-6,-9,6,4,4,5,18,7,-7,2],[-35,-21,-24,8,8,12,0,-12,-38,-44,-38,-7,20,2,-2,-15,-37,-56,-8,25,-11,-18,-22,-7,-24,-36,14,24,-17,-30,-27,1,-20,-2,23,15,-6,-3,8,-15,-25,-8,17,24,9,4,-2,-32,6,11,12,24,15,-3,-14,-1,-4,-9,18,2,15,25,11,39],[-41,-6,-35,-25,16,27,25,18,-3,5,0,-18,-10,20,33,18,21,30,8,-43,-27,4,25,31,6,-5,-25,-14,13,8,24,15,1,-12,-37,1,31,9,10,2,6,-21,-27,14,16,-8,5,2,10,-5,-8,14,0,-9,-5,-2,-13,14,8,15,1,14,2,10],[11,-14,2,0,11,15,10,-22,-3,-1,7,-14,-4,33,14,-7,2,7,-5,-40,-8,29,26,13,19,9,-11,-29,-10,13,9,35,-6,-28,-18,0,1,-7,7,30,-14,-26,-20,-16,-7,-10,-7,10,12,19,14,-12,-7,-16,-9,1,3,-5,-17,4,12,12,1,-18],[7,19,14,16,6,5,11,17,4,4,-1,6,4,8,6,7,-4,5,12,-17,-26,-7,-6,-22,6,-1,20,11,-4,-7,-12,-8,-4,-6,6,-8,-25,6,14,10,-6,2,20,-10,-14,9,8,10,-6,7,8,-3,7,13,13,-10,3,5,6,-10,-6,7,23,-3],[3,6,14,12,0,5,16,13,18,7,11,11,6,1,-1,16,23,7,2,10,14,18,8,5,17,4,14,-7,0,20,15,-5,16,-3,19,40,26,10,-5,-1,14,-41,-21,-1,-17,-14,-22,-14,0,-29,-41,-45,-49,-43,-26,-23,1,-12,-10,-24,-16,-24,-7,-12],[2,5,9,4,-4,7,-1,-8,6,9,3,-4,13,5,-3,-2,3,21,14,14,20,21,-3,-11,-2,14,6,2,5,11,2,-29,-12,0,1,1,4,20,-5,-29,-5,-10,11,13,-9,-2,-23,-11,-1,-22,-5,-9,-41,-18,-1,-19,-16,-22,-13,-12,-19,-2,-5,-36],[-10,-27,-21,-8,-1,2,-6,1,-4,11,20,22,7,-1,-13,-14,-4,12,7,11,17,-6,-9,9,-3,10,-8,2,11,-2,0,-3,5,-2,-16,7,17,-8,-4,-3,15,6,-5,-10,-6,-5,-4,22,-6,5,-9,-22,1,12,9,8,-16,-15,-5,2,1,6,4,2],[9,24,-10,-6,-6,-17,-30,-22,13,15,25,-18,-53,-45,-28,-19,10,16,37,-5,-25,-7,17,20,1,3,35,17,-14,0,11,18,9,9,19,0,-18,-11,0,-3,10,4,12,3,-9,-7,-7,11,-3,-4,-7,-3,-2,0,8,9,17,14,8,7,13,-5,-27,-7],[-13,-2,4,13,14,12,-11,10,-7,-15,16,-4,-35,-59,-26,13,-9,1,-3,-2,-25,-38,-41,-4,-34,-11,-24,13,12,-22,-22,-21,0,1,-8,-3,14,-8,-33,-7,-22,-13,-22,-31,22,-11,-11,49,-34,3,-6,-5,40,18,28,36,-5,20,11,4,10,14,20,14],[-10,-1,4,5,2,9,3,-9,-3,11,-3,-10,4,-12,-24,-22,0,14,-7,-12,15,4,-20,-12,-3,9,-17,-8,1,1,-3,7,25,-13,-23,15,4,10,26,35,-27,-81,-13,38,18,15,25,30,-28,-54,-11,36,10,15,0,-5,-20,-24,-18,-15,-12,-4,-6,-9],[4,1,10,17,14,-11,-25,-29,3,-2,12,18,20,-20,-49,-74,10,5,4,17,7,-5,-35,-72,10,0,-4,17,0,-2,-9,-39,-6,12,2,1,-5,7,-10,-22,0,-6,-19,-17,-10,-8,1,15,10,-5,-16,2,23,30,20,4,-17,0,13,5,-3,8,17,10],[-6,9,-7,-11,-18,-17,4,6,-16,3,-2,-5,-4,-7,8,-4,4,10,15,6,-17,1,3,-8,18,3,12,9,-12,-9,-22,3,3,8,13,-23,-6,12,0,12,-2,-3,12,10,29,21,9,11,5,-9,7,24,19,-3,-3,13,-3,-6,4,16,15,0,-4,-10],[26,30,40,37,23,3,-26,-35,20,10,-10,2,5,21,15,-17,-14,-32,-34,-17,-14,2,10,1,-23,-30,-5,-5,4,12,14,2,-4,-8,-9,-2,2,3,12,-6,-20,6,3,-4,-14,-8,-14,-13,-5,-2,17,17,2,-10,-21,-18,15,4,-4,7,13,-5,-6,15],[4,-16,1,-1,-15,-20,8,-12,-10,6,24,23,-3,17,33,4,2,11,20,-12,-38,-10,23,-2,11,-8,1,-17,-11,-14,-9,0,-18,-6,0,-30,-13,11,16,15,-18,23,11,-31,2,27,24,3,-25,9,19,-1,16,18,0,17,10,-8,7,10,7,10,13,-2],[7,-4,12,-2,-4,5,-15,0,2,4,-15,-14,5,9,0,-1,8,10,-23,-25,-2,-8,13,-1,17,-17,-28,-2,2,-12,11,-15,10,-15,-12,-13,-10,-4,-3,10,27,16,2,-1,-28,-5,6,-5,19,28,36,36,37,27,-8,-8,-17,-9,-1,-10,16,-1,-4,15],[7,5,12,11,6,-4,-1,0,11,17,18,16,5,7,10,-12,-8,-8,-12,-14,1,12,4,-3,-13,-11,-14,-6,7,-5,-8,-9,14,10,-17,-9,4,-1,-4,-18,11,1,-14,-5,3,7,-1,6,-5,-23,-22,-1,14,14,5,5,-4,-12,6,17,4,-3,8,-7],[-16,-3,-16,-12,-5,-5,-9,8,-13,-1,-2,-4,-16,-7,6,-1,3,9,4,-21,-36,-10,0,1,3,5,0,5,8,-3,0,4,2,0,-2,33,39,15,2,-10,16,3,-13,7,23,25,19,-22,13,4,-1,-22,-14,-8,15,-10,15,13,11,5,1,3,13,22],[6,-1,2,0,-4,-9,-3,1,2,6,7,1,0,0,10,1,-6,-14,-4,-6,3,-8,4,3,-2,-1,-7,-6,7,2,-3,0,-7,7,1,4,12,-13,3,-5,-18,11,4,1,-19,-12,6,-1,-5,9,12,7,14,17,-2,-3,-2,-7,1,2,10,13,-2,11],[4,4,18,-2,-9,16,-12,-26,18,9,-1,-25,-4,16,-3,-9,2,-22,-20,-14,15,28,-4,-18,-14,-19,-14,13,15,3,-14,-8,3,-7,0,21,21,-4,-1,13,10,6,-3,3,15,20,14,-10,12,17,13,-21,-22,1,3,1,7,21,10,-5,-30,-17,-4,-7],[0,17,16,28,9,-28,-6,1,-1,-9,-4,2,-7,-14,-8,8,-2,-27,-4,14,3,-13,3,-5,0,-5,15,13,4,-9,4,-1,5,1,20,5,-11,-12,5,-14,2,11,11,7,10,3,-8,-26,5,8,5,1,13,9,-19,-7,20,8,-1,14,4,-5,-15,-9],[4,-5,13,3,8,-4,0,-3,-1,-5,11,5,1,-5,-12,8,-11,0,3,-3,-4,-2,10,4,4,2,6,-7,4,10,1,5,8,2,11,-2,2,0,5,15,8,11,16,8,14,20,12,-13,-2,0,7,2,-6,-5,-2,8,6,-11,-6,-1,5,7,2,3],[-31,-16,19,7,25,30,23,13,-3,18,8,-16,-26,2,9,11,-20,2,-5,-18,-30,-37,-32,-27,-6,1,4,14,19,12,-23,-23,9,-14,4,5,4,27,13,5,-1,-1,0,-12,-11,14,3,-10,2,-7,-3,9,-6,-5,1,-19,12,-13,4,3,0,-3,-12,8],[23,27,15,7,32,33,19,14,-9,-13,-12,-9,-4,18,24,31,-11,2,1,2,-28,-6,13,19,-5,10,23,13,-38,-35,-19,3,-9,-10,21,2,-18,-28,-26,15,-4,-16,-3,10,34,4,-13,-5,4,-20,-21,-1,7,8,-6,-18,16,22,1,3,-17,-2,-9,-14],[7,16,7,-7,-3,2,-10,-7,-1,18,21,-21,-31,5,6,-8,-1,13,32,-10,-25,-4,-9,0,-19,0,26,13,16,-10,-10,6,-4,-1,8,6,14,-7,2,2,-3,-6,-15,5,15,1,3,-9,-3,-5,-8,-8,-7,1,0,2,14,-7,-5,-7,-4,7,-9,5],[-10,11,-4,1,15,15,10,-2,-1,14,5,9,-5,-16,-9,-10,14,3,4,16,-2,-13,-12,-11,9,7,4,11,-9,-18,-3,0,-1,12,19,6,9,-7,10,-20,3,7,-12,12,27,11,-8,-24,-3,-3,-20,-11,4,2,-19,-17,8,11,3,-2,4,3,-6,-23],[2,-3,7,-3,8,13,8,13,4,5,8,16,8,2,-6,0,-5,10,8,-8,-11,1,1,-12,-6,-4,1,3,3,0,1,-4,1,-2,-6,1,-13,2,0,2,5,12,8,-3,-12,0,-8,9,-5,3,1,-5,-4,4,1,-2,-1,5,9,3,-9,6,0,-9],[1,-7,-8,0,3,4,-1,-6,-4,0,-3,5,-11,1,4,2,4,0,3,14,12,0,13,5,-1,-6,-11,-7,-11,0,17,6,11,5,-13,-1,5,-17,-1,-4,-3,9,-2,2,1,-6,5,-2,2,7,2,9,21,14,2,6,1,0,-1,-7,8,6,0,16],[3,15,9,5,10,13,14,1,-9,9,6,8,11,20,7,-1,-19,-5,19,16,-25,13,-3,1,-9,10,37,-3,-35,5,9,9,2,32,-2,-60,-19,0,11,-28,15,24,-42,-47,10,-18,-10,-31,19,5,-31,-1,21,-15,-5,-5,2,-11,-25,-3,6,18,22,9],[5,10,12,6,-1,8,7,3,7,8,4,-3,0,7,-2,14,3,4,-9,18,22,7,-21,-14,-6,4,1,16,-12,7,8,16,1,17,6,-10,-18,-6,3,21,6,33,-13,-39,-8,-12,-24,19,12,33,-2,-25,21,-5,-33,5,8,6,8,8,-11,-28,-35,-1],[-15,-14,-5,-3,6,4,-23,-25,1,2,3,-2,13,10,-12,-22,12,3,-14,-20,-7,17,4,-17,11,-7,-5,2,2,-9,1,-2,3,-2,-2,-6,3,-21,-2,10,3,17,9,1,5,13,4,0,2,3,6,-7,6,6,2,8,4,-7,-11,1,-3,-5,6,10],[6,29,3,5,2,-7,-3,3,4,15,3,1,7,0,2,10,3,9,27,8,3,17,20,5,8,6,23,5,-12,1,13,-3,9,2,7,-10,-21,7,8,4,18,6,11,6,8,16,13,12,0,-10,-2,-7,-7,1,-1,-9,-12,-25,-5,-4,-8,-2,-25,-24],[3,1,1,6,-1,7,5,3,5,5,7,-1,-3,2,-9,12,-6,4,1,12,3,10,8,11,-11,-6,1,-7,-15,13,12,4,8,-3,-4,-4,0,1,-1,5,2,4,0,7,9,-10,-3,4,2,6,7,4,-4,3,-5,7,-3,-7,0,-5,10,6,2,13],[15,6,8,8,-6,-4,-10,-14,5,4,9,-3,5,10,-8,-1,6,6,-8,-12,-17,-11,-2,-10,11,10,2,1,0,9,-1,1,4,5,2,11,-1,12,-1,13,-10,-3,8,0,-14,-7,7,10,2,4,11,13,-2,-2,5,8,-1,5,3,12,1,-1,11,0],[11,-10,2,6,11,5,18,2,-8,7,-3,13,4,6,-7,-13,7,12,-1,3,9,17,10,1,2,-10,-11,-13,-17,12,17,5,9,1,8,-12,-19,22,22,8,13,11,0,-10,1,17,4,-7,14,4,12,-13,3,1,-15,-9,14,17,8,-11,-5,14,10,15],[1,14,4,6,-6,0,5,2,-9,-4,1,-5,-15,-2,3,0,-5,-17,7,7,9,13,10,-2,1,-4,6,-5,-19,-1,2,3,7,9,6,-8,-6,-1,-4,8,-17,4,9,6,-4,-16,7,0,-9,4,10,14,5,4,-8,2,-5,-4,-8,-1,8,17,1,17],[-33,-14,11,14,4,-3,-11,-13,-29,-5,16,-12,-35,-8,-5,-12,-16,0,34,5,-44,-14,9,4,-13,-5,31,12,-3,4,1,9,7,13,17,15,6,4,-5,-11,10,-4,-12,-7,-2,4,0,-7,5,-3,-2,6,0,-6,0,2,10,10,14,12,-4,-9,5,3],[-8,-14,11,2,5,6,10,0,-10,-2,-2,9,-2,-9,-5,14,-20,-10,9,3,-5,2,7,8,-12,-21,7,-12,-3,9,4,11,12,2,0,5,10,-2,2,12,18,8,-1,7,18,20,-1,-2,-6,-7,-4,-2,-8,-11,-4,2,0,-5,-15,-2,-6,-3,-3,-4],[-5,-3,0,6,3,-20,-20,-31,-28,-20,-17,8,11,8,25,11,-20,-24,-22,-5,-15,-15,8,30,-23,-3,-5,16,-1,-35,-27,2,-29,-8,-7,31,2,-29,-45,-46,-21,-13,-20,10,39,14,-64,-74,-15,11,-1,8,28,0,-59,-29,-7,21,26,22,22,-4,-51,-22],[-30,-15,7,0,-7,-11,-7,-6,-13,0,-7,-18,-20,-15,-1,-8,-8,5,9,16,-14,-3,-2,-18,-15,8,25,17,-6,20,-4,-18,-3,6,15,0,1,14,1,-9,1,2,12,7,17,18,11,-1,13,0,-1,5,-3,7,12,-3,7,13,9,15,-4,-6,10,13],[13,-4,4,5,-13,-29,-42,-29,18,9,9,14,18,6,-15,-44,-9,-12,-21,-16,10,18,7,-3,-17,-5,-23,-5,6,12,15,7,1,1,-8,16,15,0,0,6,-22,-4,-1,3,-14,-6,15,35,-2,-1,5,17,11,6,12,13,-8,4,11,8,-3,-12,-1,5],[11,-9,-15,-15,-13,-15,0,-7,15,12,21,41,29,36,33,36,12,1,-5,-27,-33,-20,2,18,-3,-12,-20,-30,-8,-13,-34,-42,-10,-7,-11,10,25,-1,-13,-45,-8,-5,10,19,6,-7,-3,-1,-3,5,4,-10,-6,13,15,6,27,4,1,0,12,18,16,5],[-8,-13,4,11,23,19,5,-11,-11,-23,8,9,-2,-5,9,3,-12,-19,4,5,-33,6,15,2,-8,-27,9,-1,-42,26,29,12,-4,-23,-14,-7,-18,14,10,-12,17,9,-8,-4,-4,12,-20,-23,10,8,1,-7,-1,-6,-10,5,5,18,0,-9,18,18,6,12],[-14,9,-11,-6,29,41,-9,-29,-2,2,-19,-13,10,-20,-42,-12,-11,0,-11,4,28,-13,-32,-14,-10,0,-9,-1,6,9,10,23,-27,-8,0,12,12,-1,25,31,-40,-22,-15,19,15,12,7,3,-14,-20,15,8,-8,-18,-17,9,-8,-18,1,-3,11,3,-15,-17],[-2,-15,-21,-15,6,20,12,17,4,1,1,5,1,-1,16,24,13,23,8,-13,-6,-7,-14,-9,13,22,14,8,11,-10,-38,-33,-1,-1,1,2,-10,-6,-25,-27,3,-1,-7,-11,-7,13,20,-18,8,9,-14,-11,-3,16,16,-22,6,16,17,7,-2,15,9,-4],[-8,12,-7,4,0,-2,-8,-10,-13,6,2,-8,-10,-11,-4,6,-10,-10,-7,3,14,-9,5,12,3,-3,-5,-9,-3,1,-6,17,10,6,-11,-7,12,-2,6,5,0,-3,-7,24,22,4,2,-1,3,-10,-8,16,27,9,-9,8,8,-9,-14,-18,6,8,2,11],[9,3,-12,-1,14,23,34,17,-5,1,2,12,-16,-33,-32,-30,0,0,23,6,-9,-29,-41,-56,10,7,0,-9,14,17,3,19,6,5,-11,-30,8,22,41,34,-2,5,10,-17,-18,6,13,15,0,3,12,4,-2,-12,-15,15,1,-3,6,3,-2,-11,-13,9],[-8,-2,-3,9,6,-8,0,-4,2,8,2,-7,-11,4,10,-4,18,6,6,18,2,13,12,3,-3,-4,1,0,-14,9,3,-3,0,4,12,1,-2,16,-5,-12,-2,5,-7,-13,7,1,4,-5,4,10,-4,-4,4,0,-1,-3,-2,5,-4,-6,16,5,4,13],[11,-2,9,13,8,-1,-12,2,-30,-37,3,10,0,-12,8,16,-68,-41,3,25,16,-6,15,17,-64,-34,13,23,13,15,14,4,-36,-26,-5,16,-12,15,2,8,-18,-18,-4,13,-11,0,13,20,-20,-24,-5,-1,-29,-8,22,9,-11,-37,-16,-3,-11,-9,11,25],[-10,-12,-6,-7,8,12,8,10,-2,3,2,7,-6,-1,-1,5,-9,16,17,5,-1,4,1,18,4,10,16,-8,4,14,18,17,14,9,-3,-15,-1,15,17,9,1,-20,-37,6,23,-1,-14,-5,-3,-29,-28,-11,3,-12,-15,6,15,-2,5,17,9,14,11,0],[-9,-3,-4,4,0,-6,-6,-9,4,-2,0,0,2,0,4,-1,8,-3,3,9,7,13,8,2,-7,1,4,4,-9,-3,4,5,0,-1,5,-3,9,0,-6,2,2,0,-1,-6,11,14,2,-12,-4,3,4,0,4,4,-3,3,3,-5,-5,2,3,0,1,9],[-4,-3,-7,-3,9,4,-4,13,2,1,0,7,13,15,19,3,4,-1,-13,7,17,16,4,12,-5,3,-11,8,22,7,7,-1,-20,-7,-8,4,15,22,17,-17,-12,-2,-4,-12,-3,13,3,-5,0,7,0,-11,-13,0,12,-6,-3,18,6,-2,-8,8,7,-8],[-2,13,-5,3,-19,-49,-76,-22,13,8,24,28,2,-49,-94,-15,12,3,13,39,16,-38,-58,-10,-7,13,2,31,-12,-22,0,6,3,21,-2,10,-1,-4,-3,-4,-8,1,2,-14,-5,9,7,27,1,-3,-8,-4,9,22,15,-4,-2,9,9,1,-9,-22,-16,-24],[11,7,-9,5,12,-4,-8,-14,-3,-2,-21,-2,9,-2,-26,9,-8,-1,-14,7,11,-18,-13,6,-9,-9,-7,-9,-22,-6,-2,5,1,7,0,-23,-1,0,14,2,-1,20,15,0,-5,9,11,-11,11,7,14,9,21,14,-1,11,-1,8,3,-4,10,19,12,23],[-11,-6,0,9,-2,-7,-8,-2,2,-20,-4,0,-11,-35,-23,12,5,-11,-10,19,32,-11,-21,13,-4,0,-23,-16,2,1,1,-4,-2,12,11,-11,-5,-3,-20,-35,-19,4,22,1,5,-2,-3,-5,-19,-1,32,18,3,9,21,27,-12,-3,21,12,1,7,6,9],[-14,-8,-16,-36,-43,-6,20,20,-10,8,-27,-16,15,9,-6,-11,-18,-11,-6,14,2,9,0,3,-22,-3,12,31,8,25,7,7,-7,9,15,14,-34,20,16,12,-12,-6,12,6,-8,13,13,17,-3,-19,5,4,8,9,3,8,-3,11,14,7,-4,8,9,18],[15,15,-11,7,16,29,27,25,11,3,5,16,0,2,2,10,-10,6,7,14,0,-2,-20,-12,-7,9,-1,0,12,4,-10,-31,4,-3,-22,-4,-8,-8,-12,-25,9,-10,-7,-9,2,-9,-12,-14,7,2,10,-3,15,18,6,-7,8,14,-9,-30,-16,14,14,6],[25,4,4,3,0,-10,-4,5,17,12,20,23,7,-2,-12,-6,5,22,20,5,19,26,-13,-23,11,-3,3,3,8,-3,-29,-32,10,-20,-23,-11,-10,-17,-10,-4,-7,-27,-33,-26,-18,4,9,25,-24,-10,1,6,22,18,5,-13,1,17,26,9,-5,-18,-11,-9],[0,2,-2,7,7,-3,-1,8,2,-2,6,0,15,10,11,-3,-7,0,14,7,10,10,7,-2,-13,5,10,7,-7,5,-2,-8,-9,-10,-1,8,-8,-5,-2,-4,-16,4,-2,-12,-11,-14,1,2,-14,10,4,7,-4,3,-11,-17,-14,-9,-2,2,-2,2,-4,2],[-28,-2,6,8,-8,-17,-29,3,3,-9,-4,-19,-30,-22,5,27,2,1,1,13,-3,-15,3,-9,14,15,6,26,3,-13,-16,-17,21,7,6,15,-2,-12,-17,-20,14,9,35,20,-15,-5,3,4,12,13,42,4,-13,-2,17,11,-1,31,34,7,0,-9,-1,5],[-3,3,5,11,6,27,14,-3,1,0,0,-6,15,16,6,2,-16,8,-9,-2,21,28,3,-2,-21,-2,-15,-8,11,13,2,-14,-28,1,-9,14,16,9,-8,-12,-2,-1,0,5,10,-8,-20,2,10,-4,-9,-11,-17,-14,3,5,-8,-4,-5,1,-11,-2,1,11],[-2,14,5,11,16,9,20,21,-7,-7,-8,6,8,2,-2,1,-25,-14,-13,-5,0,-10,-18,-8,-12,-6,-14,-8,8,0,-7,-31,-14,-7,-8,6,23,10,11,-9,1,-3,3,26,7,-20,-3,14,4,10,3,13,4,-13,-15,-22,-7,-7,-1,13,12,-3,10,2],[-2,-3,-10,-4,2,21,8,2,-6,1,-2,-15,-10,13,5,-35,-4,-4,4,-14,17,45,10,-34,-8,-3,-2,0,7,20,-2,-34,-12,1,-4,15,10,-3,-38,-26,-22,-1,5,7,-5,-27,-32,-9,1,-4,-2,2,-6,2,7,18,-4,-2,2,5,23,14,8,18],[10,27,25,12,5,-9,-1,-4,-28,0,17,9,5,10,7,6,-30,-21,-1,17,1,-3,5,9,-35,-51,-10,32,12,-8,3,6,-4,-29,-55,-9,-1,-1,0,19,16,14,-19,-41,-12,-3,-7,-15,21,45,34,-1,20,-2,-1,-30,-7,-12,4,8,12,11,-7,5],[-7,0,4,3,-1,4,13,5,-1,11,-4,5,15,2,6,3,7,-1,5,8,14,-3,-2,21,-3,6,-9,-15,12,8,-4,-18,-4,-2,-8,10,12,-4,-4,-29,0,-5,15,41,-25,-38,1,-22,0,3,21,38,-24,-54,-29,-30,6,19,16,24,3,-15,3,-11],[10,16,14,10,20,21,-2,-14,6,10,10,10,5,-12,-4,3,8,-3,7,10,10,-28,-1,-5,5,-3,-7,1,2,-8,-18,-43,-29,-16,-13,-6,14,-9,-17,-25,-16,-23,-27,0,6,-14,-10,13,15,-2,3,17,18,11,-8,3,10,19,21,6,1,5,10,-3],[10,-3,2,5,-11,-10,-10,-6,3,7,-1,-1,7,11,5,-4,9,11,-1,-1,-1,11,19,-3,5,1,6,7,-10,8,6,0,-1,1,7,8,2,6,-8,9,-16,5,6,-12,-16,-7,8,11,-1,5,18,6,7,4,-1,0,-5,9,1,9,13,2,11,15],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[11,17,-4,0,7,9,2,0,0,1,-1,0,4,0,-3,-7,5,-10,-2,41,28,-9,-12,0,-7,-3,-11,8,16,10,-16,-5,4,24,-13,-19,2,18,-5,-17,-22,9,-4,-20,-12,16,33,10,-29,-27,19,5,-17,21,22,2,-12,-43,-41,-24,-26,-18,-10,18],[-18,-2,-9,-13,-2,-2,-4,5,-15,5,-8,3,24,11,-4,0,-1,12,7,-7,10,16,0,8,14,3,5,-11,-1,0,-9,-10,2,1,6,-20,-2,18,16,-11,8,3,15,20,13,14,5,-20,1,3,-4,1,1,-17,-22,-1,3,-8,-8,0,4,-7,1,2],[13,4,8,6,-11,5,14,8,14,15,4,-1,1,-6,-26,0,12,18,8,-4,14,18,-18,5,12,9,2,-19,10,23,-23,-21,4,13,7,-11,27,15,-31,-50,17,13,18,35,27,14,-21,-46,2,-25,-20,-8,-14,-42,-16,8,8,6,-9,-3,-14,-31,-19,-59],[-7,8,9,11,-7,-11,-9,-5,11,0,-18,1,1,-2,4,-8,1,-6,6,3,4,6,16,-2,-1,-20,-8,1,0,1,-5,-12,-8,-19,12,5,2,-8,-13,-15,-18,22,47,10,-31,-7,7,-3,-4,31,36,-13,-26,1,-4,2,-3,26,40,15,-13,-9,-11,-14],[18,0,-2,-7,-4,12,-7,-13,9,5,-14,-14,0,12,0,-8,1,1,-6,-11,10,21,17,18,-1,-2,-8,-15,-11,14,15,6,4,-1,5,3,1,15,6,-11,9,-14,-21,-3,29,15,-2,4,13,-4,-1,7,30,9,3,18,9,14,-2,-5,12,-4,-12,8],[1,9,1,4,22,16,12,-5,-2,-2,1,12,6,17,13,9,5,-10,-9,-8,-15,-23,-25,-6,15,11,-9,-1,3,-20,-39,-29,-6,2,3,12,10,-3,-17,-25,-4,-2,-7,8,-2,-20,-24,-19,3,16,6,8,15,5,-4,-31,7,3,-9,-3,16,33,22,-11],[26,27,35,15,15,9,2,-3,1,-4,2,-11,-10,3,3,11,-22,-8,16,16,10,-4,-16,14,-27,17,47,23,12,14,3,-2,-50,-44,-15,-5,-9,9,13,6,-32,-39,-54,-50,-29,-11,-16,-18,-2,21,32,23,2,-19,-13,-22,23,17,3,-3,-18,-10,-12,-15],[-4,-10,-11,-2,-3,-12,-17,-22,9,-12,8,7,6,11,6,-12,7,0,-10,-12,-16,-1,17,4,-2,2,-1,-8,-3,17,7,10,-19,1,10,11,7,-2,-11,-4,-36,2,11,2,-16,-28,4,16,-24,-9,13,1,-14,6,16,11,13,0,-5,2,24,14,22,25],[-14,-8,-20,-24,1,17,14,13,-13,-12,8,-20,14,26,9,1,9,5,-22,-27,21,-14,-28,-12,9,1,-23,6,38,-4,-33,-1,16,16,-30,-12,28,22,15,18,6,-25,-31,-37,-8,22,17,6,4,12,9,-35,-18,9,1,-12,-10,20,16,-25,-25,12,19,1],[-5,12,13,5,8,7,-7,-20,-7,9,23,-19,-39,-3,-7,-6,-7,18,28,-12,-26,-5,-13,2,-2,0,20,-3,5,14,-8,-3,-5,6,27,1,-6,1,6,-1,-1,6,11,-8,-8,-8,-1,14,-5,5,0,6,-1,4,4,4,2,3,4,4,0,-7,-15,9],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[4,-20,-11,-3,10,13,11,-10,-3,6,12,10,-10,-1,12,-17,-9,12,19,0,-11,-5,11,-20,-4,-5,0,-9,-15,12,-3,-12,11,-18,-8,2,-8,-3,-8,9,-45,-21,18,15,-14,-13,5,11,-66,-28,21,15,3,18,6,-3,-34,-20,0,-1,-5,2,-4,7],[9,0,1,2,1,1,-6,9,12,4,10,7,3,6,3,10,0,4,-8,-7,-10,0,-2,6,-3,6,8,16,17,12,0,-5,-11,-7,-3,20,0,8,10,8,-14,0,1,-20,-18,1,5,9,-18,0,10,-8,-15,-15,-4,-1,-4,0,14,10,-3,-24,-12,11],[-2,-2,-12,-3,0,5,-6,2,13,5,12,15,15,19,7,-6,17,12,-4,-7,0,5,4,-1,7,6,-7,17,12,4,3,-6,-8,-1,3,10,-4,-5,-3,-5,-13,4,4,-7,-21,-8,2,12,-3,8,0,-7,0,11,14,-7,-2,0,12,13,13,0,0,0],[-4,0,4,5,5,19,19,8,-24,-11,2,5,7,5,-4,-10,-19,-1,6,4,18,-4,-15,-12,-5,7,-10,-7,8,-4,-17,-27,-2,-7,-9,1,16,-8,-19,-31,7,2,-8,10,-2,-20,-20,-18,16,5,6,17,8,-13,-13,-14,3,9,9,5,8,11,21,-9],[1,16,0,2,16,30,25,12,-15,-11,-15,-19,-1,-6,-12,-7,-7,-18,-10,1,-16,-40,-49,-45,15,-13,2,8,10,-13,-32,-2,1,5,11,-11,4,29,41,36,-2,3,2,-19,1,27,24,7,-3,-2,9,3,1,5,1,1,16,-7,0,6,12,-4,9,8],[-4,-17,5,2,-3,0,-7,3,-15,3,8,1,15,10,-2,-6,0,7,3,-13,9,6,30,16,8,-2,-22,-26,-11,-5,12,25,7,-1,5,-2,-9,-7,11,18,7,12,-2,3,-21,-5,15,10,-4,8,5,-1,7,21,-6,12,7,3,0,-1,10,10,9,10],[0,-7,0,13,7,-3,-3,-7,-2,-1,9,8,12,1,-5,6,-4,3,1,-4,-5,8,-2,-5,-8,1,18,-2,7,10,-10,-4,-5,-1,6,10,6,-3,1,8,4,-1,15,-1,19,19,13,-23,-2,0,5,-4,-4,-7,4,-10,1,-3,-3,6,-3,-5,-10,-12],[-7,13,13,8,12,21,-17,-20,7,10,-2,-21,11,0,-26,-38,-2,-16,-11,19,39,-4,-23,-8,-16,-5,3,18,-12,-23,-8,18,-3,6,5,6,-2,-15,-12,-3,6,5,8,10,-4,0,1,4,19,13,11,3,-3,-5,11,5,18,3,10,12,12,-12,-13,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[7,-7,3,0,7,4,2,-4,7,12,10,10,17,13,0,-6,1,-1,-12,-17,-15,-4,4,-5,-2,-7,-1,-8,13,4,1,-2,0,-4,4,-6,-2,-11,-4,9,10,5,-1,2,-8,7,3,-2,-7,-11,-8,-9,-7,10,-9,4,-3,-10,6,-4,-1,1,1,-1],[-2,12,19,16,16,15,9,25,-4,-5,-7,-13,-20,-14,-10,9,-12,-8,-2,-10,-16,-21,-24,-20,-9,9,19,20,21,-1,-17,-26,-19,7,19,31,1,-1,-3,2,-2,18,26,2,-35,-13,9,9,16,21,14,-15,-8,13,6,-17,-12,-13,0,-9,-13,-12,-20,-6],[14,-3,1,9,7,8,7,11,15,6,1,-12,-27,-42,-46,-40,3,-1,2,1,20,14,6,4,3,1,-1,3,18,26,42,53,5,0,-6,2,5,-2,22,46,-1,8,-6,-2,-4,-25,-16,-2,-3,5,1,8,14,-12,-19,-6,5,-5,-5,-8,-13,-5,-5,-13],[-5,9,-1,9,8,4,5,4,-9,-3,5,10,11,-2,-1,-7,-4,3,9,-4,-9,-16,-7,-7,10,-2,9,-2,12,-10,-5,-4,8,1,12,-10,-15,-10,16,3,1,-1,2,4,-3,0,-2,-15,-5,-2,-7,-3,11,7,-16,-9,5,4,2,-2,-9,9,9,-8],[12,0,-6,-13,-10,-12,5,-1,9,12,0,10,-4,-7,-11,5,-9,10,24,1,-2,-5,-5,3,-4,-3,9,-11,-13,-9,-24,-3,2,-8,-3,-24,-7,0,-4,-2,-27,-14,4,17,-1,19,8,1,-14,-2,20,15,8,13,3,18,15,7,7,6,6,-8,-3,11],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[-17,-1,-1,-7,-1,3,-11,-1,-2,-3,-10,-18,-16,-1,1,-1,1,-12,-26,-17,11,3,-10,-24,3,-6,-14,20,15,-11,-27,-9,5,0,-5,20,24,-1,-6,9,-4,0,2,4,28,27,9,1,6,14,19,0,-1,16,22,9,12,15,16,3,-17,-2,20,13],[6,-12,-23,-24,-7,-5,-5,-19,-31,-20,-4,13,11,6,1,9,-3,6,15,0,-15,-18,-17,-12,21,-4,4,-20,-20,-9,-27,5,3,-15,-1,-23,-10,24,19,22,1,3,18,18,22,34,19,2,0,1,18,17,12,8,-1,17,21,15,-1,0,-3,-22,2,8],[12,9,-3,-10,3,4,9,10,-2,0,0,12,21,0,-1,-2,-6,6,2,3,-4,10,7,1,5,-8,3,14,-13,8,13,6,-6,-5,0,7,-12,7,-5,-6,-6,6,19,0,-20,-5,-20,-12,-3,6,14,-10,-19,-7,-17,-9,-12,11,21,0,-13,2,2,0],[-11,15,9,0,6,14,4,3,-10,-4,0,11,12,17,10,-5,-14,-6,7,23,38,13,-1,5,-18,-16,-8,11,20,20,12,-1,-14,-31,-56,-43,-21,13,10,-8,8,-10,-41,-70,-27,18,10,2,7,27,35,7,-2,4,-14,-16,0,-37,-25,0,3,1,3,-6],[8,3,-5,-5,-3,0,17,-5,-6,-9,0,-15,-16,-10,-2,-10,-9,-6,2,12,-1,-3,-4,-15,-4,4,8,-7,-7,-6,-2,8,-3,19,14,-14,-1,2,19,11,-4,0,-15,13,26,3,-2,-8,-3,-16,-16,14,33,20,-1,9,12,-12,-8,2,8,7,10,9],[15,11,20,16,3,-11,-15,-8,-13,-29,-32,-28,-14,-3,-8,0,-28,-20,0,21,12,8,10,10,-9,13,22,21,8,-5,6,8,8,2,20,4,-3,-2,13,-5,2,-7,0,12,-2,14,12,-8,4,-13,0,13,2,3,7,17,-2,-4,13,3,-6,-11,-7,-3],[-5,3,-3,9,6,10,-1,5,13,-1,-2,-1,1,3,4,14,3,-9,-17,11,14,13,3,10,-5,10,-2,9,11,10,9,3,0,9,-10,10,9,-3,-7,0,-1,-12,-3,1,2,-12,0,12,1,-5,-2,2,2,2,10,-2,-10,-10,-10,2,-4,-6,-18,-13],[-15,-12,0,-6,-1,-1,-4,-2,6,22,6,-3,-5,18,15,23,20,7,-24,-29,-16,-3,13,18,4,-9,-23,-1,21,-12,-25,-16,-7,-8,-25,7,25,-4,-20,-17,-12,-15,2,33,8,-4,9,3,-21,-7,0,9,6,19,10,12,0,-7,-3,1,10,15,-5,3],[-8,-7,4,6,6,7,8,8,-18,-5,7,7,-13,-11,-5,7,-22,-8,9,18,1,-6,7,1,-14,-11,2,-10,-5,-1,-3,5,10,-1,4,-12,-4,-9,8,2,12,7,3,12,13,8,1,-17,1,-1,6,-3,4,5,-11,6,7,-7,-2,-5,4,16,-1,9],[-3,3,1,5,18,13,6,11,-3,-1,-6,7,17,8,11,-2,-17,-3,-6,-4,3,2,-15,0,-10,14,3,18,8,0,-5,-1,-12,2,-6,6,-1,5,12,1,-8,-10,-1,-1,3,-3,-18,-1,-3,-5,-1,-2,4,4,-5,-22,-2,3,13,3,-20,-1,-6,-27],[-7,9,9,-6,-10,8,5,-6,-5,-3,-4,1,-4,-9,10,10,-1,-7,2,-2,-5,-25,-13,-6,-2,-2,-2,-5,15,-9,-29,-15,-7,6,-6,-7,11,-4,10,-1,2,-6,-21,9,27,-2,-6,14,-6,-9,-23,16,34,18,-6,13,11,-14,-10,5,17,23,15,13],[19,0,3,13,26,15,-17,-7,-11,-8,-16,7,39,25,-3,-21,-15,-2,-27,-19,17,19,-3,9,-1,9,-17,-14,14,12,11,-2,1,10,-16,-3,8,13,6,-21,6,6,-4,2,-3,10,-10,-2,8,10,-7,0,1,2,-8,-12,-6,10,0,-11,-10,-7,8,-2],[-2,-10,1,3,4,-9,2,-5,2,-3,4,3,1,0,8,10,3,-1,5,-2,-6,8,10,0,-1,4,8,8,5,4,-4,-3,3,4,15,9,-4,2,-4,3,0,12,13,1,8,13,11,-17,-3,7,2,-4,0,7,11,3,4,0,0,6,11,9,6,10],[1,-5,-7,-5,3,-3,-4,-5,9,2,8,9,-4,5,11,16,3,-1,-15,8,10,1,-1,6,-4,1,5,15,10,6,6,-3,-13,-3,0,19,14,2,-8,-2,-8,9,7,-8,-15,-4,8,9,-5,10,5,-5,-4,10,9,-3,-3,-4,4,6,12,1,-4,4],[21,29,46,30,17,7,1,12,18,-1,-21,-11,6,11,19,26,-23,-55,-43,-16,-10,-16,1,36,-15,-10,19,10,-4,-15,-27,8,5,2,26,8,1,-2,4,-8,16,8,3,-10,-16,12,6,-3,6,-3,-7,9,3,2,5,-6,1,-7,-11,-12,-7,-5,7,-11],[-10,-7,7,-8,-1,11,20,15,35,40,37,10,-12,12,11,-12,26,15,9,-4,10,11,10,0,-13,-11,4,0,4,-9,0,-19,-31,-14,12,28,7,-24,-11,-15,-24,-29,-8,15,-9,-28,6,15,-12,-13,-14,-22,-21,-10,8,21,24,18,26,22,-4,-17,-17,-7],[-6,2,5,2,-2,0,-2,8,3,1,9,-4,-1,-12,-2,-14,1,-1,-6,11,24,-3,3,-12,-9,14,-12,-6,3,1,1,-21,16,1,-10,3,18,-16,-17,-15,-3,-24,13,26,6,-24,-10,14,-10,-8,23,22,9,-6,-3,17,-16,0,9,11,14,-11,-13,-8],[-12,5,-5,6,3,-2,4,0,6,-3,-1,-5,-12,3,9,3,9,-13,-4,9,14,0,-2,-4,-5,5,-1,1,4,-4,-2,-6,4,16,4,7,-2,-3,6,-7,-5,-6,4,-5,3,-5,7,-4,3,3,-1,1,12,4,7,-10,9,5,1,-3,12,-5,-2,8],[24,3,26,17,13,-12,-15,-10,0,-7,-2,-7,-8,8,-2,10,14,3,7,-1,3,13,10,15,-11,-13,-2,21,10,6,4,-9,-10,-51,-53,-37,-2,-18,-9,-13,34,20,-3,-10,-22,-13,-3,-12,25,38,53,45,8,3,8,-18,-2,-18,-10,-18,-18,-8,-8,-19],[-4,-12,-4,16,18,-8,16,6,-4,-3,11,13,-10,-12,10,-5,16,5,21,14,-15,-4,-5,-5,9,3,10,-5,-4,4,-15,-6,11,18,17,-19,-7,9,13,-4,-2,11,9,-20,3,15,-1,-28,-7,11,0,-15,4,5,6,-6,10,15,-5,-21,-4,9,23,8],[-4,20,0,-2,-3,-8,8,-2,9,13,5,-4,-10,-4,8,14,-3,-8,-4,16,5,12,7,9,-26,-19,-2,4,5,13,3,4,-31,-14,-2,-7,7,19,9,-16,6,-5,-2,-21,26,30,-3,-24,-2,15,-7,-22,3,20,7,-5,-8,-2,-10,-6,15,32,21,11],[-10,-13,-17,2,4,9,12,-5,-17,-25,11,12,0,7,16,-17,-34,-20,14,18,-7,-3,-6,-19,-44,-42,8,28,15,-12,-25,1,-22,-14,-2,18,5,-9,-5,-2,-18,-7,7,4,12,4,-1,-10,-6,7,-8,-10,6,-5,-2,-35,4,3,6,-3,9,6,-2,0],[-6,-10,-13,-11,0,11,-7,5,6,7,5,5,7,6,8,3,8,4,-3,16,16,0,2,11,-13,3,-9,5,13,-1,13,-2,-10,4,-6,10,11,4,2,-7,5,1,-4,2,2,-10,5,9,-3,1,-9,-15,-3,9,7,7,-5,2,-1,1,11,7,-9,5],[5,22,28,12,15,18,10,11,9,8,8,13,1,9,14,22,-5,-5,6,21,17,-1,-9,17,-9,10,8,2,9,-6,3,-6,-15,4,-3,5,-5,7,9,-9,2,-7,-4,-21,-4,3,-4,1,-12,-18,-10,-15,-31,-13,14,10,-17,-22,-6,-3,-12,-21,-13,-4],[18,9,-22,-16,-1,-4,-9,24,30,38,-7,-41,3,5,-22,-6,17,45,11,-53,-22,1,-6,1,7,36,45,-22,4,-4,-12,0,14,16,35,24,11,6,13,1,12,-15,-5,10,4,-3,13,8,-2,-14,-10,-1,-1,-12,5,6,22,11,-5,6,-2,4,-6,11],[3,0,3,-8,10,7,-4,-19,-4,12,3,9,22,17,8,-17,11,10,-8,-21,-2,24,6,-10,16,-1,-7,-7,-2,-2,-3,-10,-12,-8,5,-5,0,12,9,-1,1,-7,-9,-1,1,27,17,6,3,-10,-3,-14,-3,4,1,4,4,1,-11,2,-4,-9,-2,-12],[-16,-2,15,11,9,12,6,3,-15,2,9,13,-4,-3,-3,6,-12,-13,-11,6,6,5,-10,3,5,-10,4,-4,12,-3,-10,-4,16,7,-3,-10,4,-6,-2,-4,11,7,5,17,25,8,0,-19,-2,-6,-1,-1,8,10,-9,-5,3,-7,-11,-3,-6,-3,-15,-8],[6,-16,-13,-13,-15,5,4,10,18,2,12,-2,-2,-9,-6,10,29,21,16,4,16,-9,-13,-11,18,14,1,1,22,3,-8,-17,-6,-16,-14,-2,9,5,2,4,-18,-29,-26,-21,-26,13,43,20,-3,-5,-11,-24,-1,22,8,19,35,39,38,15,3,-7,-4,27],[-6,-7,4,-8,3,22,0,2,1,5,-4,2,4,1,-10,7,-13,2,-6,-1,5,5,0,10,-7,6,-4,-10,7,15,13,3,1,-2,-11,15,19,3,-6,2,6,3,-4,9,2,-5,-5,20,3,-11,-7,-1,-8,5,10,7,-8,-10,-7,-6,1,0,-7,2],[-11,-4,-2,7,14,-3,-5,4,2,-6,-11,2,-4,-4,-5,7,3,-12,-8,5,16,3,-8,9,-4,4,-1,-6,9,-9,-5,9,9,13,5,4,4,-12,-2,1,4,2,1,6,22,9,6,-6,5,-3,4,5,4,-1,9,-1,5,-5,-7,4,7,-11,-11,0]],"b1":[4,-5,-14,-15,2,-2,5,29,0,20,-6,-5,4,30,6,-17,-20,16,-4,12,0,10,15,3,-4,22,9,2,2,-13,15,8,14,17,18,-31,12,15,-25,11,1,18,6,-24,4,10,17,-13,7,0,3,-14,5,1,4,-30,-9,19,2,-21,-4,11,9,-24,-15,-23,2,-3,-19,-7,8,-6,2,-20,-2,9,-15,-2,-3,11,27,-8,-7,11,24,4,-13,-1,5,16,-26,-2,24,-8,7,6,21,-7,1,12,11,-12,-9,-37,5,1,11,-5,-5,-10,14,7,12,-2,-4,-18,0,-7,-31,3,-9,-10,7,-10,10,10,10,-10],"w2":[[-70,-10,-11,17,13,38,-11,7,33,-50,-4,-2,-47,-10,35,27,7,-3,17,27,-3,-62,-3,6,-11,7,6,76,-6,-16,21,3,23,28,21,13,6,15,15,9,22,-3,-2,-1,4,-98,7,-31,4,-7,-7,0,11,-22,5,-46,-45,12,-33,16,-15,23,20,-67,-59,-2,-12,-13,-49,-32,20,0,-27,20,44,9,-27,-58,-108,-2,20,14,0,18,7,16,-36,-50,20,10,-76,0,11,-48,-48,22,18,0,-48,7,26,-85,-21,-26,-30,-46,0,3,-11,-7,7,-18,-1,-62,-20,-24,-3,7,-46,43,-21,-78,5,11,-6,3,-18,-34],[-43,11,16,7,-7,15,14,63,10,7,40,5,66,123,16,31,11,-24,-24,-55,2,-36,-14,-6,2,-27,-105,-84,-21,19,-9,-3,-15,-60,-35,37,-12,-20,37,-4,3,-20,8,22,-17,-15,-27,35,-27,19,-16,9,5,-4,-5,33,27,-16,2,26,22,-8,-7,37,22,44,11,-36,57,21,-14,0,14,37,-10,4,26,18,-114,-45,73,11,0,-31,-28,-2,24,-51,-31,-21,15,0,-29,22,-96,9,-32,0,1,-67,-9,19,30,59,1,-9,-8,10,34,28,-18,-16,-88,-10,20,13,-72,15,33,-5,7,24,-57,15,-7,-36,-5,4],[-13,21,-1,-48,-1,-8,8,5,-23,-58,-24,24,19,-34,24,42,-29,22,-8,24,-3,-53,15,17,-17,-6,-15,-25,-4,-56,-6,22,43,-26,4,-37,11,1,2,13,-15,6,-123,-63,18,5,30,-33,-23,28,-71,-23,-75,50,-8,-21,36,22,23,-29,10,49,-8,11,5,16,18,-12,34,33,1,0,-15,-23,-61,41,32,-3,-44,-2,-129,-18,0,29,-20,-4,19,-23,17,-21,11,0,1,63,-57,-3,24,0,-14,19,12,-55,26,-10,3,3,5,-19,10,22,-15,-7,35,-5,18,-10,34,-47,-57,-38,-1,-32,-40,-4,-3,59,17,-10],[46,-57,-9,-40,15,-45,28,10,-2,-32,-60,12,3,-69,-20,12,-37,23,19,17,8,10,11,10,24,-7,-3,64,-20,36,-13,5,-61,-19,14,-30,-12,2,-31,-4,-32,-22,27,-24,14,23,-59,4,25,-3,61,7,-47,-28,7,6,28,-1,-48,-58,-13,-5,-4,-48,-2,-11,13,2,-33,2,13,0,9,-3,-18,-46,-4,16,18,30,42,-33,0,-10,1,19,5,34,-5,-2,32,0,-3,-23,37,-6,-23,0,6,-2,-39,28,-11,30,2,31,-13,-15,-1,3,9,16,47,28,-21,8,23,9,-9,-11,7,-15,-76,10,-15,29,-5,-2],[45,-56,12,17,-10,32,-51,-39,-30,74,26,-26,-50,-10,2,-42,16,-99,35,37,-43,8,-14,45,8,13,-75,-48,20,12,-17,5,-47,-30,-7,19,1,-14,34,5,25,14,-9,20,-59,-105,19,49,-46,19,0,15,3,15,10,-10,-53,38,31,-25,-82,-53,-22,13,17,-30,19,8,8,-17,-10,0,10,9,55,10,21,-30,34,-39,54,-1,0,-56,-33,-31,23,24,13,5,25,0,-17,-50,6,-2,-3,0,8,38,-28,-76,21,14,-11,-17,18,-27,8,-55,9,-20,-40,25,7,2,5,16,37,-11,-15,6,7,2,8,-32,-8,7],[11,-60,2,3,-7,35,-130,-43,7,-47,-22,9,31,-50,-81,-32,-2,-13,14,25,13,2,6,-82,-1,7,31,-59,25,7,12,-15,-41,-23,-14,-7,-13,-3,13,-11,14,6,68,-7,-40,74,-20,-45,15,-16,31,-18,22,15,-11,10,-82,-18,-66,15,10,22,-8,-32,-38,22,-90,17,16,28,-15,0,-15,6,19,-35,-21,8,49,-14,-45,24,0,-34,16,3,-2,8,26,2,-55,0,20,35,56,22,-5,0,-42,-4,-1,43,5,-7,-9,13,11,5,20,-12,4,-4,13,-4,-29,-10,45,8,2,32,1,16,34,0,12,15,-1,-9],[-119,46,-2,19,-27,30,2,-37,16,-33,-12,-34,11,-11,37,-27,12,-62,8,-21,-32,7,4,-29,10,2,48,31,13,-23,-5,-19,47,49,-24,2,-7,20,-24,16,27,-13,45,13,7,62,-74,22,17,-6,19,-2,68,-9,-8,-29,-35,-12,1,37,10,-62,8,21,-27,18,-30,-90,-85,-22,12,0,32,-36,-29,-8,-15,34,-90,20,60,21,0,36,11,-1,-5,18,-14,-6,-18,0,-20,22,43,1,10,0,10,7,1,-23,-4,27,6,9,-5,14,-15,-16,6,0,-73,-125,-22,3,-59,3,-49,7,-24,-19,-4,-60,-11,7,-21,-12],[26,11,5,-27,-16,-135,5,48,3,42,5,-6,22,-24,17,-12,43,11,46,-43,24,-22,-16,39,-9,7,48,25,-63,-5,-2,-17,71,-15,18,8,-11,3,-13,-21,-88,13,-39,-7,24,20,16,35,-45,-9,-15,-15,11,-2,1,-7,29,-37,19,-31,-26,-21,-15,50,8,14,-2,-70,-3,-33,-13,0,-112,15,23,7,-1,-42,6,-25,-28,-83,0,-16,10,-4,-18,31,-27,15,17,0,9,8,37,-8,46,0,49,43,0,-42,-2,14,13,1,-16,12,10,14,-3,-7,28,-3,12,-9,-17,-25,0,-42,-7,13,-63,22,12,-92,11,12],[-45,17,-10,-7,10,-27,38,-115,-5,-109,-1,-5,-45,-116,31,-44,-18,27,-78,-67,-10,27,7,-13,6,8,14,-35,31,-12,3,13,46,50,9,4,10,-6,-39,15,-4,10,13,-4,-13,-3,22,-4,15,12,-27,0,20,-24,9,-8,-4,0,11,-41,20,1,9,-14,-10,-33,5,40,-33,-30,0,0,33,-27,-52,21,-40,-18,-26,10,-32,8,0,22,10,9,-27,4,-27,11,1,0,-3,-19,7,1,17,0,14,-1,14,-32,-14,-52,14,32,11,-3,-11,-20,10,10,-6,13,15,12,-91,-7,4,14,6,21,65,-32,12,4,4,12],[39,23,-6,14,-11,-22,-4,9,-12,20,10,15,-84,0,-47,34,-16,9,-33,23,2,47,-10,-22,-51,-2,13,50,0,-3,7,-10,-85,1,8,-3,3,8,0,-18,23,6,0,12,24,-85,15,-107,19,-43,-79,5,9,2,-1,14,2,6,9,41,6,29,-2,-57,5,-44,6,55,-50,-7,9,0,11,-12,-6,-81,5,2,55,17,-90,-6,0,-5,20,9,10,-112,-6,-2,-7,0,-2,-58,-54,-21,-39,0,-34,-53,11,32,-47,-78,6,-102,-6,-5,-62,2,5,9,-34,4,-17,-13,67,-16,-4,8,11,4,44,7,-19,2,13,-17]],"b2":[15,-27,3,-7,-4,0,3,4,11,-4]}; // rede pequena treinada com dígitos manuscritos (pesos × 40)
+const dense = (W, b, x) => W.map((row, j) => { let s = b[j]; for (let i = 0; i < row.length; i++) s += row[i] * x[i]; return s / 40; });
+var mathOn = false, mathSess = [], mathTimer = 0, mathGroup = 0, toastTimer = 0;
+function toast(msg, ms = 2600) {
+  const t = $('etoast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+}
+function strokeInfo(p) {
+  let minx = 1e9, maxx = -1e9, miny = 1e9, maxy = -1e9, len = 0;
+  for (let i = 0; i < p.length; i += 2) {
+    minx = Math.min(minx, p[i]); maxx = Math.max(maxx, p[i]); miny = Math.min(miny, p[i+1]); maxy = Math.max(maxy, p[i+1]);
+    if (i) len += Math.hypot(p[i] - p[i-2], p[i+1] - p[i-1]);
+  }
+  const n = p.length / 2, dx = p[p.length-2] - p[0], dy = p[p.length-1] - p[1], chord = Math.hypot(dx, dy);
+  return { p, minx, maxx, miny, maxy, w: maxx - minx, h: maxy - miny, cx: (minx + maxx) / 2, cy: (miny + maxy) / 2, len, dx, dy,
+    st: len > 0 ? chord / len : 1, ang: Math.atan2(Math.abs(dy), Math.abs(dx)) * 180 / Math.PI, n };
+}
+function classifyDigit(strs) {
+  const cv = classifyDigit.cv || (classifyDigit.cv = document.createElement('canvas'));
+  cv.width = cv.height = 32;
+  const c = cv.getContext('2d', { willReadFrequently:true });
+  c.clearRect(0, 0, 32, 32);
+  let minx = 1e9, maxx = -1e9, miny = 1e9, maxy = -1e9;
+  strs.forEach(s => { minx = Math.min(minx, s.minx); maxx = Math.max(maxx, s.maxx); miny = Math.min(miny, s.miny); maxy = Math.max(maxy, s.maxy); });
+  const sc = Math.min(30 / Math.max(maxy - miny, 1), 30 / Math.max(maxx - minx, 1)), ox = 16 - (minx + maxx) / 2 * sc, oy = 16 - (miny + maxy) / 2 * sc;
+  c.lineWidth = 4; c.lineCap = c.lineJoin = 'round'; c.strokeStyle = c.fillStyle = '#000';
+  strs.forEach(s => {
+    c.beginPath(); c.moveTo(s.p[0] * sc + ox, s.p[1] * sc + oy);
+    for (let i = 2; i < s.p.length; i += 2) c.lineTo(s.p[i] * sc + ox, s.p[i+1] * sc + oy);
+    if (s.p.length === 2) c.lineTo(s.p[0] * sc + ox + .1, s.p[1] * sc + oy);
+    c.stroke();
+  });
+  const a = c.getImageData(0, 0, 32, 32).data; let x = new Array(64).fill(0);
+  for (let y = 0; y < 32; y++) for (let px = 0; px < 32; px++) x[(y >> 2) * 8 + (px >> 2)] += a[(y * 32 + px) * 4 + 3] / 255 / 16;
+  const m = Math.max(...x); if (m > 0) x = x.map(v => v / m);
+  const o = dense(NET.w2, NET.b2, dense(NET.w1, NET.b1, x).map(v => Math.max(0, v)));
+  const mx = Math.max(...o), e = o.map(v => Math.exp(v - mx)), z = e.reduce((s, v) => s + v, 0);
+  let k = 0; e.forEach((v, i) => { if (v > e[k]) k = i; });
+  return { ch: String(k), prob: e[k] / z };
+}
+function mathClusters(S, H0) {
+  S = S.slice().sort((a, b) => a.minx - b.minx);
+  const C = [];
+  for (const s of S) {
+    let hit = null;
+    for (const c of C) {
+      const cw = c.maxx - c.minx, ov = Math.min(c.maxx, s.maxx) - Math.max(c.minx, s.minx), nw = Math.min(cw, s.w);
+      const sThin = s.w < .15 * H0, cThin = cw < .15 * H0;
+      let ok;
+      if (sThin && !cThin) ok = s.cx >= c.minx - .1 * cw && s.cx <= c.maxx + .1 * cw;   // traço fino (ponto, haste) dentro do símbolo
+      else if (cThin && !sThin) ok = (c.minx + c.maxx) / 2 >= s.minx - .1 * s.w && (c.minx + c.maxx) / 2 <= s.maxx + .1 * s.w;
+      else if (sThin && cThin) ok = Math.abs(s.cx - (c.minx + c.maxx) / 2) < .05 * H0;
+      else ok = ov > .35 * nw;
+      if (ok) { hit = c; break; }
+    }
+    if (hit) { hit.s.push(s); hit.minx = Math.min(hit.minx, s.minx); hit.maxx = Math.max(hit.maxx, s.maxx); hit.miny = Math.min(hit.miny, s.miny); hit.maxy = Math.max(hit.maxy, s.maxy); }
+    else C.push({ s:[s], minx:s.minx, maxx:s.maxx, miny:s.miny, maxy:s.maxy });
+  }
+  C.forEach(c => { c.w = c.maxx - c.minx; c.h = c.maxy - c.miny; c.cx = (c.minx + c.maxx) / 2; c.cy = (c.miny + c.maxy) / 2; });
+  return C.sort((a, b) => a.cx - b.cx);
+}
+const isH = s => s.ang < 25 && s.st > .8, isV = s => s.ang > 55 && s.st > .8;
+function classifyCluster(c, refH, base) {
+  const S = c.s, n = S.length;
+  if (n === 1) {
+    const s = S[0];
+    if (s.w < .3 * refH && s.h < .3 * refH) return c.maxy >= base - .35 * refH ? { ch:'.' } : { ch:'?' };
+    if (isH(s) && s.w > .3 * refH) return { ch:'-' };
+    if (s.st > .9 && s.h > .5 * refH) return s.ang > 55 ? { ch:'1' } : { ch:'÷' }; // traço reto vertical = 1; inclinado = "/"
+  }
+  if (n === 2) {
+    const [a, b] = S;
+    const bar = isH(a) ? a : isH(b) ? b : null, oth = bar === a ? b : a;
+    if (bar && isH(oth) && Math.abs(a.cy - b.cy) > .08 * Math.max(a.w, b.w) && Math.min(a.w, b.w) > .6 * Math.max(a.w, b.w)) return { ch:'=' };
+    if (bar && isV(oth)) {
+      const fy = (bar.cy - oth.miny) / Math.max(oth.h, 1), fx = (oth.cx - bar.minx) / Math.max(bar.w, 1);
+      if (fy > .25 && fy < .75 && fx > .2 && fx < .8) return { ch:'+' };
+    }
+    const da = a.ang >= 22 && a.ang <= 68 && a.st > .75, db = b.ang >= 22 && b.ang <= 68 && b.st > .75;
+    if (da && db && a.dx * a.dy * b.dx * b.dy < 0) return { ch:'×' };
+  }
+  if (n === 3) {
+    const bar = S.find(isH);
+    if (bar && bar.w > .35 * refH) {
+      const dots = S.filter(s => s !== bar);
+      if (dots.length === 2 && dots.every(d => d.w < .45 * bar.w && d.h < .45 * bar.w) && (dots[0].cy - bar.cy) * (dots[1].cy - bar.cy) < 0) return { ch:'÷' };
+    }
+  }
+  const r = classifyDigit(S);
+  return r.prob >= .45 ? { ch:r.ch, prob:r.prob } : { ch:'?', prob:r.prob };
+}
+function evalTokens(t) {
+  t = t.slice();
+  if (t[0] === '-') { t.shift(); if (typeof t[0] !== 'number') return null; t[0] = -t[0]; }
+  if (!t.length || typeof t[0] !== 'number') return null;
+  for (let i = 0; i < t.length; i++) if ((i % 2 === 0) !== (typeof t[i] === 'number')) return null;
+  if (typeof t[t.length - 1] !== 'number') return null;
+  for (let i = 1; i < t.length; i += 2) if (t[i] === '×' || t[i] === '÷') {
+    if (t[i] === '÷' && t[i+1] === 0) return 'div0';
+    t.splice(i - 1, 3, t[i] === '×' ? t[i-1] * t[i+1] : t[i-1] / t[i+1]); i -= 2;
+  }
+  let v = t[0]; for (let i = 1; i < t.length; i += 2) v = t[i] === '+' ? v + t[i+1] : v - t[i+1];
+  return v;
+}
+function fmtNum(v) {
+  const r = Math.round(v * 100) / 100;
+  return String(Object.is(r, -0) ? 0 : r).replace('.', ',');
+}
+function readMath(raw) {
+  const S = raw.map(s => strokeInfo(s.p)).filter(s => s.len >= 2 || s.n <= 2);
+  if (S.length < 3) return { err:'Escreva a conta completa, por exemplo 5+5' };
+  const H0 = Math.max(...S.map(s => Math.max(s.w, s.h)));
+  const C = mathClusters(S, H0);
+  const tall = C.filter(c => c.h > .5 * Math.max(...C.map(k => k.h)));
+  const refH = tall.reduce((m, c) => Math.max(m, c.h), 0) || H0;
+  const base = tall.map(c => c.maxy).sort((a, b) => a - b)[tall.length >> 1];
+  const toks = []; let num = '', bad = null, dec = 0;
+  const flush = () => { if (num !== '') { const v = parseFloat(num); toks.push(isNaN(v) ? NaN : v); num = ''; dec = 0; } };
+  for (const c of C) {
+    const r = classifyCluster(c, refH, base);
+    if (r.ch === '?') { bad = 'Não entendi um dos símbolos. Escreva com mais calma'; break; }
+    if (r.ch === '=') { flush(); break; }
+    if (/\d/.test(r.ch)) num += r.ch;
+    else if (r.ch === '.') { if (dec++) { bad = 'Número com dois pontos decimais'; break; } num += (num === '' ? '0' : '') + '.'; }
+    else { flush(); toks.push(r.ch); }
+  }
+  flush();
+  if (bad) return { err:bad };
+  if (toks.some(x => typeof x === 'number' && isNaN(x))) return { err:'Não consegui ler os números' };
+  const v = evalTokens(toks);
+  if (v === 'div0') return { err:'Divisão por zero' };
+  if (v === null || !isFinite(v)) return { err:'Não consegui montar a conta' };
+  if (Math.abs(v) >= 1e9) return { err:'Resultado grande demais' };
+  const box = { minx:Math.min(...C.map(c => c.minx)), maxx:Math.max(...C.map(c => c.maxx)), miny:Math.min(...C.map(c => c.miny)), maxy:Math.max(...C.map(c => c.maxy)) };
+  return { value:v, text:toks.join(' ').replace(/\./g, ','), box, refH, base };
+}
+
+/* "fonte" de caneta: cada caractere é uma ou mais polilinhas numa caixa 0..0.6 × 0..1 */
+const arcP = (cx, cy, rx, ry, a0, a1, n = 14) => Array.from({ length:n + 1 }, (_, i) => { const a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; return [cx + rx * Math.cos(a), cy + ry * Math.sin(a)]; });
+const GLYPH = {
+  '0': [arcP(.3, .5, .27, .5, -90, 270, 20)],
+  '1': [[[.15, .22], [.42, 0], [.42, 1]]],
+  '2': [[...arcP(.3, .27, .26, .27, 190, 395, 12), [.05, 1], [.6, 1]]],
+  '3': [[...arcP(.3, .26, .25, .26, 200, 450, 10), ...arcP(.3, .76, .29, .25, 270, 520, 10)]],
+  '4': [[[.46, 1], [.46, 0], [.0, .68], [.62, .68]]],
+  '5': [[[.55, 0], [.12, 0], [.07, .45], ...arcP(.3, .7, .3, .3, 232, 505, 12)]],
+  '6': [[[.5, 0], [.17, .4], ...arcP(.3, .7, .27, .3, 190, 550, 16).slice(0)]],
+  '7': [[[.04, 0], [.6, 0], [.22, 1]]],
+  '8': [[...arcP(.3, .26, .22, .25, 90, -270, 14), ...arcP(.3, .75, .28, .26, 270, 630, 14)]],
+  '9': [[...arcP(.3, .3, .27, .3, 0, 360, 16), [.57, .3], [.52, .7], [.28, 1]]],
+  '-': [[[.0, .5], [.52, .5]]],
+  '=': [[[.0, .36], [.55, .36]], [[.0, .66], [.55, .66]]],
+  ',': [[[.06, .88], [.06, .92], [.0, 1.08]]]
+};
+const ADV = { '-':.7, '=':.78, ',':.3, ' ':.4 };
+function penText(txt, x0, y0, H, w, color) {
+  const out = []; let x = x0; const rnd = Math.random;
+  for (const ch of txt) {
+    if (ch === ' ') { x += ADV[' '] * H; continue; }
+    const g = GLYPH[ch]; if (!g) continue;
+    const rot = (rnd() - .5) * .1, sc = .96 + rnd() * .08, ph = rnd() * 6, am = .012;
+    const cs = Math.cos(rot), sn = Math.sin(rot);
+    g.forEach(pl => {
+      const pts = []; // reamostra: corners ficam nítidos e curvas continuam suaves
+      for (let i = 0; i < pl.length; i++) {
+        pts.push(pl[i]);
+        if (i < pl.length - 1) { const d = Math.hypot(pl[i+1][0] - pl[i][0], pl[i+1][1] - pl[i][1]), k = Math.floor(d / .07); for (let j = 1; j <= k; j++) pts.push([pl[i][0] + (pl[i+1][0] - pl[i][0]) * j / (k + 1), pl[i][1] + (pl[i+1][1] - pl[i][1]) * j / (k + 1)]); }
+      }
+      const p = [];
+      pts.forEach(([ux, uy]) => {
+        const wx = ux + am * Math.sin(uy * 5 + ph), wy = uy + am * Math.sin(ux * 5 + ph * 1.3);
+        const rx = (wx - .3) * cs - (wy - .5) * sn + .3, ry = (wx - .3) * sn + (wy - .5) * cs + .5;
+        p.push(Math.round((x + rx * sc * H) * 10) / 10, Math.round((y0 + ry * sc * H) * 10) / 10);
+      });
+      out.push({ c:color, w, e:false, p });
+    });
+    x += (ch === '-' || ch === '=' || ch === ',' ? ADV[ch] : .78) * H;
+  }
+  return out;
+}
+function animateStrokes(list, g, done) {
+  const target = strokes; let si = 0, pi = 2;
+  const step = () => {
+    if (strokes !== target || !current) return;
+    let budget = 5;
+    while (budget > 0 && si < list.length) {
+      const src = list[si];
+      if (!src.live) { src.live = { c:src.c, w:src.w, e:false, g, p:[src.p[0], src.p[1]] }; target.push(src.live); }
+      const live = src.live;
+      if (pi < src.p.length) { live.p.push(src.p[pi], src.p[pi + 1]); segTo(live); pi += 2; budget--; growPaper(src.p[pi - 2], src.p[pi - 1]); }
+      else { finishSeg(live); si++; pi = 2; }
+    }
+    if (si < list.length) requestAnimationFrame(step);
+    else { if (current) { current.updated = Date.now(); save(); } done && done(); }
+  };
+  step();
+}
+function runMath() {
+  mathTimer = 0;
+  const sess = mathSess.filter(s => strokes.includes(s)); mathSess = [];
+  if (!mathOn || !current || !sess.length) return;
+  const r = readMath(sess);
+  if (r.err) return toast(r.err, 3200);
+  const last = sess[sess.length - 1], H = Math.min(90, Math.max(22, r.refH * .95));
+  const resTxt = '= ' + fmtNum(r.value), y0 = r.box.maxy + Math.max(14, r.refH * .45);
+  mathGroup++;
+  toast(`${r.text} = ${fmtNum(r.value)}`);
+  growPaper(r.box.minx, y0 + H);
+  animateStrokes(penText(resTxt, r.box.minx, y0, H, last.w, last.c), mathGroup);
+}
+function mathPush(s) {
+  mathSess.push(s); clearTimeout(mathTimer); mathTimer = setTimeout(runMath, 1300);
+}
+function setMath(on) {
+  mathOn = on; mathSess = []; clearTimeout(mathTimer);
+  $('mathBtn').classList.toggle('on', on);
+  if (on) { if (tool !== 'pen') setTool('pen'); toast('Escreva uma conta com a caneta, ex.: 5+5', 3200); }
+}
+
+/* ---------- Inserir texto na nota (áudio e imagem) ---------- */
+function insertIntoNote(text, para) {
+  text = (text || '').replace(/[ \t]+\n/g, '\n').trim();
+  if (!text || !current) return false;
+  if (drawMode) setDrawMode(false);
+  restoreSel();
+  document.execCommand('styleWithCSS', false, true);
+  const before = bodyEl.innerText.trim();
+  if (before) {
+    if (para) document.execCommand('insertParagraph');
+    else { // separa do texto anterior com um espaço, se precisar
+      const sel = getSelection(), r = sel.rangeCount ? sel.getRangeAt(0) : null;
+      const prev = r && r.collapsed && r.startContainer.nodeType === 3 && r.startOffset > 0 ? r.startContainer.textContent[r.startOffset - 1] : ' ';
+      if (!/\s/.test(prev)) document.execCommand('insertText', false, ' ');
+    }
+  }
+  text.split(/\n+/).forEach((ln, i) => { if (i) document.execCommand('insertParagraph'); document.execCommand('insertText', false, ln); });
+  onEdit(); refreshFmt();
+  return true;
+}
+
+/* ---------- Telas sobrepostas (áudio, câmera, texto detectado) ---------- */
+let ovOpen = null, ovAfter = null;
+const OVS = ['audioScreen', 'camScreen', 'ocrScreen'];
+function showOv(id) { OVS.forEach(o => { $(o).classList.toggle('open', o === id); $(o).setAttribute('aria-hidden', o === id ? 'false' : 'true'); }); }
+function openOv(id) { if (!ovOpen) history.pushState({ ov:1 }, ''); ovOpen = id; showOv(id); }
+function closeOv(after) { if (!ovOpen) return; ovAfter = after || null; history.back(); }
+function hideOvs() { // chamado pelo popstate (voltar do Android incluído)
+  if (!ovOpen) return false;
+  ovOpen = null; showOv(null); audCleanup(); camStop(); ocrRun++;
+  const f = ovAfter; ovAfter = null; if (f) f();
+  return true;
+}
+
+/* ---------- Áudio → texto ---------- */
+const SRClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+const capSR = () => window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.SpeechRecognition;
+const aud = { on:false, text:'', interim:'', err:'', t0:0, tick:0, rec:null, plugin:false };
+const audOk = () => !!(capSR() || SRClass);
+function audRender() {
+  const has = !!(aud.text || aud.interim);
+  $('aRec').classList.toggle('rec', aud.on);
+  $('aRec').setAttribute('aria-label', aud.on ? 'Parar gravação' : 'Gravar áudio');
+  $('aOk').disabled = !has && !aud.on;
+  $('aTime').textContent = aud.on ? (m => String(m / 60 | 0).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'))(Math.floor((Date.now() - aud.t0) / 1000)) : '';
+  $('aStatus').textContent = !audOk() ? 'Seu navegador/aparelho não oferece transcrição de voz.'
+    : aud.err ? aud.err : aud.on ? 'Gravando… fale agora' : has ? 'Toque no microfone para continuar ou confirme em OK' : 'Toque no microfone para gravar';
+  $('aText').innerHTML = has ? esc(aud.text) + (aud.interim ? ' <span class="interim">' + esc(aud.interim) + '</span>' : '') : '<span class="interim">A transcrição aparece aqui.</span>';
+  $('aText').scrollTop = 1e6;
+}
+function audAdd(t) { t = (t || '').trim(); if (!t) return; if (!aud.text) t = t.charAt(0).toUpperCase() + t.slice(1); aud.text += (aud.text ? ' ' : '') + t; }
+async function audStart() {
+  aud.err = '';
+  if (!audOk()) return audRender();
+  try {
+    const P = capSR();
+    if (P) {
+      aud.plugin = true;
+      try { const pr = await P.requestPermissions(); if (pr && pr.speechRecognition === 'denied') throw { error:'not-allowed' }; } catch (e) { if (e && e.error) throw e; }
+      P.removeAllListeners && P.removeAllListeners();
+      P.addListener('partialResults', d => { aud.interim = (d.matches || [])[0] || ''; audRender(); });
+      await P.start({ language:'pt-BR', maxResults:1, partialResults:true, popup:false });
+    } else {
+      const r = new SRClass(); aud.plugin = false;
+      r.lang = 'pt-BR'; r.continuous = true; r.interimResults = true;
+      r.onresult = ev => {
+        let interim = '';
+        for (let i = ev.resultIndex; i < ev.results.length; i++) { const res = ev.results[i]; if (res.isFinal) audAdd(res[0].transcript); else interim += res[0].transcript; }
+        aud.interim = interim; audRender();
+      };
+      r.onerror = ev => {
+        if (ev.error === 'no-speech' || ev.error === 'aborted') return;
+        aud.err = ev.error === 'not-allowed' || ev.error === 'service-not-allowed' ? 'Permissão do microfone negada. Libere o microfone nas configurações.'
+          : ev.error === 'network' ? 'Sem internet: a transcrição precisa de conexão.' : 'Erro na transcrição (' + ev.error + ').';
+        aud.on = false; audRender();
+      };
+      r.onend = () => { if (aud.on && aud.rec === r) { try { r.start(); } catch (e) { aud.on = false; audRender(); } } else { audAdd(aud.interim); aud.interim = ''; audRender(); } };
+      aud.rec = r; r.start();
+    }
+    aud.on = true; aud.t0 = Date.now(); clearInterval(aud.tick); aud.tick = setInterval(audRender, 500);
+  } catch (e) {
+    aud.on = false;
+    aud.err = e && e.error === 'not-allowed' ? 'Permissão do microfone negada. Libere o microfone nas configurações.' : 'Não consegui iniciar a gravação.';
+  }
+  audRender();
+}
+async function audStop() {
+  if (!aud.on) return;
+  aud.on = false; clearInterval(aud.tick);
+  try {
+    if (aud.plugin) { const P = capSR(); await P.stop(); P.removeAllListeners && P.removeAllListeners(); audAdd(aud.interim); aud.interim = ''; }
+    else if (aud.rec) { const r = aud.rec; aud.rec = null; r.stop(); audAdd(aud.interim); aud.interim = ''; }
+  } catch (e) {}
+  audRender();
+}
+function audCleanup() {
+  aud.on = false; clearInterval(aud.tick);
+  try { if (aud.plugin) { const P = capSR(); P && P.stop && P.stop(); } else if (aud.rec) { const r = aud.rec; aud.rec = null; r.abort ? r.abort() : r.stop(); } } catch (e) {}
+}
+function openAudio() { Object.assign(aud, { on:false, text:'', interim:'', err:'', rec:null }); audRender(); openOv('audioScreen'); }
+$('aRec').onclick = () => aud.on ? audStop() : audStart();
+$('aTrash').onclick = () => closeOv();
+$('aOk').onclick = async () => { await audStop(); const t = aud.text; closeOv(() => insertIntoNote(t, false)); };
+$('aClose').onclick = () => closeOv();
+
+/* ---------- Imagem → texto (câmera + OCR) ---------- */
+let camStream = null, ocrRun = 0, ocrText = '';
+function camStop() { if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; } $('camVideo').srcObject = null; }
+async function camStart() {
+  $('camMsg').textContent = ''; $('camMsg').classList.remove('show'); $('camShot').disabled = true;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { camFail('Este aparelho/navegador não liberou a câmera aqui. Use “Escolher foto”.'); return; }
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ ideal:'environment' }, width:{ ideal:1920 }, height:{ ideal:1080 } }, audio:false });
+    const v = $('camVideo'); v.srcObject = camStream; await v.play(); $('camShot').disabled = false;
+  } catch (e) { camFail(e && e.name === 'NotAllowedError' ? 'Permissão da câmera negada. Libere a câmera nas configurações ou use “Escolher foto”.' : 'Não consegui abrir a câmera. Use “Escolher foto”.'); }
+}
+function camFail(msg) { $('camMsg').textContent = msg; $('camMsg').classList.add('show'); }
+function openScan() { openOv('camScreen'); camStart(); }
+function toCanvas(src, w, h) {
+  const k = Math.min(1, 1800 / Math.max(w, h)), c = document.createElement('canvas');
+  c.width = Math.round(w * k); c.height = Math.round(h * k);
+  const x = c.getContext('2d'); try { x.filter = 'grayscale(1) contrast(1.35)'; } catch (e) {}
+  x.drawImage(src, 0, 0, c.width, c.height); return c;
+}
+$('camShot').onclick = () => { const v = $('camVideo'); if (!v.videoWidth) return; const c = toCanvas(v, v.videoWidth, v.videoHeight); camStop(); startOcr(c); };
+$('camFile').onchange = e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  const img = new Image(), url = URL.createObjectURL(f);
+  img.onload = () => { URL.revokeObjectURL(url); camStop(); startOcr(toCanvas(img, img.naturalWidth, img.naturalHeight)); };
+  img.onerror = () => { URL.revokeObjectURL(url); camFail('Não consegui abrir essa imagem.'); };
+  img.src = url;
+};
+$('camClose').onclick = () => closeOv();
+let tessP = null;
+function loadTesseract() {
+  if (window.Tesseract) return Promise.resolve();
+  return tessP || (tessP = new Promise((ok, no) => {
+    const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    s.onload = ok; s.onerror = () => { tessP = null; no(new Error('load')); }; document.head.appendChild(s);
+  }));
+}
+async function startOcr(canvas) {
+  const run = ++ocrRun; ocrText = '';
+  $('ocrImg').src = canvas.toDataURL('image/jpeg', .7);
+  $('ocrText').value = ''; $('ocrText').hidden = true; $('ocrOk').disabled = true; $('ocrWork').hidden = false;
+  $('ocrState').textContent = 'Carregando o leitor de texto…'; $('ocrBar').style.width = '4%';
+  showOv('ocrScreen'); ovOpen = 'ocrScreen';
+  try {
+    await loadTesseract();
+    const r = await Tesseract.recognize(canvas, 'por+eng', { logger:m => {
+      if (run !== ocrRun) return;
+      if (m.status === 'recognizing text') { $('ocrState').textContent = 'Lendo o texto… ' + Math.round(m.progress * 100) + '%'; $('ocrBar').style.width = Math.max(8, m.progress * 100) + '%'; }
+      else $('ocrState').textContent = 'Preparando o idioma…';
+    } });
+    if (run !== ocrRun) return;
+    ocrText = (r.data.text || '').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+    $('ocrWork').hidden = true; $('ocrText').hidden = false; $('ocrText').value = ocrText;
+    if (!ocrText) { $('ocrWork').hidden = false; $('ocrBar').style.width = '0'; $('ocrState').textContent = 'Nenhum texto detectado. Tente de novo com mais luz e a folha reta.'; }
+    $('ocrOk').disabled = !ocrText;
+  } catch (e) {
+    if (run !== ocrRun) return;
+    $('ocrBar').style.width = '0';
+    $('ocrState').textContent = 'Não consegui carregar o leitor de texto. Na primeira vez ele precisa de internet.';
+  }
+}
+$('ocrText').oninput = () => { $('ocrOk').disabled = !$('ocrText').value.trim(); };
+$('ocrRetake').onclick = () => { ocrRun++; showOv('camScreen'); ovOpen = 'camScreen'; camStart(); };
+$('ocrOk').onclick = () => { const t = $('ocrText').value; closeOv(() => insertIntoNote(t, true)); };
+
+/* teclado virtual (iOS): mantém a barra de ferramentas acima do teclado */
+if (window.visualViewport) {
+  const kb = () => { const v = window.visualViewport, o = Math.max(0, innerHeight - v.height - v.offsetTop); $('editor').style.setProperty('--kb', o > 80 ? o + 'px' : '0px'); };
+  visualViewport.addEventListener('resize', kb); visualViewport.addEventListener('scroll', kb);
+}
 
 /* ---------- Calendário ---------- */
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
