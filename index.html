@@ -79,6 +79,12 @@
   .plus { color:var(--accent); }
   .sec-title { font-size:22px; font-weight:700; margin:2px 4px 10px; letter-spacing:.2px; }
   .sec-title.none { display:none; }
+  #foldTitle { margin-top:30px; margin-bottom:14px; }
+  #recentTitle { margin-top:34px; margin-bottom:16px; }
+  #settings h1.large { margin-bottom:34px; }
+  #setSearch { margin-bottom:0; }
+  #setSearch + .empty, #setEmpty { padding:30px 20px; }
+  #settings .gcap:first-of-type { margin-top:6px; }
   h1.large { font-size:34px; font-weight:700; letter-spacing:.3px; margin:44px 0 10px; line-height:1.15; }
 
   .search { display:flex; align-items:center; gap:9px; border-radius:24px; padding:0 18px; height:48px; color:var(--muted); margin-bottom:18px; }
@@ -115,6 +121,23 @@
   .gcap:first-of-type { margin-top:4px; }
   .tile { width:30px; height:30px; border-radius:7px; background:var(--accent); color:var(--on-accent); display:grid; place-items:center; flex:none; }
   .tile svg.i { width:18px; height:18px; }
+  .nav-row.t[data-go="set-theme"] .tile { background:#5e5ce6; color:#fff; }
+  .nav-row.t[data-go="set-access"] .tile { background:#0a84ff; color:#fff; }
+  .nav-row.t[data-go="set-guide"] .tile { background:#ff9f0a; color:#fff; }
+  .nav-row.t[data-go="set-datetime"] .tile { background:#8e8e93; color:#fff; }
+  .nav-row.t[data-go="set-lang"] .tile { background:#30b0c7; color:#fff; }
+  .nav-row.t[data-go="set-devices"] .tile { background:#34c759; color:#fff; }
+  .nav-row.t[data-go="set-aivoice"] .tile { background:#ff3b30; color:#fff; }
+  .nav-row.t[data-go="set-aipen"] .tile { background:#ff9500; color:#fff; }
+  .nav-row.t[data-go="set-aiscan"] .tile { background:#af52de; color:#fff; }
+  .nav-row.t[data-go="set-sound"] .tile { background:#ff2d55; color:#fff; }
+  .nav-row.t[data-go="set-notif"] .tile { background:#ff453a; color:#fff; }
+  .nav-row.t[data-go="set-update"] .tile { background:#0a84ff; color:#fff; }
+  .nav-row.t[data-go="set-accounts"] .tile { background:#5ac8fa; color:#fff; }
+  .nav-row.t[data-go="set-data"] .tile { background:#30d158; color:#fff; }
+  .nav-row.t[data-go="set-security"] .tile { background:#636366; color:#fff; }
+  .nav-row.t[data-go="set-privacy"] .tile { background:#0a84ff; color:#fff; }
+  .nav-row.t[data-go="set-about"] .tile { background:#8e8e93; color:#fff; }
   .lbl { flex:1; }
   .val { color:var(--muted); display:flex; align-items:center; gap:8px; font-size:17px; }
   .chev { width:18px; height:18px; color:var(--muted); opacity:.7; flex:none; }
@@ -209,7 +232,8 @@
   .evalert.show { display:flex; animation:fadeIn .25s ease; }
   .evalert .t { flex:1; min-width:0; } .evalert b { display:block; font-size:16px; } .evalert span { font-size:14px; color:var(--muted); }
   .evalert button { border:0; background:var(--accent); color:var(--on-accent); border-radius:14px; height:36px; padding:0 16px; font-weight:600; font-size:15px; }
-  .cal-m .d.today span { background:var(--accent); color:var(--on-accent); font-weight:700; }
+  .cal-m .d.today { background:color-mix(in srgb, var(--accent) 20%, transparent); border-radius:9px; }
+  .cal-m .d.today span { color:var(--accent); font-weight:700; }
 
   /* ---------- Dock (barra de navegação) ---------- */
   .dock { position:fixed; left:0; right:0; bottom:calc(14px + env(safe-area-inset-bottom)); display:flex; justify-content:center; align-items:center; gap:12px; z-index:20; pointer-events:none; }
@@ -262,17 +286,34 @@
   .home-actions[data-mode="sel"] .hpill { display:none; }
   .home-actions[data-mode="sel"] .hcancel { display:block; }
   .nitem { transition:background .18s, color .18s; }
-  .ngrid { display:grid; grid-template-columns:repeat(var(--gc, 2),1fr); gap:10px; }
-  .ngrid.c3 { gap:8px; }
-  .ngrid.c3 .gcard { padding:9px 9px 8px; border-radius:10px; }
-  .ngrid.c3 .gcard h3 { font-size:13px; }
-  .ngrid.c3 .gcard p { font-size:11px; margin-top:3px; }
-  .ngrid.c3 .gcard small { font-size:10px; margin-top:5px; padding-top:4px; }
-  .gcard { background:var(--card); border-radius:12px; padding:14px 14px 12px; aspect-ratio:1 / 1.4142; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 1px 3px var(--glass-shadow); }
-  .gcard:active { background:var(--field); }
-  .gcard h3 { font-size:16px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .gcard p { font-size:14px; color:var(--muted); margin-top:4px; flex:1; min-height:0; word-break:break-word; overflow:hidden; line-height:1.35; -webkit-mask-image:linear-gradient(#000 78%, transparent); mask-image:linear-gradient(#000 78%, transparent); }
-  .gcard small { font-size:12px; color:var(--muted); margin-top:8px; padding-top:6px; border-top:.5px solid var(--sep); }
+  .ngrid { display:grid; grid-template-columns:repeat(var(--gc, 2),1fr); gap:20px 12px; }
+  .ngrid.c3 { gap:16px 8px; }
+  .gcard { display:block; min-width:0; }
+  .gthumb { position:relative; aspect-ratio:1 / 1.4142; background:var(--card); border-radius:12px; overflow:hidden; box-shadow:0 1px 3px var(--glass-shadow); }
+  .gcard.c3 .gthumb { border-radius:9px; }
+  .gcard:active .gthumb { background:var(--field); }
+  .gmeta { padding:7px 4px 0; text-align:center; min-width:0; }
+  .gmeta b { display:block; font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .gmeta small { display:block; font-size:12px; color:var(--muted); margin-top:1px; border:0; padding:0; }
+  .gcard.c3 .gmeta b { font-size:12px; } .gcard.c3 .gmeta small { font-size:10.5px; }
+  .gcard.nitem.sel { background:none; }
+  .gcard.sel .gthumb::after { content:""; position:absolute; inset:0; background:rgba(255,59,48,.55); z-index:2; }
+  .gcard.sel .gmeta b { color:var(--danger); }
+  .gcard.sel .gmeta small { color:var(--muted); }
+  .gpage { position:absolute; left:0; top:0; width:360px; height:509px; transform-origin:0 0; padding:18px 20px 0 var(--pl, 24px); overflow:hidden; pointer-events:none; color:var(--text); }
+  .gpage.caderno { --pl:56px; background-color:var(--paper-cad); background-image:linear-gradient(to right, transparent 42px, rgba(255,59,48,.5) 42px, rgba(255,59,48,.5) 43.5px, transparent 43.5px), linear-gradient(to bottom, transparent calc(var(--lh, 27px) - 1px), var(--rule) calc(var(--lh, 27px) - 1px)); background-size:100% 100%, 100% var(--lh, 27px); background-position:0 0, 0 10px; }
+  .gt { font-size:24px; font-weight:700; line-height:1.2; margin-bottom:8px; word-break:break-word; }
+  .gph { opacity:.4; }
+  .gb { word-break:break-word; overflow:hidden; }
+  .gb * { max-width:100%; }
+  .gink { position:absolute; left:0; top:0; width:360px; height:509px; }
+  .gpage.task { padding-right:20px; }
+  .gr { display:flex; align-items:center; gap:10px; font-size:20px; padding:6px 0; }
+  .gr i { width:20px; height:20px; border:2px solid var(--muted); border-radius:6px; flex:none; }
+  .gr.d i { background:var(--accent); border-color:var(--accent); }
+  .gr.d span { text-decoration:line-through; color:var(--muted); }
+  .gr.gph { opacity:.4; } .gr.gph i { display:none; }
+  .gc { font-size:15px; font-weight:700; color:var(--muted); text-transform:uppercase; margin:10px 0 2px; }
   .nitem.sel { background:var(--danger); color:#fff; }
   .nitem.sel h3, .nitem.sel .sub, .nitem.sel .sub b, .nitem.sel p, .nitem.sel small { color:#fff; }
   .selbar { position:fixed; left:0; right:0; margin:0 auto; width:max-content; bottom:calc(18px + env(safe-area-inset-bottom)); z-index:21; border-radius:999px;
@@ -337,7 +378,7 @@
   .etoast { position:absolute; left:50%; bottom:calc(env(safe-area-inset-bottom) + 70px); transform:translate(-50%, 10px); max-width:88%; padding:9px 16px; border-radius:16px; font-size:15px; font-weight:600; background:rgba(30,30,34,.88); color:#fff; opacity:0; pointer-events:none; transition:opacity .2s, transform .25s; z-index:6; text-align:center; }
   .etoast.show { opacity:1; transform:translate(-50%, 0); }
   /* pastas */
-  #folders .group { margin-bottom:6px; }
+  #folders .group { margin-bottom:10px; }
   .frow { display:flex; align-items:center; gap:12px; width:100%; border:0; background:none; text-align:left; color:var(--text); font-size:17px; padding:11px 16px; position:relative; }
   .frow + .frow::before { content:""; position:absolute; top:0; left:54px; right:0; height:.5px; background:var(--sep); }
   .frow:active { background:var(--field); }
@@ -369,6 +410,11 @@
   .mbtns button { flex:1; height:46px; border:0; border-radius:15px; font-size:17px; font-weight:600; background:var(--field); color:var(--accent); }
   .mbtns button.pri { background:var(--accent); color:var(--on-accent); }
   .mbtns button:disabled { opacity:.4; }
+  .msheet { -webkit-backdrop-filter:blur(26px) saturate(190%); backdrop-filter:blur(26px) saturate(190%); box-shadow:inset 0 1px 0 rgba(255,255,255,.55), 0 14px 40px var(--glass-shadow); }
+  .mbtns.col { flex-direction:column; gap:8px; }
+  .mbtns.col button { flex:none; width:100%; height:50px; border-radius:16px; background:var(--glass-hi); box-shadow:inset 0 1px 0 rgba(255,255,255,.35); }
+  .mbtns.col button.pri { background:var(--accent); box-shadow:none; }
+  .mbtns.col button.dng { color:var(--danger); }
   /* telas sobrepostas */
   .ov { position:fixed; inset:0; z-index:60; background:var(--bg); display:none; flex-direction:column; padding-bottom:env(safe-area-inset-bottom); }
   .ov.open { display:flex; animation:fadeIn .25s ease; }
@@ -445,6 +491,28 @@
   .pop.upl { transform-origin:bottom left; }
   .pop.glass { position:fixed; border-radius:22px; padding:7px; min-width:190px; background:linear-gradient(135deg, var(--glass-hi), var(--glass) 55%, var(--glass)); -webkit-backdrop-filter:blur(22px) saturate(190%) brightness(1.05); backdrop-filter:blur(22px) saturate(190%) brightness(1.05); }
   .pop.glass:active { transform:none; }
+  .inkdot { display:block; width:22px; height:22px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(128,128,128,.45); }
+  .cpgrid { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; justify-items:center; padding:10px 6px 14px; }
+  .cpsw { width:40px; height:40px; border-radius:50%; border:0; box-shadow:inset 0 0 0 1px rgba(128,128,128,.4); }
+  .cpsw.on { box-shadow:inset 0 0 0 1px rgba(128,128,128,.4), 0 0 0 2px var(--card), 0 0 0 4px var(--accent); }
+  .cpcust { display:flex; align-items:center; justify-content:space-between; padding:6px 12px 10px; font-size:16px; }
+  .cpcust input { width:56px; height:34px; border:0; padding:0; background:none; }
+  .pop.tb .szp { grid-column:1 / -1; padding:2px 6px; }
+  .szprev { height:30px; display:flex; align-items:center; justify-content:center; }
+  .szprev i { display:block; width:70%; border-radius:99px; background:var(--text); }
+  .szrow { display:flex; align-items:center; gap:14px; }
+  .szrow input { flex:1; min-width:0; accent-color:var(--accent); height:26px; }
+  .szrow b { min-width:24px; text-align:right; font-size:15px; }
+  .pop.tb { padding:5px; border-radius:18px; transform-origin:bottom center; }
+  .pop.tb.show { display:grid; grid-template-columns:1fr 1fr; gap:0 4px; align-content:start; }
+  .pop.tb .sizes, .pop.tb .grid, .pop.tb .aligns { grid-column:1 / -1; }
+  .pop.tb .pi { font-size:15px; padding:5px 10px; min-height:34px; border-radius:11px; }
+  .pop.tb .sizes { grid-template-columns:repeat(4,1fr); min-width:0; }
+  .pop.tb .sizes .pi { padding:5px 2px; }
+  .pop.tb .grid { grid-template-columns:repeat(5,1fr); justify-items:center; gap:8px; padding:6px 4px; }
+  .pop.tb .sw2 { width:34px; height:34px; }
+  .pop.tb .aligns { justify-content:space-between; }
+  .pop.tb .aligns .pi { flex:1; }
   .pop.glass .pi { border-radius:15px; padding:11px 12px; }
   .pop .sizes { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; min-width:190px; }
   .pop .sizes .pi { justify-content:center; padding:9px 4px; }
@@ -458,6 +526,75 @@
   .pop .aligns { display:flex; gap:4px; }
   .pop .aligns .pi { width:auto; padding:10px 12px; justify-content:center; }
   .pop .aligns .pi svg.i { color:inherit; stroke-width:2; width:20px; height:20px; }
+  /* ---- Tarefas ---- */
+  #taskScreen { bottom:var(--kb, 0px); }
+  .tk-right { display:flex; align-items:center; justify-self:end; }
+  .ov-x.ib { min-width:0; padding:8px 7px; } .ov-x.ib svg.i { width:22px; height:22px; }
+  #favBtn.on svg.i, #tkFav.on svg.i { fill:#ff2d55; color:#ff2d55; stroke:#ff2d55; }
+  .tk-body { flex:1; min-height:0; overflow-y:auto; padding:4px 16px 24px; width:100%; max-width:560px; margin:0 auto; }
+  .tk-title { width:100%; border:0; background:transparent; color:var(--text); font:inherit; font-size:26px; font-weight:700; outline:none; padding:6px 2px; }
+  .tk-add { background:var(--card); border-radius:14px; padding:8px 14px; margin:6px 0 14px; }
+  .tk-add textarea { width:100%; border:0; background:transparent; color:var(--text); font:inherit; font-size:17px; outline:none; resize:none; height:28px; max-height:110px; line-height:1.35; display:block; }
+  .tk-cat { font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; margin:14px 6px 6px; display:flex; justify-content:space-between; }
+  .tk-group { background:var(--card); border-radius:14px; overflow:hidden; }
+  .tk-row { display:flex; align-items:center; gap:12px; padding:11px 14px; border-top:.5px solid var(--sep); }
+  .tk-row:first-child { border-top:0; }
+  .tk-box { flex:none; width:24px; height:24px; border-radius:7px; border:2px solid var(--muted); background:none; color:#fff; display:grid; place-items:center; padding:0; }
+  .tk-box svg { width:15px; height:15px; stroke-width:3.5; opacity:0; }
+  .tk-row.done .tk-box { background:var(--accent); border-color:var(--accent); }
+  .tk-row.done .tk-box svg { opacity:1; }
+  .tk-text { flex:1; font-size:17px; word-break:break-word; }
+  .tk-row.done .tk-text { text-decoration:line-through; color:var(--muted); }
+  .tk-row.ghost { opacity:.45; }
+  .tk-x { flex:none; background:none; border:0; color:var(--muted); font-size:22px; line-height:1; padding:2px 6px; }
+  .tk-hint { text-align:center; color:var(--muted); font-size:14px; line-height:1.5; padding:34px 20px; }
+  .tk-bar { flex:none; display:flex; padding:10px 16px; padding-bottom:calc(10px + env(safe-area-inset-bottom)); border-top:.5px solid var(--sep); background:var(--bg); }
+  .tk-tpl { display:flex; align-items:center; gap:8px; border:0; border-radius:16px; padding:10px 16px; font-size:16px; font-weight:600; color:var(--accent); }
+  .tk-tpl svg.i { width:20px; height:20px; }
+  .tki { width:15px; height:15px; vertical-align:-2px; margin-right:5px; color:var(--accent); }
+  .pop .plabel { font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; padding:8px 10px 4px; }
+  .pop .pdiv { height:.5px; background:var(--sep); margin:5px 6px; }
+  /* calendário compacto + hábitos */
+  #calendar h1.large { margin-top:6px; margin-bottom:26px; }
+  #evList .empty { padding:22px 20px !important; margin-top:0 !important; }
+  .cal-head { margin:0 6px 6px; }
+  .cal-card { padding:8px 8px 4px; }
+  .cal-wd { padding-bottom:6px; margin-bottom:3px; }
+  .cal-m { row-gap:1px; }
+  .cal-m .d { height:34px; font-size:15px; align-items:start; }
+  .cal-m .d span { width:27px; height:27px; margin-top:1px; }
+  .cal-m .d.has::after { display:none; }
+  .cal-m .d.sel { box-shadow:inset 0 0 0 2px var(--accent); border-radius:9px; }
+  .cal-m .d .dots { position:absolute; left:0; right:0; bottom:0; height:5px; display:flex; justify-content:center; gap:2px; pointer-events:none; }
+  .cal-m .d .dots i { width:4px; height:4px; border-radius:50%; background:var(--accent); }
+  .cal-m .d .dots i.h { background:#34c759; }
+  .hab-head { display:flex; align-items:center; justify-content:space-between; margin:30px 4px 10px; }
+  .hab-head .sec-title { margin:0; }
+  .hab-pen { width:40px; height:40px; border-radius:50%; border:0; display:grid; place-items:center; color:var(--accent); padding:0; }
+  .hab-pen svg.i { width:20px; height:20px; }
+  .hrow { display:flex; align-items:center; gap:12px; padding:11px 14px; position:relative; }
+  .hrow + .hrow::before { content:""; position:absolute; top:0; left:50px; right:0; height:.5px; background:var(--sep); }
+  .hrow .hbox { flex:none; width:26px; height:26px; border-radius:8px; border:2px solid var(--muted); background:none; color:#fff; display:grid; place-items:center; padding:0; }
+  .hrow .hbox svg { width:16px; height:16px; stroke-width:3.5; opacity:0; }
+  .hrow.done .hbox { background:#34c759; border-color:#34c759; }
+  .hrow.done .hbox svg { opacity:1; }
+  .hrow .hn { flex:1; min-width:0; font-size:17px; word-break:break-word; }
+  .hrow .hx { flex:none; background:none; border:0; color:var(--muted); padding:6px; display:grid; place-items:center; }
+  .hrow .hx svg.i { width:19px; height:19px; }
+  .nrow { display:flex; gap:12px; align-items:flex-start; padding:12px 16px; position:relative; }
+  .nrow + .nrow::before { content:""; position:absolute; top:0; left:50px; right:0; height:.5px; background:var(--sep); }
+  .nrow svg.i { width:22px; height:22px; color:var(--accent); flex:none; margin-top:2px; }
+  .nrow .ni { min-width:0; } .nrow h3 { font-size:17px; font-weight:600; } .nrow .sub { font-size:14px; color:var(--muted); margin-top:2px; word-break:break-word; }
+  .dlgtop { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; margin:-6px -2px 12px; }
+  .dlgtop h3 { margin:0; }
+  .dlgtop button { background:none; border:0; color:var(--accent); font-size:17px; padding:8px 10px; }
+  .dlgtop button:first-child { justify-self:start; color:var(--muted); }
+  .dlgtop button:last-child { justify-self:end; font-weight:700; }
+  .dlgtop button:disabled { opacity:.35; }
+  .dlgin { width:100%; border:0; border-radius:14px; background:var(--glass-hi); color:var(--text); font:inherit; font-size:18px; padding:13px 14px; outline:none; box-shadow:inset 0 0 0 .5px var(--sep); margin-bottom:8px; }
+  /* vidro mais translúcido nos pop-ups */
+  .pop.glass, .msheet { background:linear-gradient(135deg, color-mix(in srgb, var(--glass-hi) 62%, transparent), color-mix(in srgb, var(--glass) 38%, transparent) 55%, color-mix(in srgb, var(--glass) 30%, transparent)); -webkit-backdrop-filter:blur(30px) saturate(210%) brightness(1.04); backdrop-filter:blur(30px) saturate(210%) brightness(1.04); }
+  .pop.glass { box-shadow:inset 0 1px 0 rgba(255,255,255,.5), 0 12px 36px var(--glass-shadow); }
 </style>
 </head>
 <body>
@@ -474,6 +611,12 @@
   <symbol id="i-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></symbol>
   <symbol id="i-archive" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></symbol>
   <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
   <symbol id="i-sound" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></symbol>
   <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></symbol>
   <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
@@ -535,33 +678,42 @@
   </div>
   <div class="sec-title" id="evTitle" style="margin-top:22px"></div>
   <div id="evList"></div>
+  <div class="hab-head"><span class="sec-title">Hábitos</span></div>
+  <div id="habList"></div>
 </main>
 
 <!-- Ajustes (raiz) -->
 <main id="settings" class="screen">
   <h1 class="large">Ajustes</h1>
+  <label class="search glass" id="setSearch"><svg class="i"><use href="#i-search"/></svg><input id="setQ" type="search" placeholder="Pesquisar" enterkeyhint="search" autocomplete="off"></label>
+  <div class="empty" id="setEmpty" hidden>Nenhuma configuração encontrada.</div>
   <div class="gcap">Geral</div>
   <div class="group">
-    <button class="nav-row t" data-go="set-theme"><span class="tile"><svg class="i"><use href="#i-contrast"/></svg></span><span class="lbl">Tema e Aparência</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-kw="claro escuro automatico paleta cores grade lista rolagem a4 linha estilo nota" data-go="set-theme"><span class="tile"><svg class="i"><use href="#i-contrast"/></svg></span><span class="lbl">Tema e Aparência</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-lang"><span class="tile"><svg class="i"><use href="#i-globe"/></svg></span><span class="lbl">Idioma</span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row t" data-go="set-access"><span class="tile"><svg class="i"><use href="#i-access"/></svg></span><span class="lbl">Acessibilidade</span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row t" data-go="set-guide"><span class="tile"><svg class="i"><use href="#i-book"/></svg></span><span class="lbl">Guia do usuário</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-datetime"><span class="tile"><svg class="i"><use href="#i-clock"/></svg></span><span class="lbl">Data e hora</span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row t" data-go="set-devices"><span class="tile"><svg class="i"><use href="#i-device"/></svg></span><span class="lbl">Aparelhos conectados</span><svg class="i chev"><use href="#i-chev"/></svg></button>
   </div>
   <div class="gcap">Recursos de IA</div>
   <div class="group">
-    <button class="nav-row t" data-go="set-aivoice"><span class="tile"><svg class="i"><use href="#i-mic"/></svg></span><span class="lbl">Voz para texto</span><span class="val" id="aiVoiceName"></span><svg class="i chev"><use href="#i-chev"/></svg></button>
-    <button class="nav-row t" data-go="set-aipen"><span class="tile"><svg class="i"><use href="#i-pen"/></svg></span><span class="lbl">Escrever com caneta</span><span class="val" id="aiPenName"></span><svg class="i chev"><use href="#i-chev"/></svg></button>
-    <button class="nav-row t" data-go="set-aiscan"><span class="tile"><svg class="i"><use href="#i-scan"/></svg></span><span class="lbl">Imagem para texto</span><span class="val" id="aiScanName"></span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-aivoice"><span class="tile"><svg class="i"><use href="#i-mic"/></svg></span><span class="lbl">Voz para texto</span><span class="val" id="aiVoiceName" hidden></span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-aipen"><span class="tile"><svg class="i"><use href="#i-pen"/></svg></span><span class="lbl">Escrever com caneta</span><span class="val" id="aiPenName" hidden></span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-aiscan"><span class="tile"><svg class="i"><use href="#i-scan"/></svg></span><span class="lbl">Imagem para texto</span><span class="val" id="aiScanName" hidden></span><svg class="i chev"><use href="#i-chev"/></svg></button>
   </div>
-  <div class="gcap">Som</div>
+  <div class="gcap">Som e notificação</div>
   <div class="group">
-    <button class="nav-row t" data-go="set-sound"><span class="tile"><svg class="i"><use href="#i-sound"/></svg></span><span class="lbl">Sons e vibrações</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-sound"><span class="tile"><svg class="i"><use href="#i-sound"/></svg></span><span class="lbl">Sons</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-notif"><span class="tile"><svg class="i"><use href="#i-bell"/></svg></span><span class="lbl">Notificações</span><svg class="i chev"><use href="#i-chev"/></svg></button>
   </div>
   <div class="gcap">Sistema</div>
   <div class="group">
     <button class="nav-row t" data-go="set-update"><span class="tile"><svg class="i"><use href="#i-download"/></svg></span><span class="lbl">Atualização do software</span><svg class="i chev"><use href="#i-chev"/></svg></button>
-    <button class="nav-row t" data-go="set-data"><span class="tile"><svg class="i"><use href="#i-cloud"/></svg></span><span class="lbl">Contas e backups</span><svg class="i chev"><use href="#i-chev"/></svg></button>
-    <button class="nav-row t" data-go="set-privacy"><span class="tile"><svg class="i"><use href="#i-shield"/></svg></span><span class="lbl">Segurança e privacidade</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-accounts"><span class="tile"><svg class="i"><use href="#i-user"/></svg></span><span class="lbl">Contas</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-kw="exportar importar apagar notas nplus" data-go="set-data"><span class="tile"><svg class="i"><use href="#i-cloud"/></svg></span><span class="lbl">Backups</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-security"><span class="tile"><svg class="i"><use href="#i-shield"/></svg></span><span class="lbl">Segurança</span><svg class="i chev"><use href="#i-chev"/></svg></button>
+    <button class="nav-row t" data-go="set-privacy"><span class="tile"><svg class="i"><use href="#i-lock"/></svg></span><span class="lbl">Privacidade</span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row t" data-go="set-about"><span class="tile"><svg class="i"><use href="#i-info"/></svg></span><span class="lbl">Sobre</span><svg class="i chev"><use href="#i-chev"/></svg></button>
   </div>
 </main>
@@ -658,9 +810,14 @@
   <div class="group" id="palList"></div>
 </main>
 
-<!-- Ajustes › Dados e Backup -->
+<!-- Ajustes › Contas -->
+<main id="set-accounts" class="screen sub">
+  <h1 class="large">Contas</h1>
+</main>
+
+<!-- Ajustes › Backups -->
 <main id="set-data" class="screen sub">
-  <h1 class="large">Contas e backups</h1>
+  <h1 class="large">Backups</h1>
   <div class="group">
     <button class="item act" id="exportBtn"><span>Exportar notas</span><span class="val" id="exportCount"></span></button>
     <label class="item act" style="cursor:pointer"><span>Importar notas</span><span class="val">.nplus</span>
@@ -673,9 +830,19 @@
   <p class="note-help">As notas ficam salvas apenas neste navegador e neste aparelho. Exporte de vez em quando para ter um backup.</p>
 </main>
 
-<!-- Ajustes › Sons e vibrações -->
+<!-- Ajustes › Data e hora -->
+<main id="set-datetime" class="screen sub">
+  <h1 class="large">Data e hora</h1>
+</main>
+
+<!-- Ajustes › Sons -->
 <main id="set-sound" class="screen sub">
-  <h1 class="large">Sons e vibrações</h1>
+  <h1 class="large">Sons</h1>
+</main>
+
+<!-- Ajustes › Notificações -->
+<main id="set-notif" class="screen sub">
+  <h1 class="large">Notificações</h1>
 </main>
 
 <!-- Ajustes › Atualização do software -->
@@ -691,11 +858,33 @@
 <!-- Ajustes › Acessibilidade -->
 <main id="set-access" class="screen sub">
   <h1 class="large">Acessibilidade</h1>
+  <div class="group">
+    <button class="nav-row" data-go="set-uiscale"><span class="lbl">Tamanho da tela</span><span class="val" id="uiName"></span><svg class="i chev"><use href="#i-chev"/></svg></button>
+  </div>
 </main>
 
-<!-- Ajustes › Segurança e privacidade -->
+<!-- Ajustes › Acessibilidade › Tamanho da tela -->
+<main id="set-uiscale" class="screen sub">
+  <h1 class="large">Tamanho da tela</h1>
+  <div class="group" id="uiList"></div>
+  <p class="note-help">Muda o tamanho de tudo no app: textos, botões e telas.</p>
+</main>
+
+<!-- Ajustes › Idioma -->
+<main id="set-lang" class="screen sub">
+  <h1 class="large">Idioma</h1>
+  <div class="group" id="langList"></div>
+  <p class="note-help">Por enquanto o app está disponível apenas em português do Brasil.</p>
+</main>
+
+<!-- Ajustes › Segurança -->
+<main id="set-security" class="screen sub">
+  <h1 class="large">Segurança</h1>
+</main>
+
+<!-- Ajustes › Privacidade -->
 <main id="set-privacy" class="screen sub">
-  <h1 class="large">Segurança e privacidade</h1>
+  <h1 class="large">Privacidade</h1>
 </main>
 
 <!-- Ajustes › Aparelhos conectados -->
@@ -724,9 +913,6 @@
 
 <!-- Botões do topo (tela de início) -->
 <div class="home-actions" id="homeActions" data-mode="normal">
-  <div class="hpill glass">
-    <button id="moreBtn" aria-label="Mais opções"><svg class="i"><use href="#i-dots"/></svg></button>
-  </div>
   <button class="hcancel glass" id="selCancel">Cancelar</button>
 </div>
 <div class="selbar glass" id="selbar"><button id="selDelete" disabled><svg class="i"><use href="#i-trash"/></svg><span>Excluir</span><b id="selCount">0</b></button></div>
@@ -753,6 +939,7 @@
   <div class="ebar">
     <button id="back"><svg class="i"><use href="#i-back"/></svg>Notas</button>
     <div class="right">
+      <button id="favBtn" aria-label="Favoritar"><svg class="i"><use href="#i-heart"/></svg></button>
       <button id="del" aria-label="Excluir"><svg class="i"><use href="#i-trash"/></svg></button>
       <button id="done" style="font-weight:600">OK</button>
     </div>
@@ -796,12 +983,8 @@
         <button class="fb" data-tool="hand" aria-label="Mover a página"><svg class="i"><use href="#i-move"/></svg></button>
         <button class="fb" data-d="undo" aria-label="Desfazer traço"><svg class="i"><use href="#i-undo"/></svg></button>
       </div>
-      <div class="grp" id="inkColors" aria-label="Cores"></div>
-      <div class="grp" aria-label="Tamanho">
-        <button class="fb th" data-w="2" aria-label="Fina"><i style="width:4px;height:4px"></i></button>
-        <button class="fb th" data-w="4" aria-label="Média"><i style="width:8px;height:8px"></i></button>
-        <button class="fb th" data-w="8" aria-label="Grossa"><i style="width:13px;height:13px"></i></button>
-      </div>
+      <button class="fb" data-d="color" aria-label="Cor da caneta"><span class="inkdot" id="inkDot"></span></button>
+      <button class="fb th" data-d="size" aria-label="Tamanho da caneta"><i id="sizeDot"></i></button>
       <button class="fb" id="mathBtn" data-d="math" aria-label="Contas por gesto"><svg class="i"><use href="#i-mathpen"/></svg></button>
     </div>
   </div>
@@ -816,6 +999,17 @@
 </div>
 <!-- Janela de diálogo / escolha de pasta -->
 <div class="modal" id="modal" aria-hidden="true"><div class="msheet glass" id="msheet"></div></div>
+
+<!-- Editor de tarefas -->
+<div class="ov" id="taskScreen" aria-hidden="true">
+  <div class="ov-top"><button id="tkBack" class="ov-x" aria-label="Voltar"><svg class="i" style="width:22px;height:22px;vertical-align:-5px"><use href="#i-back"/></svg>Voltar</button><span class="ov-title">Tarefa</span><span class="tk-right"><button id="tkFav" class="ov-x ib" aria-label="Favoritar"><svg class="i"><use href="#i-heart"/></svg></button><button id="tkDel" class="ov-x ib" aria-label="Excluir"><svg class="i"><use href="#i-trash"/></svg></button><button id="tkOk" class="ov-ok">OK</button></span></div>
+  <div class="tk-body">
+    <input id="tkTitle" class="tk-title" placeholder="Título da tarefa" maxlength="80" autocomplete="off">
+    <div class="tk-add"><textarea id="tkInput" rows="1" placeholder="Escreva um item…" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></textarea></div>
+    <div id="tkList"></div>
+  </div>
+  <div class="tk-bar"><button id="tkTpl" class="tk-tpl glass"><svg class="i"><use href="#i-layout"/></svg>Template</button></div>
+</div>
 
 <!-- Evento do calendário -->
 <div class="ov" id="evScreen" aria-hidden="true">
@@ -873,10 +1067,18 @@
 <script>
 const KEY = 'bloco-de-notas-v1', CFG = 'bloco-de-notas-cfg', FKEY = 'bloco-de-notas-folders';
 let folders = [], events = [];
-const EKEY = 'bloco-de-notas-events';
+const EKEY = 'bloco-de-notas-events', HKEY = 'bloco-de-notas-habits';
+let habits = []; try { const hv = JSON.parse(localStorage.getItem(HKEY)); habits = Array.isArray(hv) ? hv.filter(h => h && typeof h.id === 'string' && typeof h.name === 'string').map(h => ({ id:h.id, name:h.name.slice(0, 40), days:Array.isArray(h.days) ? h.days.filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)) : [] })) : []; } catch (e) { habits = []; }
+const saveHabits = () => { try { localStorage.setItem(HKEY, JSON.stringify(habits)); } catch (e) {} };
 const saveEvents = () => { try { localStorage.setItem(EKEY, JSON.stringify(events)); } catch (e) {} };
 const saveFolders = () => { try { localStorage.setItem(FKEY, JSON.stringify(folders)); } catch (e) {} };
-const folderOf = id => folders.find(f => f.id === id);
+const SPECIAL = [{ id:'fav', name:'Favoritos', special:true }, { id:'notif', name:'Notificações', special:true }, { id:'trash', name:'Lixeira', special:true }];
+const NKEY = 'bloco-de-notas-notifs';
+let notifLog = []; try { const nv = JSON.parse(localStorage.getItem(NKEY)); notifLog = Array.isArray(nv) ? nv.filter(x => x && typeof x.id === 'string' && typeof x.title === 'string').slice(0, 100) : []; } catch (e) { notifLog = []; }
+const saveNotifs = () => { try { localStorage.setItem(NKEY, JSON.stringify(notifLog.slice(0, 100))); } catch (e) {} };
+function logNotif(e, missed) { notifLog.unshift({ id:'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 4), title:e.title, date:e.date, time:e.time, desc:e.desc || '', at:Date.now(), missed:!!missed }); notifLog = notifLog.slice(0, 100); saveNotifs(); try { render(); } catch (er) {} }
+const folderOf = id => folders.find(f => f.id === id) || SPECIAL.find(f => f.id === id);
+const live = () => notes.filter(n => !n.trash);
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -890,9 +1092,9 @@ const PALETTES = {
 };
 const TABS = ['home', 'calendar', 'settings'];
 const NPLUS = 'N<span class="plus">+</span>';
-const TITLES = { home:NPLUS, calendar:'Calendário', settings:'Ajustes', 'set-theme':'Tema e Aparência', 'set-palette':'Paleta de cores', 'set-data':'Contas e backups', 'set-about':'Sobre', 'set-sound':'Sons e vibrações', 'set-update':'Atualização do software', 'set-guide':'Guia do usuário', 'set-access':'Acessibilidade', 'set-privacy':'Segurança e privacidade', 'set-devices':'Aparelhos conectados', 'set-homestyle':'Estilo de nota na tela de início', 'set-gridscale':'Escala da grade', 'set-aivoice':'Voz para texto', 'set-aipen':'Escrever com caneta', 'set-aiscan':'Imagem para texto', 'set-notestyle':'Estilo de nota', 'set-scroll':'Tipo de rolagem' };
+const TITLES = { home:NPLUS, calendar:'Calendário', settings:'Ajustes', 'set-theme':'Tema e Aparência', 'set-palette':'Paleta de cores', 'set-data':'Backups', 'set-accounts':'Contas', 'set-about':'Sobre', 'set-sound':'Sons', 'set-datetime':'Data e hora', 'set-notif':'Notificações', 'set-update':'Atualização do software', 'set-guide':'Guia do usuário', 'set-access':'Acessibilidade', 'set-security':'Segurança', 'set-uiscale':'Tamanho da tela', 'set-lang':'Idioma', 'set-privacy':'Privacidade', 'set-devices':'Aparelhos conectados', 'set-homestyle':'Estilo de nota na tela de início', 'set-gridscale':'Escala da grade', 'set-aivoice':'Voz para texto', 'set-aipen':'Escrever com caneta', 'set-aiscan':'Imagem para texto', 'set-notestyle':'Estilo de nota', 'set-scroll':'Tipo de rolagem' };
 
-let notes = [], cfg = { auto:true, theme:'light', palette:'purple', home:'list', cols:2, noteStyle:'a4', scroll:'v', aiVoice:true, aiPen:false, aiScan:true }, current = null;
+let notes = [], cfg = { auto:true, theme:'light', palette:'purple', home:'list', cols:2, noteStyle:'a4', scroll:'v', aiVoice:true, aiPen:false, aiScan:true, ui:'m' }, current = null;
 let stack = ['settings'];
 try { notes = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
 try { const f = JSON.parse(localStorage.getItem(FKEY)); folders = Array.isArray(f) ? f.filter(x => x && typeof x.id === 'string' && typeof x.name === 'string') : null; } catch (e) { folders = null; }
@@ -919,7 +1121,7 @@ const saveCfg = () => { try { localStorage.setItem(CFG, JSON.stringify(cfg)); } 
 const mq = window.matchMedia('(prefers-color-scheme: dark)');
 const eff = () => cfg.auto ? (mq.matches ? 'dark' : 'light') : cfg.theme;
 
-function applyTheme() { document.documentElement.dataset.theme = cfg.auto ? 'auto' : cfg.theme; redrawInk(); }
+function applyTheme() { document.documentElement.dataset.theme = cfg.auto ? 'auto' : cfg.theme; redrawInk(); try { thumbsPost(document); } catch (e) {} }
 function applyPalette() {
   const p = PALETTES[cfg.palette], r = document.documentElement.style;
   r.setProperty('--accent-l', p.l); r.setProperty('--accent-d', p.d);
@@ -936,6 +1138,12 @@ function renderAppearance() {
   $('scrollName').textContent = DIRS[cfg.scroll];
   const GS = { 2:'Padrão · 2 notas por linha', 3:'Compacta · 3 notas por linha' };
   $('gridScaleName').textContent = cfg.cols + ' por linha';
+  const UI = { s:['Pequeno', .9], m:['Padrão', 1], l:['Grande', 1.15] };
+  if (!UI[cfg.ui]) cfg.ui = 'm';
+  document.documentElement.style.zoom = UI[cfg.ui][1] === 1 ? '' : UI[cfg.ui][1];
+  $('uiName').textContent = UI[cfg.ui][0];
+  $('uiList').innerHTML = Object.keys(UI).map(k => `<button class="item" data-ui="${k}"><span>${UI[k][0]}</span>${k === cfg.ui ? ck : ''}</button>`).join('');
+  $('langList').innerHTML = `<button class="item"><span>Português (Brasil)</span>${ck}</button><div class="item" style="color:var(--muted)"><span>English</span><span class="val">Em breve</span></div><div class="item" style="color:var(--muted)"><span>Español</span><span class="val">Em breve</span></div>`;
   $('gsList').innerHTML = [2, 3].map(k => `<button class="item" data-gs="${k}"><span>${GS[k]}</span>${k === cfg.cols ? ck : ''}</button>`).join('');
   $('nsList').innerHTML = Object.keys(STY).map(k => `<button class="item" data-ns="${k}"><span>${STY[k]}</span>${k === cfg.noteStyle ? ck : ''}</button>`).join('');
   const YN = (k, key) => `<button class="item" data-ai="${key}" data-v="1"><span>Sim</span>${cfg[key] ? ck : ''}</button><button class="item" data-ai="${key}" data-v="0"><span>Não</span>${cfg[key] ? '' : ck}</button>`;
@@ -965,6 +1173,7 @@ $('palList').onclick = e => {
   const b = e.target.closest('.pal-row'); if (!b) return;
   cfg.palette = b.dataset.p; saveCfg(); applyPalette(); renderAppearance();
 };
+$('uiList').onclick = e => { const b = e.target.closest('[data-ui]'); if (!b) return; cfg.ui = b.dataset.ui; saveCfg(); renderAppearance(); };
 $('gsList').onclick = e => { const b = e.target.closest('[data-gs]'); if (!b) return; cfg.cols = +b.dataset.gs; saveCfg(); render(); renderAppearance(); };
 $('nsList').onclick = e => {
   const b = e.target.closest('[data-ns]'); if (!b) return;
@@ -988,34 +1197,81 @@ function fmt(ts) {
   if (d.toDateString() === now.toDateString()) return d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
   return d.toLocaleDateString('pt-BR');
 }
+/* ---------- Miniaturas reais (grade) ---------- */
+const THW = 360, THH = Math.round(360 * 1.4142);
+function noteThumb(n) {
+  const st = (n.style || (cfg.noteStyle === 'caderno' ? 'caderno' : 'a4')) === 'caderno' ? 'caderno' : 'a4';
+  const size = n.size || DEF_SIZE, lh = n.lh || DEF_LH;
+  let body = '';
+  try { body = n.html ? sanitizeHtml(n.html.slice(0, 6000)) : esc(n.body.slice(0, 1500)).replace(/\n/g, '<br>'); } catch (e) { body = esc(n.body.slice(0, 1500)); }
+  const empty = !n.title && !n.body.trim() && !(n.ink && n.ink.length) && !(n.inkh && n.inkh.length);
+  return `<div class="gpage ${st}" style="--lh:${size * lh}px"><div class="gt${n.title ? '' : ' gph'}">${esc(n.title) || (empty ? 'Nova nota' : '')}</div><div class="gb" style="font-size:${size}px;line-height:${lh}">${body}</div><canvas class="gink" width="${THW * 2}" height="${THH * 2}"></canvas></div>`;
+}
+function taskThumb(n) {
+  const items = n.items || [], row = x => `<div class="gr${x.done ? ' d' : ''}"><i></i><span>${esc(x.text)}</span></div>`;
+  let inner = '';
+  if (!items.length) inner = '<div class="gr gph"><span>Sem itens</span></div>';
+  else if (n.mode === 'shopping') {
+    const g = {}; items.forEach(x => { const c = tkCat(x.text); (g[c] = g[c] || []).push(x); });
+    inner = TK_ORDER.filter(c => g[c]).map(c => `<div class="gc">${esc(c)}</div>${g[c].map(row).join('')}`).join('');
+  } else inner = items.map(row).join('');
+  return `<div class="gpage task"><div class="gt${n.title ? '' : ' gph'}">${esc(n.title) || 'Nova tarefa'}</div>${inner}</div>`;
+}
+function paintThumbInk(cv, list) {
+  const c = cv.getContext('2d'), auto = getComputedStyle(document.body).color;
+  c.scale(2, 2); c.lineCap = c.lineJoin = 'round';
+  list.forEach(s => {
+    const p = s.p, m = p.length / 2; if (!m) return;
+    c.globalCompositeOperation = s.e ? 'destination-out' : 'source-over';
+    c.strokeStyle = c.fillStyle = s.e ? '#000' : (s.c || auto); c.lineWidth = s.w;
+    if (m === 1) { c.beginPath(); c.arc(p[0], p[1], s.w / 2, 0, 7); c.fill(); return; }
+    c.beginPath(); c.moveTo(p[0], p[1]);
+    for (let i = 1; i < m - 1; i++) c.quadraticCurveTo(p[2*i], p[2*i+1], (p[2*i] + p[2*i+2]) / 2, (p[2*i+1] + p[2*i+3]) / 2);
+    c.lineTo(p[2*m-2], p[2*m-1]); c.stroke();
+  });
+}
+const thumbRO = new ResizeObserver(es => es.forEach(e => { const g = e.target.querySelector('.gpage'); if (g) g.style.transform = `scale(${e.contentRect.width / THW})`; }));
+function thumbsPost(root) {
+  root.querySelectorAll('.gcard').forEach(card => {
+    thumbRO.observe(card.querySelector('.gthumb'));
+    const cv = card.querySelector('canvas.gink'); if (!cv) return;
+    const n = notes.find(x => x.id === card.dataset.id); if (!n) return;
+    const l = cfg.scroll === 'h' ? (n.inkh && n.inkh.length ? n.inkh : n.ink) : (n.ink && n.ink.length ? n.ink : n.inkh);
+    if (l && l.length) paintThumbInk(cv, l);
+  });
+}
 function noteListHtml(items, sel) {
   const cls = n => 'nitem' + (sel && selected.has(n.id) ? ' sel' : '');
-  const prev = n => esc(n.body.replace(/\s+/g, ' ')) || 'Sem texto adicional';
+  const isT = n => n.kind === 'task';
+  const prev = n => isT(n) ? ((n.items || []).length ? `${n.items.filter(x => x.done).length}/${n.items.length} · ` + esc(n.body) : 'Sem itens') : (esc(n.body.replace(/\s+/g, ' ')) || 'Sem texto adicional');
+  const ttl = n => (isT(n) ? '<svg class="i tki"><use href="#i-task"/></svg>' : '') + (esc(n.title) || (isT(n) ? 'Nova tarefa' : 'Nova nota'));
   if (cfg.home === 'grid') return `<div class="ngrid c${cfg.cols}" style="--gc:${cfg.cols}">${items.map(n => `
-      <div class="gcard ${cls(n)}" data-id="${esc(n.id)}"><h3>${esc(n.title) || 'Nova nota'}</h3><p>${prev(n)}</p><small>${fmt(n.updated)}</small></div>`).join('')}</div>`;
+      <div class="gcard c${cfg.cols} ${cls(n)}" data-id="${esc(n.id)}"><div class="gthumb">${isT(n) ? taskThumb(n) : noteThumb(n)}</div><div class="gmeta"><b>${esc(n.title) || (isT(n) ? 'Nova tarefa' : 'Nova nota')}</b><small>${fmt(n.updated)}</small></div></div>`).join('')}</div>`;
   return `<div class="group">${items.map(n => `
       <div class="row ${cls(n)}" data-id="${esc(n.id)}">
-        <h3>${esc(n.title) || 'Nova nota'}</h3>
+        <h3>${ttl(n)}</h3>
         <div class="sub"><b>${fmt(n.updated)}</b>${prev(n)}</div>
       </div>`).join('')}</div>`;
 }
+const folderItems = id => id === 'notif' ? notifLog : id === 'fav' ? notes.filter(n => n.fav && !n.trash) : id === 'trash' ? notes.filter(n => n.trash) : notes.filter(n => n.folder === id && !n.trash);
 function render() {
   const q = $('search').value.trim().toLowerCase();
-  const items = notes
+  const items = live()
     .filter(n => !q || n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q))
     .sort((a, b) => b.updated - a.updated);
   if (selMode) selected = new Set([...selected].filter(id => items.some(n => n.id === id)));
   if (!items.length) $('list').innerHTML = `<div class="empty">${q ? 'Nenhum resultado.' : 'Nenhuma nota ainda.<br>Toque no botão de escrever para criar a primeira.'}</div>`;
-  else $('list').innerHTML = noteListHtml(items, true);
-  const showF = folders.length && !selMode;
+  else { $('list').innerHTML = noteListHtml(items, true); thumbsPost($('list')); }
+  const showF = !selMode;
   $('foldTitle').classList.toggle('none', !showF);
-  $('folders').innerHTML = !showF ? '' : `<div class="group">${folders.map(f => `
-      <button class="frow" data-fid="${esc(f.id)}"><svg class="i fi"><use href="#i-folder"/></svg><span class="fn">${esc(f.name)}</span><span class="fc">${notes.filter(n => n.folder === f.id).length}</span><svg class="i chev"><use href="#i-chev"/></svg></button>`).join('')}</div>`;
+  $('folders').innerHTML = !showF ? '' : `<div class="group">${folders.concat(SPECIAL).map(f => `
+      <button class="frow" data-fid="${esc(f.id)}"><svg class="i fi"><use href="#i-${f.id === 'fav' ? 'heart' : f.id === 'trash' ? 'trash' : f.id === 'notif' ? 'bell' : 'folder'}"/></svg><span class="fn">${esc(f.name)}</span><span class="fc">${folderItems(f.id).length}</span><svg class="i chev"><use href="#i-chev"/></svg></button>`).join('')}</div>`;
   renderFolderScreen();
   $('recentTitle').classList.toggle('none', !items.length || !!q);
-  $('count').textContent = notes.length ? `${notes.length} ${notes.length === 1 ? 'Nota' : 'Notas'}` : '';
+  { const lv = live(), nt = lv.filter(n => n.kind !== 'task').length, tk = lv.length - nt;
+    $('count').textContent = !lv.length ? '' : [nt ? `${nt} ${nt === 1 ? 'Nota' : 'Notas'}` : '', tk ? `${tk} ${tk === 1 ? 'Tarefa' : 'Tarefas'}` : ''].filter(Boolean).join(' · '); }
   $('exportCount').textContent = notes.length;
-  $('aboutCount').textContent = notes.length;
+  $('aboutCount').textContent = live().length;
   updateSelUI();
 }
 
@@ -1029,7 +1285,7 @@ function showCurrent() {
   $('dock').classList.toggle('away', (tabNow() === 'settings' && stack.length > 1) || selMode);
   $('homeActions').classList.toggle('show', id === 'home');
   document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
-  $('fab').classList.toggle('hide', tabNow() !== 'home');
+  $('fab').classList.toggle('hide', tabNow() !== 'home' && tabNow() !== 'calendar');
   updateTopbar();
 }
 function goTab(t) {
@@ -1136,7 +1392,9 @@ window.addEventListener('scroll', updateTopbar, { passive:true });
 /* ---------- Editor ---------- */
 function openNote(id) {
   current = notes.find(n => n.id === id); if (!current) return;
-  $('title').value = current.title; loadNoteIntoEditor();
+  if (current.kind === 'task') return openTask();
+  resetZoom();
+  $('title').value = current.title; loadNoteIntoEditor(); favUI();
   $('edate').textContent = new Date(current.updated).toLocaleString('pt-BR', { dateStyle:'long', timeStyle:'short' });
   $('editor').classList.add('open'); $('editor').setAttribute('aria-hidden', 'false');
   history.pushState({ editor:1 }, '');
@@ -1146,7 +1404,7 @@ function closeEditor() {
   if (!$('editor').classList.contains('open')) return false;
   if (current && !current.title.trim() && !current.body.trim() && !(current.ink && current.ink.length) && !(current.inkh && current.inkh.length)) { notes = notes.filter(n => n.id !== current.id); save(); }
   current = null;
-  closePop(); setDrawMode(false);
+  closePop(); setDrawMode(false); resetZoom();
   $('editor').classList.remove('open'); $('editor').setAttribute('aria-hidden', 'true');
   document.activeElement && document.activeElement.blur();
   render();
@@ -1167,19 +1425,22 @@ window.addEventListener('popstate', () => {
   if (hideModal()) return;
   if (hideOvs()) return;
   if (closeSearch()) { if (pendingOpen) { const id = pendingOpen; pendingOpen = null; openNote(id); } return; }
+  if (closeTask()) return;
   if (closeEditor()) return;
   if (closeFolder()) return;
   if (stack.length > 1) { stack.pop(); showCurrent(); updateTopbar(); }
 });
 
-$('fab').onclick = e => openPop(e.currentTarget,
+$('fab').onclick = e => tabNow() === 'calendar' ? openPop(e.currentTarget, '<button class="pi" data-v="event"><span>Criar evento</span><svg class="i ic"><use href="#i-calendar"/></svg></button><button class="pi" data-v="habit"><span>Criar hábito</span><svg class="i ic"><use href="#i-compose"/></svg></button>', v => { if (v === 'event') openEvent(ymd(new Date())); else newHabitDialog(); }) : openPop(e.currentTarget,
   '<button class="pi" data-v="note"><span>Criar nota</span><svg class="i ic"><use href="#i-compose"/></svg></button>' +
   '<button class="pi" data-v="folder"><span>Criar pasta</span><svg class="i ic"><use href="#i-folderplus"/></svg></button>' +
-  '<button class="pi" data-v="task"><span>Criar tarefa</span><svg class="i ic"><use href="#i-task"/></svg></button>',
+  '<button class="pi" data-v="task"><span>Criar tarefa</span><svg class="i ic"><use href="#i-task"/></svg></button>' +
+  '<div class="pdiv"></div><button class="pi" data-v="select"><span>Selecionar</span><svg class="i ic"><use href="#i-checkc"/></svg></button>',
   v => {
+    if (v === 'select') return enterSel();
     if (v === 'note') newNote(null);
     else if (v === 'folder') askName('Nova pasta', '', 'Criar', name => createFolder(name));
-    // tarefas: ainda sem função
+    else if (v === 'task') newTask(null);
   });
 
 $('back').onclick = leave;
@@ -1187,18 +1448,18 @@ $('done').onclick = () => {
   const has = current && (current.title.trim() || current.body.trim() || (current.ink && current.ink.length) || (current.inkh && current.inkh.length));
   if (has) chooseFolder(); else leave();
 };
-$('del').onclick = () => {
-  if (current && confirm('Excluir esta nota?')) {
-    notes = notes.filter(n => n.id !== current.id); save(); current = null; leave();
-  }
-};
+$('del').onclick = () => { if (current) { current.trash = Date.now(); save(); leave(); } };
+function favUI() { const on = !!(current && current.fav); $('favBtn').classList.toggle('on', on); $('tkFav').classList.toggle('on', on); }
+function toggleFav() { if (!current) return; if (current.fav) delete current.fav; else current.fav = true; current.updated = Date.now(); save(); favUI(); }
+$('favBtn').onclick = toggleFav; $('tkFav').onclick = toggleFav;
+$('tkDel').onclick = () => { if (current) { tkCommit(); current.trash = Date.now(); save(); leave(); } };
 $('title').oninput = onEdit;
 /* ---------- Tela de pesquisa ---------- */
 let pendingOpen = null;
 function renderSearch() {
   const q = $('sinput').value.trim().toLowerCase();
   if (!q) { $('sres').innerHTML = '<div class="empty">Digite para buscar nas suas notas.</div>'; return; }
-  const items = notes.filter(n => n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q)).sort((a, b) => b.updated - a.updated);
+  const items = live().filter(n => n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q)).sort((a, b) => b.updated - a.updated);
   $('sres').innerHTML = items.length ? `<div class="group">${items.map(n => `
     <div class="row" data-id="${esc(n.id)}"><h3>${esc(n.title) || 'Nova nota'}</h3>
     <div class="sub"><b>${fmt(n.updated)}</b>${esc(n.body.replace(/\s+/g, ' ')) || 'Sem texto adicional'}</div></div>`).join('')}</div>`
@@ -1236,9 +1497,20 @@ function createFolder(name) {
 function renderFolderScreen() {
   if (curFolder === null) return;
   const f = folderOf(curFolder); if (!f) return;
-  const items = notes.filter(n => n.folder === f.id).sort((a, b) => b.updated - a.updated);
+  if (f.id === 'notif') {
+    $('fTitle').textContent = f.name; $('fMore').hidden = false; $('fNew').hidden = true;
+    $('fList').innerHTML = notifLog.length ? '<div class="group">' + notifLog.map(x => { const d = new Date(x.date + 'T00:00:00');
+      return `<div class="nrow"><svg class="i"><use href="#i-bell"/></svg><div class="ni"><h3>${esc(x.title)}</h3><div class="sub">${d.toLocaleDateString('pt-BR')} · ${esc(x.time)}${x.missed ? ' · Perdida' : ''}${x.desc ? ' · ' + esc(x.desc) : ''}</div></div></div>`; }).join('') + '</div>'
+      : '<div class="empty">Nenhuma notificação ainda.<br>Os avisos dos seus eventos aparecem aqui.</div>';
+    $('fCount').textContent = notifLog.length ? `${notifLog.length} ${notifLog.length === 1 ? 'Notificação' : 'Notificações'}` : '';
+    return;
+  }
+  const items = folderItems(f.id).sort((a, b) => b.updated - a.updated);
   $('fTitle').textContent = f.name;
-  $('fList').innerHTML = items.length ? noteListHtml(items, false) : '<div class="empty">Pasta vazia.<br>Toque no botão de escrever para criar uma nota aqui.</div>';
+  $('fMore').hidden = f.id === 'fav'; $('fNew').hidden = !!f.special;
+  const emptyMsg = f.id === 'fav' ? 'Nenhum favorito ainda.<br>Toque no coração dentro de uma nota ou tarefa.' : f.id === 'trash' ? 'A lixeira está vazia.' : 'Pasta vazia.<br>Toque no botão de escrever para criar uma nota aqui.';
+  $('fList').innerHTML = items.length ? noteListHtml(items, false) : `<div class="empty">${emptyMsg}</div>`;
+  thumbsPost($('fList'));
   $('fCount').textContent = items.length ? `${items.length} ${items.length === 1 ? 'Nota' : 'Notas'}` : '';
 }
 function openFolder(id) {
@@ -1254,9 +1526,36 @@ function closeFolder() {
 }
 $('folders').onclick = e => { const b = e.target.closest('[data-fid]'); if (b) openFolder(b.dataset.fid); };
 $('fBack').onclick = () => history.back();
-$('fList').onclick = e => { const r = e.target.closest('.nitem'); if (r) openNote(r.dataset.id); };
-$('fNew').onclick = () => newNote(curFolder);
-$('fMore').onclick = e => openPop(e.currentTarget,
+$('fList').onclick = e => { const r = e.target.closest('.nitem'); if (!r) return; if (curFolder === 'trash') trashItem(r.dataset.id); else openNote(r.dataset.id); };
+function trashItem(id) {
+  const n = notes.find(x => x.id === id); if (!n) return;
+  showModal(`<h3>${esc(n.title) || (n.kind === 'task' ? 'Nova tarefa' : 'Nova nota')}</h3><p>Este item está na lixeira.</p>
+    <div class="mbtns col"><button class="pri" data-m="restore">Restaurar</button><button class="dng" data-m="purge">Excluir definitivamente</button><button data-m="cancel">Cancelar</button></div>`,
+    a => {
+      if (a === 'cancel') return closeModal();
+      closeModal(() => { if (a === 'restore') delete n.trash; else notes = notes.filter(x => x.id !== id); save(); render(); });
+    });
+}
+function notifMenu(btn) {
+  openPop(btn, '<button class="pi" data-v="clear" style="color:var(--danger)"><span>Limpar notificações</span></button>', () => {
+    if (!notifLog.length) return;
+    showModal(`<h3>Limpar notificações?</h3><p>${notifLog.length} ${notifLog.length === 1 ? 'aviso será removido' : 'avisos serão removidos'} do histórico. Seus eventos não são apagados.</p>
+      <div class="mbtns"><button data-m="cancel">Cancelar</button><button class="pri" style="background:var(--danger)" data-m="ok">Limpar</button></div>`,
+      a => { if (a === 'cancel') return closeModal(); closeModal(() => { notifLog = []; saveNotifs(); render(); }); });
+  });
+}
+function trashMenu(btn) {
+  openPop(btn, '<button class="pi" data-v="empty" style="color:var(--danger)"><span>Esvaziar lixeira</span></button>', () => {
+    const c = notes.filter(n => n.trash).length; if (!c) return;
+    showModal(`<h3>Esvaziar a lixeira?</h3><p>${c} ${c === 1 ? 'item será excluído' : 'itens serão excluídos'} para sempre. Isso não pode ser desfeito.</p>
+      <div class="mbtns"><button data-m="cancel">Cancelar</button><button class="pri" style="background:var(--danger)" data-m="ok">Esvaziar</button></div>`,
+      a => { if (a === 'cancel') return closeModal(); closeModal(() => { notes = notes.filter(n => !n.trash); save(); render(); }); });
+  });
+}
+$('fNew').onclick = e => openPop(e.currentTarget,
+  '<button class="pi" data-v="note"><span>Criar nota</span><svg class="i ic"><use href="#i-compose"/></svg></button><button class="pi" data-v="task"><span>Criar tarefa</span><svg class="i ic"><use href="#i-task"/></svg></button>',
+  v => { if (v === 'task') newTask(curFolder); else newNote(curFolder); });
+$('fMore').onclick = e => curFolder === 'trash' ? trashMenu(e.currentTarget) : curFolder === 'notif' ? notifMenu(e.currentTarget) : openPop(e.currentTarget,
   '<button class="pi" data-v="rename"><span>Renomear pasta</span></button><button class="pi" data-v="del" style="color:var(--danger)"><span>Excluir pasta</span></button>',
   v => {
     const f = folderOf(curFolder); if (!f) return;
@@ -1290,8 +1589,8 @@ $('modal').addEventListener('click', e => {
   if (e.target === $('modal')) return closeModal();
   const b = e.target.closest('[data-m]'); if (b && modalH) modalH(b.dataset.m, b);
 });
-function askName(title, initial, okLabel, cb) {
-  showModal(`<h3>${esc(title)}</h3><input id="mInput" maxlength="40" placeholder="Nome da pasta" autocomplete="off" value="${esc(initial)}">
+function askName(title, initial, okLabel, cb, ph) {
+  showModal(`<h3>${esc(title)}</h3><input id="mInput" maxlength="40" placeholder="${esc(ph || 'Nome da pasta')}" autocomplete="off" value="${esc(initial)}">
     <div class="mbtns"><button data-m="cancel">Cancelar</button><button class="pri" data-m="ok" id="mOk">${esc(okLabel)}</button></div>`,
     a => { if (a === 'cancel') return closeModal(); const v = $('mInput').value.trim(); if (v) closeModal(() => cb(v)); });
   const inp = $('mInput'), upd = () => { $('mOk').disabled = !inp.value.trim(); };
@@ -1306,7 +1605,7 @@ function finishSave(folderId) {
 function chooseFolder() { // ao tocar em OK no editor: em qual pasta salvar?
   const cur = (current && current.folder) || '';
   const ck = '<svg class="i ck"><use href="#i-check"/></svg>';
-  showModal(`<h3>Salvar em…</h3><p>Escolha a pasta desta nota.</p>
+  showModal(`<h3>Salvar em…</h3><p>Escolha a pasta ${current && current.kind === 'task' ? 'desta tarefa' : 'desta nota'}.</p>
     ${folders.map(f => `<button class="mrow" data-m="f:${esc(f.id)}"><svg class="i fi"><use href="#i-folder"/></svg><span class="fn">${esc(f.name)}</span>${f.id === cur ? ck : ''}</button>`).join('')}
     <button class="mrow dim" data-m="f:"><svg class="i fi" style="color:var(--muted)"><use href="#i-folder"/></svg><span class="fn">Sem pasta</span>${!cur ? ck : ''}</button>
     <div class="msep"></div>
@@ -1321,8 +1620,8 @@ function chooseFolder() { // ao tocar em OK no editor: em qual pasta salvar?
 
 /* ---------- Dados: exportar / importar / apagar ---------- */
 $('exportBtn').onclick = () => {
-  if (!notes.length && !events.length) return alert('Não há notas nem eventos para exportar.');
-  const pack = { app:'N+', format:'nplus', version:1, exported:new Date().toISOString(), folders, events, notes };
+  if (!notes.length && !events.length && !habits.length) return alert('Não há notas, eventos nem hábitos para exportar.');
+  const pack = { app:'N+', format:'nplus', version:1, exported:new Date().toISOString(), folders, events, notes, templates:userTpls, habits };
   const blob = new Blob([JSON.stringify(pack)], { type:'application/octet-stream' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -1336,8 +1635,8 @@ $('importFile').onchange = e => {
   r.onload = () => {
     try {
       let data = JSON.parse(r.result);
-      let impF = [], impE = [];
-      if (data && data.format === 'nplus' && Array.isArray(data.notes)) { impF = Array.isArray(data.folders) ? data.folders : []; impE = Array.isArray(data.events) ? data.events : []; data = data.notes; } // formato .nplus
+      let impF = [], impE = [], impT = [], impH = [];
+      if (data && data.format === 'nplus' && Array.isArray(data.notes)) { impT = Array.isArray(data.templates) ? data.templates : []; impH = Array.isArray(data.habits) ? data.habits : []; impF = Array.isArray(data.folders) ? data.folders : []; impE = Array.isArray(data.events) ? data.events : []; data = data.notes; } // formato .nplus
       if (!Array.isArray(data)) throw 0;                                                   // .json antigo (lista de notas)
       const valid = data.map(cleanNote).filter(Boolean);
       if (!valid.length && !impE.length && !impF.length) throw 0;
@@ -1354,6 +1653,12 @@ $('importFile').onchange = e => {
       const eids = new Set(events.map(x => x.id));
       (impE || []).forEach(x => { if (x && typeof x.id === 'string' && !eids.has(x.id) && /^\d{4}-\d{2}-\d{2}$/.test(x.date) && typeof x.title === 'string') { events.push({ id:x.id.slice(0, 40), title:x.title.slice(0, 80), date:x.date, time:/^\d{2}:\d{2}$/.test(x.time) ? x.time : '09:00', desc:typeof x.desc === 'string' ? x.desc.slice(0, 500) : '', alarm:ALARMS[x.alarm] ? x.alarm : 'none', notify:!!x.notify, fired:true }); eids.add(x.id); } });
       saveEvents();
+      impT.forEach(t => { if (t && typeof t.name === 'string' && Array.isArray(t.items) && !userTpls.some(u => u.name.toLowerCase() === t.name.toLowerCase())) userTpls.push({ id:'t-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name:t.name.slice(0, 40), mode:t.mode === 'shopping' ? 'shopping' : 'list', items:t.items.filter(x => typeof x === 'string').slice(0, 200).map(x => x.slice(0, 80)) }); });
+      saveTpls();
+      impH.forEach(h => { if (!h || typeof h.id !== 'string' || typeof h.name !== 'string') return;
+        const days = Array.isArray(h.days) ? h.days.filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(0, 4000) : [], ex = habits.find(x => x.id === h.id);
+        if (ex) days.forEach(d => { if (!ex.days.includes(d)) ex.days.push(d); }); else habits.push({ id:h.id.slice(0, 40), name:h.name.slice(0, 40), days }); });
+      saveHabits(); renderCal();
       notes = notes.concat(novas); save(); saveFolders(); render();
       alert(`${novas.length} nota(s) importada(s).`);
     } catch (err) { alert('Arquivo inválido.'); }
@@ -1433,6 +1738,12 @@ function cleanNote(n) {
   if (typeof n.size === 'number' && n.size >= 8 && n.size <= 80) o.size = n.size;
   const k = cleanInk(n.ink); if (k) o.ink = k;
   const k2 = cleanInk(n.inkh); if (k2) o.inkh = k2;
+  if (n.kind === 'task' && Array.isArray(n.items)) {
+    o.kind = 'task'; o.mode = n.mode === 'shopping' ? 'shopping' : 'list';
+    o.items = n.items.filter(x => x && typeof x.text === 'string').slice(0, 500).map((x, i) => ({ id:typeof x.id === 'string' ? x.id.slice(0, 30) : 'i' + i, text:x.text.slice(0, 80), done:!!x.done }));
+  }
+  if (n.fav === true) o.fav = true;
+  if (typeof n.trash === 'number') o.trash = n.trash;
   if (n.style === 'a4' || n.style === 'caderno') o.style = n.style;
   if (n.dir === 'v' || n.dir === 'h') o.dir = n.dir;
   if (Number.isInteger(n.inkP) && n.inkP >= 1 && n.inkP <= 60) o.inkP = n.inkP;
@@ -1541,20 +1852,29 @@ function setLH(v) {
 function openPop(btn, html, onPick) {
   if (popFor === btn) return closePop();
   closePop();
-  pop.innerHTML = html; pop.className = 'pop show' + (['fab', 'moreBtn', 'fMore'].includes(btn.id) ? ' glass' : ''); popFor = btn; popPick = onPick;
+  pop.innerHTML = html; pop.className = 'pop show' + (['fab', 'fNew', 'moreBtn', 'fMore', 'tkTpl', 'habPen'].includes(btn.id) ? ' glass' : '') + (btn.closest('#tools') ? ' glass tb' : ''); pop.style.width = ''; pop.style.maxHeight = ''; popFor = btn; popPick = onPick;
   btn.classList.add('open');
   placePop();
 }
 function placePop() {
   if (!popFor) return;
+  const tl = popFor.closest('#tools');
+  if (tl) { // menus da barra de ferramentas: painel largo, logo acima da barra
+    const tr = tl.getBoundingClientRect(), br = popFor.getBoundingClientRect(), w = Math.min(innerWidth - 16, 280);
+    pop.style.width = w + 'px'; pop.style.left = Math.round(Math.max(8, Math.min(br.left + br.width / 2 - w / 2, innerWidth - w - 8))) + 'px';
+    pop.style.maxHeight = Math.max(120, Math.min(innerHeight * .45, tr.top - 16)) + 'px';
+    pop.style.top = Math.max(8, tr.top - 8 - pop.offsetHeight) + 'px';
+    pop.classList.remove('up', 'upl'); return;
+  }
   const r = popFor.getBoundingClientRect(), h = pop.offsetHeight;
   pop.style.left = '0px';
   const w = pop.offsetWidth;
-  const up = popFor.id === 'fab' || (r.bottom + 8 + h > innerHeight - 8 && r.top - 8 - h > 8);
+  const fabLike = popFor.id === 'fab' || popFor.id === 'fNew';
+  const up = fabLike || (r.bottom + 8 + h > innerHeight - 8 && r.top - 8 - h > 8);
   pop.style.top = (up ? Math.max(8, r.top - h - 10) : r.bottom + 8) + 'px';
-  if (popFor.id === 'fab') pop.style.left = Math.max(8, r.right - w) + 'px';
+  if (fabLike) pop.style.left = Math.max(8, r.right - w) + 'px';
   else pop.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + 'px';
-  pop.classList.toggle('up', popFor.id === 'fab'); pop.classList.toggle('upl', up && popFor.id !== 'fab');
+  pop.classList.toggle('up', fabLike); pop.classList.toggle('upl', up && !fabLike);
 }
 function closePop() { pop.className = 'pop'; if (popFor) popFor.classList.remove('open'); popFor = null; }
 const menuFont = () => { const c = curFontIdx(); return FONTS.map((f, i) => `<button class="pi" data-v="${i}" style="font-family:${f.v.replace(/"/g, '&quot;')}"><span>${f.n}</span>${i === c ? CHK : ''}</button>`).join(''); };
@@ -1657,7 +1977,8 @@ function growPaper(x, y) { // a página cresce quando o desenho chega perto do f
   current.inkH = nh;
   layoutEditor();
 }
-const pos = e => { const r = ink.getBoundingClientRect(); return [Math.round((e.clientX - r.left) * 10) / 10, Math.round((e.clientY - r.top) * 10) / 10]; };
+let ez = 1; // zoom do editor (pinça com dois dedos)
+const pos = e => { const r = ink.getBoundingClientRect(); return [Math.round((e.clientX - r.left) / ez * 10) / 10, Math.round((e.clientY - r.top) / ez * 10) / 10]; };
 ink.addEventListener('pointerdown', e => {
   if (!drawMode || tool === 'hand' || activeId !== null || !current) return;
   e.preventDefault();
@@ -1699,9 +2020,9 @@ function setDrawMode(on) {
   else { $('editor').dataset.tool = 'pen'; if (mathOn) setMath(false); refreshFmt(); }
 }
 function renderDrawbar() {
-  $('inkColors').innerHTML = INK_COLORS.map((c, i) => `<button class="dotc${c === inkColor ? ' on' : ''}" data-ci="${i}" style="background:${c || 'linear-gradient(135deg,#000 50%,#fff 50%)'}" aria-label="Cor"></button>`).join('');
+  $('inkDot').style.background = inkColor || 'linear-gradient(135deg,#000 50%,#fff 50%)';
+  const sd = $('sizeDot'); sd.style.width = sd.style.height = Math.min(20, Math.max(3, inkW + 1)) + 'px';
   document.querySelectorAll('#drawbar [data-tool]').forEach(b => b.classList.toggle('on', b.dataset.tool === tool));
-  document.querySelectorAll('#drawbar [data-w]').forEach(b => b.classList.toggle('on', +b.dataset.w === inkW));
 }
 $('drawbar').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
@@ -1709,10 +2030,37 @@ $('drawbar').addEventListener('click', e => {
   else if (b.dataset.d === 'math') openPop(b, '<button class="pi" data-v="math"><span>Fazer contas com gesto</span>' + (mathOn ? CHK : '') + '</button>', () => setMath(!mathOn));
   else if (b.dataset.d === 'undo') { if (strokes.length) { const g = strokes[strokes.length - 1].g; strokes.pop(); if (g) while (strokes.length && strokes[strokes.length - 1].g === g) strokes.pop(); mathSess = []; redrawInk(); if (current) { current.updated = Date.now(); save(); } } }
   else if (b.dataset.tool) setTool(b.dataset.tool);
-  else if (b.dataset.w) { inkW = +b.dataset.w; renderDrawbar(); }
-  else if (b.dataset.ci !== undefined) { inkColor = INK_COLORS[+b.dataset.ci]; if (tool !== 'pen') setTool('pen'); else renderDrawbar(); }
+  else if (b.dataset.d === 'color') pickInkColor();
+  else if (b.dataset.d === 'size') inkSizePop(b);
 });
 renderDrawbar();
+
+const INK_PALETTE = [null, '#000000', '#636366', '#8e8e93', '#c7c7cc', '#ffffff',
+  '#ff3b30', '#ff6b5e', '#ff9500', '#ffcc00', '#ffe66d', '#a8e063',
+  '#34c759', '#00a86b', '#00c7be', '#5ac8fa', '#007aff', '#0a3d91',
+  '#5856d6', '#af52de', '#ff2d55', '#ff7eb6', '#8b5a2b', '#c68642'];
+function pickInkColor() {
+  let sel = inkColor;
+  const sw = c => c || 'linear-gradient(135deg,#000 50%,#fff 50%)';
+  const mark = () => { document.querySelectorAll('#msheet .cpsw').forEach(b => b.classList.toggle('on', (INK_PALETTE[+b.dataset.m.slice(2)] || null) === sel)); };
+  showModal(`<h3>Cor da caneta</h3>
+    <div class="cpgrid">${INK_PALETTE.map((c, i) => `<button class="cpsw" data-m="c:${i}" style="background:${sw(c)}" aria-label="${c || 'Automática'}"></button>`).join('')}</div>
+    <label class="cpcust"><span>Personalizada</span><input type="color" id="cpIn" value="${sel || '#000000'}"></label>
+    <div class="mbtns"><button data-m="cancel">Cancelar</button><button class="pri" data-m="ok">OK</button></div>`,
+    a => {
+      if (a === 'cancel') return closeModal();
+      if (a === 'ok') return closeModal(() => { inkColor = sel; if (tool !== 'pen') setTool('pen'); else renderDrawbar(); });
+      if (a.startsWith('c:')) { sel = INK_PALETTE[+a.slice(2)] || null; mark(); }
+    });
+  $('cpIn').oninput = () => { sel = $('cpIn').value; mark(); };
+  mark();
+}
+function inkSizePop(btn) {
+  openPop(btn, `<div class="szp"><div class="szprev"><i id="szLine" style="height:${inkW}px;${inkColor ? `background:${inkColor}` : ''}"></i></div><div class="szrow"><input type="range" id="szR" min="1" max="40" value="${inkW}" aria-label="Tamanho da caneta"><b id="szV">${inkW}</b></div></div>`, () => {});
+  const r = $('szR'); if (!r) return;
+  r.addEventListener('mousedown', e => e.stopPropagation());
+  r.oninput = () => { inkW = +r.value; $('szV').textContent = inkW; $('szLine').style.height = inkW + 'px'; renderDrawbar(); };
+}
 
 /* ---------- Contas por gesto (reconhecimento de escrita à mão, tudo dentro do app) ---------- */
 const NET = {"w1":[[13,-7,-11,-10,-7,9,18,5,16,11,10,18,2,-16,-10,4,26,12,0,8,-3,-6,-6,14,23,22,12,-12,-2,4,10,8,-6,15,33,33,15,8,2,7,-41,-14,6,20,14,20,6,6,-43,-51,-59,-53,-35,-22,-7,14,2,23,19,4,0,-14,-34,-32],[-3,-14,-8,19,29,30,4,5,6,-19,-14,-12,14,10,0,-30,7,4,-4,0,0,10,-14,-48,9,16,8,12,1,9,-29,-21,0,12,13,11,3,16,-26,-18,-24,11,16,-29,-19,-13,-25,-14,0,4,17,-21,-31,4,-9,-23,-1,4,16,3,-2,10,-4,-19],[-4,-5,4,4,8,3,-6,3,-7,-1,-8,-1,1,-15,-3,-2,4,4,17,13,4,-8,1,5,6,4,9,9,6,-5,4,-2,1,9,6,-5,2,5,10,-6,4,-5,-1,1,5,6,-2,-3,4,-10,-7,-1,2,2,-6,1,-1,-12,3,3,-5,-6,-3,-6],[10,22,23,6,1,-5,0,11,4,31,18,9,-7,2,11,-1,9,35,22,6,-24,10,2,-6,12,19,12,-2,-16,9,4,-2,17,15,4,-7,-12,12,3,-3,23,13,-6,-7,-2,5,-3,-10,5,-2,7,13,0,-11,4,-26,0,-8,-12,-10,-12,-6,-4,-10],[-8,-8,-14,4,1,-1,-7,0,10,5,5,11,6,9,9,2,12,9,10,-4,8,11,16,-3,-10,-10,-6,-5,-6,-10,5,0,-3,1,-3,6,-1,-19,-4,-7,-3,7,10,-4,-2,1,11,-7,-3,15,-3,-2,12,14,-6,-9,6,4,4,5,18,7,-7,2],[-35,-21,-24,8,8,12,0,-12,-38,-44,-38,-7,20,2,-2,-15,-37,-56,-8,25,-11,-18,-22,-7,-24,-36,14,24,-17,-30,-27,1,-20,-2,23,15,-6,-3,8,-15,-25,-8,17,24,9,4,-2,-32,6,11,12,24,15,-3,-14,-1,-4,-9,18,2,15,25,11,39],[-41,-6,-35,-25,16,27,25,18,-3,5,0,-18,-10,20,33,18,21,30,8,-43,-27,4,25,31,6,-5,-25,-14,13,8,24,15,1,-12,-37,1,31,9,10,2,6,-21,-27,14,16,-8,5,2,10,-5,-8,14,0,-9,-5,-2,-13,14,8,15,1,14,2,10],[11,-14,2,0,11,15,10,-22,-3,-1,7,-14,-4,33,14,-7,2,7,-5,-40,-8,29,26,13,19,9,-11,-29,-10,13,9,35,-6,-28,-18,0,1,-7,7,30,-14,-26,-20,-16,-7,-10,-7,10,12,19,14,-12,-7,-16,-9,1,3,-5,-17,4,12,12,1,-18],[7,19,14,16,6,5,11,17,4,4,-1,6,4,8,6,7,-4,5,12,-17,-26,-7,-6,-22,6,-1,20,11,-4,-7,-12,-8,-4,-6,6,-8,-25,6,14,10,-6,2,20,-10,-14,9,8,10,-6,7,8,-3,7,13,13,-10,3,5,6,-10,-6,7,23,-3],[3,6,14,12,0,5,16,13,18,7,11,11,6,1,-1,16,23,7,2,10,14,18,8,5,17,4,14,-7,0,20,15,-5,16,-3,19,40,26,10,-5,-1,14,-41,-21,-1,-17,-14,-22,-14,0,-29,-41,-45,-49,-43,-26,-23,1,-12,-10,-24,-16,-24,-7,-12],[2,5,9,4,-4,7,-1,-8,6,9,3,-4,13,5,-3,-2,3,21,14,14,20,21,-3,-11,-2,14,6,2,5,11,2,-29,-12,0,1,1,4,20,-5,-29,-5,-10,11,13,-9,-2,-23,-11,-1,-22,-5,-9,-41,-18,-1,-19,-16,-22,-13,-12,-19,-2,-5,-36],[-10,-27,-21,-8,-1,2,-6,1,-4,11,20,22,7,-1,-13,-14,-4,12,7,11,17,-6,-9,9,-3,10,-8,2,11,-2,0,-3,5,-2,-16,7,17,-8,-4,-3,15,6,-5,-10,-6,-5,-4,22,-6,5,-9,-22,1,12,9,8,-16,-15,-5,2,1,6,4,2],[9,24,-10,-6,-6,-17,-30,-22,13,15,25,-18,-53,-45,-28,-19,10,16,37,-5,-25,-7,17,20,1,3,35,17,-14,0,11,18,9,9,19,0,-18,-11,0,-3,10,4,12,3,-9,-7,-7,11,-3,-4,-7,-3,-2,0,8,9,17,14,8,7,13,-5,-27,-7],[-13,-2,4,13,14,12,-11,10,-7,-15,16,-4,-35,-59,-26,13,-9,1,-3,-2,-25,-38,-41,-4,-34,-11,-24,13,12,-22,-22,-21,0,1,-8,-3,14,-8,-33,-7,-22,-13,-22,-31,22,-11,-11,49,-34,3,-6,-5,40,18,28,36,-5,20,11,4,10,14,20,14],[-10,-1,4,5,2,9,3,-9,-3,11,-3,-10,4,-12,-24,-22,0,14,-7,-12,15,4,-20,-12,-3,9,-17,-8,1,1,-3,7,25,-13,-23,15,4,10,26,35,-27,-81,-13,38,18,15,25,30,-28,-54,-11,36,10,15,0,-5,-20,-24,-18,-15,-12,-4,-6,-9],[4,1,10,17,14,-11,-25,-29,3,-2,12,18,20,-20,-49,-74,10,5,4,17,7,-5,-35,-72,10,0,-4,17,0,-2,-9,-39,-6,12,2,1,-5,7,-10,-22,0,-6,-19,-17,-10,-8,1,15,10,-5,-16,2,23,30,20,4,-17,0,13,5,-3,8,17,10],[-6,9,-7,-11,-18,-17,4,6,-16,3,-2,-5,-4,-7,8,-4,4,10,15,6,-17,1,3,-8,18,3,12,9,-12,-9,-22,3,3,8,13,-23,-6,12,0,12,-2,-3,12,10,29,21,9,11,5,-9,7,24,19,-3,-3,13,-3,-6,4,16,15,0,-4,-10],[26,30,40,37,23,3,-26,-35,20,10,-10,2,5,21,15,-17,-14,-32,-34,-17,-14,2,10,1,-23,-30,-5,-5,4,12,14,2,-4,-8,-9,-2,2,3,12,-6,-20,6,3,-4,-14,-8,-14,-13,-5,-2,17,17,2,-10,-21,-18,15,4,-4,7,13,-5,-6,15],[4,-16,1,-1,-15,-20,8,-12,-10,6,24,23,-3,17,33,4,2,11,20,-12,-38,-10,23,-2,11,-8,1,-17,-11,-14,-9,0,-18,-6,0,-30,-13,11,16,15,-18,23,11,-31,2,27,24,3,-25,9,19,-1,16,18,0,17,10,-8,7,10,7,10,13,-2],[7,-4,12,-2,-4,5,-15,0,2,4,-15,-14,5,9,0,-1,8,10,-23,-25,-2,-8,13,-1,17,-17,-28,-2,2,-12,11,-15,10,-15,-12,-13,-10,-4,-3,10,27,16,2,-1,-28,-5,6,-5,19,28,36,36,37,27,-8,-8,-17,-9,-1,-10,16,-1,-4,15],[7,5,12,11,6,-4,-1,0,11,17,18,16,5,7,10,-12,-8,-8,-12,-14,1,12,4,-3,-13,-11,-14,-6,7,-5,-8,-9,14,10,-17,-9,4,-1,-4,-18,11,1,-14,-5,3,7,-1,6,-5,-23,-22,-1,14,14,5,5,-4,-12,6,17,4,-3,8,-7],[-16,-3,-16,-12,-5,-5,-9,8,-13,-1,-2,-4,-16,-7,6,-1,3,9,4,-21,-36,-10,0,1,3,5,0,5,8,-3,0,4,2,0,-2,33,39,15,2,-10,16,3,-13,7,23,25,19,-22,13,4,-1,-22,-14,-8,15,-10,15,13,11,5,1,3,13,22],[6,-1,2,0,-4,-9,-3,1,2,6,7,1,0,0,10,1,-6,-14,-4,-6,3,-8,4,3,-2,-1,-7,-6,7,2,-3,0,-7,7,1,4,12,-13,3,-5,-18,11,4,1,-19,-12,6,-1,-5,9,12,7,14,17,-2,-3,-2,-7,1,2,10,13,-2,11],[4,4,18,-2,-9,16,-12,-26,18,9,-1,-25,-4,16,-3,-9,2,-22,-20,-14,15,28,-4,-18,-14,-19,-14,13,15,3,-14,-8,3,-7,0,21,21,-4,-1,13,10,6,-3,3,15,20,14,-10,12,17,13,-21,-22,1,3,1,7,21,10,-5,-30,-17,-4,-7],[0,17,16,28,9,-28,-6,1,-1,-9,-4,2,-7,-14,-8,8,-2,-27,-4,14,3,-13,3,-5,0,-5,15,13,4,-9,4,-1,5,1,20,5,-11,-12,5,-14,2,11,11,7,10,3,-8,-26,5,8,5,1,13,9,-19,-7,20,8,-1,14,4,-5,-15,-9],[4,-5,13,3,8,-4,0,-3,-1,-5,11,5,1,-5,-12,8,-11,0,3,-3,-4,-2,10,4,4,2,6,-7,4,10,1,5,8,2,11,-2,2,0,5,15,8,11,16,8,14,20,12,-13,-2,0,7,2,-6,-5,-2,8,6,-11,-6,-1,5,7,2,3],[-31,-16,19,7,25,30,23,13,-3,18,8,-16,-26,2,9,11,-20,2,-5,-18,-30,-37,-32,-27,-6,1,4,14,19,12,-23,-23,9,-14,4,5,4,27,13,5,-1,-1,0,-12,-11,14,3,-10,2,-7,-3,9,-6,-5,1,-19,12,-13,4,3,0,-3,-12,8],[23,27,15,7,32,33,19,14,-9,-13,-12,-9,-4,18,24,31,-11,2,1,2,-28,-6,13,19,-5,10,23,13,-38,-35,-19,3,-9,-10,21,2,-18,-28,-26,15,-4,-16,-3,10,34,4,-13,-5,4,-20,-21,-1,7,8,-6,-18,16,22,1,3,-17,-2,-9,-14],[7,16,7,-7,-3,2,-10,-7,-1,18,21,-21,-31,5,6,-8,-1,13,32,-10,-25,-4,-9,0,-19,0,26,13,16,-10,-10,6,-4,-1,8,6,14,-7,2,2,-3,-6,-15,5,15,1,3,-9,-3,-5,-8,-8,-7,1,0,2,14,-7,-5,-7,-4,7,-9,5],[-10,11,-4,1,15,15,10,-2,-1,14,5,9,-5,-16,-9,-10,14,3,4,16,-2,-13,-12,-11,9,7,4,11,-9,-18,-3,0,-1,12,19,6,9,-7,10,-20,3,7,-12,12,27,11,-8,-24,-3,-3,-20,-11,4,2,-19,-17,8,11,3,-2,4,3,-6,-23],[2,-3,7,-3,8,13,8,13,4,5,8,16,8,2,-6,0,-5,10,8,-8,-11,1,1,-12,-6,-4,1,3,3,0,1,-4,1,-2,-6,1,-13,2,0,2,5,12,8,-3,-12,0,-8,9,-5,3,1,-5,-4,4,1,-2,-1,5,9,3,-9,6,0,-9],[1,-7,-8,0,3,4,-1,-6,-4,0,-3,5,-11,1,4,2,4,0,3,14,12,0,13,5,-1,-6,-11,-7,-11,0,17,6,11,5,-13,-1,5,-17,-1,-4,-3,9,-2,2,1,-6,5,-2,2,7,2,9,21,14,2,6,1,0,-1,-7,8,6,0,16],[3,15,9,5,10,13,14,1,-9,9,6,8,11,20,7,-1,-19,-5,19,16,-25,13,-3,1,-9,10,37,-3,-35,5,9,9,2,32,-2,-60,-19,0,11,-28,15,24,-42,-47,10,-18,-10,-31,19,5,-31,-1,21,-15,-5,-5,2,-11,-25,-3,6,18,22,9],[5,10,12,6,-1,8,7,3,7,8,4,-3,0,7,-2,14,3,4,-9,18,22,7,-21,-14,-6,4,1,16,-12,7,8,16,1,17,6,-10,-18,-6,3,21,6,33,-13,-39,-8,-12,-24,19,12,33,-2,-25,21,-5,-33,5,8,6,8,8,-11,-28,-35,-1],[-15,-14,-5,-3,6,4,-23,-25,1,2,3,-2,13,10,-12,-22,12,3,-14,-20,-7,17,4,-17,11,-7,-5,2,2,-9,1,-2,3,-2,-2,-6,3,-21,-2,10,3,17,9,1,5,13,4,0,2,3,6,-7,6,6,2,8,4,-7,-11,1,-3,-5,6,10],[6,29,3,5,2,-7,-3,3,4,15,3,1,7,0,2,10,3,9,27,8,3,17,20,5,8,6,23,5,-12,1,13,-3,9,2,7,-10,-21,7,8,4,18,6,11,6,8,16,13,12,0,-10,-2,-7,-7,1,-1,-9,-12,-25,-5,-4,-8,-2,-25,-24],[3,1,1,6,-1,7,5,3,5,5,7,-1,-3,2,-9,12,-6,4,1,12,3,10,8,11,-11,-6,1,-7,-15,13,12,4,8,-3,-4,-4,0,1,-1,5,2,4,0,7,9,-10,-3,4,2,6,7,4,-4,3,-5,7,-3,-7,0,-5,10,6,2,13],[15,6,8,8,-6,-4,-10,-14,5,4,9,-3,5,10,-8,-1,6,6,-8,-12,-17,-11,-2,-10,11,10,2,1,0,9,-1,1,4,5,2,11,-1,12,-1,13,-10,-3,8,0,-14,-7,7,10,2,4,11,13,-2,-2,5,8,-1,5,3,12,1,-1,11,0],[11,-10,2,6,11,5,18,2,-8,7,-3,13,4,6,-7,-13,7,12,-1,3,9,17,10,1,2,-10,-11,-13,-17,12,17,5,9,1,8,-12,-19,22,22,8,13,11,0,-10,1,17,4,-7,14,4,12,-13,3,1,-15,-9,14,17,8,-11,-5,14,10,15],[1,14,4,6,-6,0,5,2,-9,-4,1,-5,-15,-2,3,0,-5,-17,7,7,9,13,10,-2,1,-4,6,-5,-19,-1,2,3,7,9,6,-8,-6,-1,-4,8,-17,4,9,6,-4,-16,7,0,-9,4,10,14,5,4,-8,2,-5,-4,-8,-1,8,17,1,17],[-33,-14,11,14,4,-3,-11,-13,-29,-5,16,-12,-35,-8,-5,-12,-16,0,34,5,-44,-14,9,4,-13,-5,31,12,-3,4,1,9,7,13,17,15,6,4,-5,-11,10,-4,-12,-7,-2,4,0,-7,5,-3,-2,6,0,-6,0,2,10,10,14,12,-4,-9,5,3],[-8,-14,11,2,5,6,10,0,-10,-2,-2,9,-2,-9,-5,14,-20,-10,9,3,-5,2,7,8,-12,-21,7,-12,-3,9,4,11,12,2,0,5,10,-2,2,12,18,8,-1,7,18,20,-1,-2,-6,-7,-4,-2,-8,-11,-4,2,0,-5,-15,-2,-6,-3,-3,-4],[-5,-3,0,6,3,-20,-20,-31,-28,-20,-17,8,11,8,25,11,-20,-24,-22,-5,-15,-15,8,30,-23,-3,-5,16,-1,-35,-27,2,-29,-8,-7,31,2,-29,-45,-46,-21,-13,-20,10,39,14,-64,-74,-15,11,-1,8,28,0,-59,-29,-7,21,26,22,22,-4,-51,-22],[-30,-15,7,0,-7,-11,-7,-6,-13,0,-7,-18,-20,-15,-1,-8,-8,5,9,16,-14,-3,-2,-18,-15,8,25,17,-6,20,-4,-18,-3,6,15,0,1,14,1,-9,1,2,12,7,17,18,11,-1,13,0,-1,5,-3,7,12,-3,7,13,9,15,-4,-6,10,13],[13,-4,4,5,-13,-29,-42,-29,18,9,9,14,18,6,-15,-44,-9,-12,-21,-16,10,18,7,-3,-17,-5,-23,-5,6,12,15,7,1,1,-8,16,15,0,0,6,-22,-4,-1,3,-14,-6,15,35,-2,-1,5,17,11,6,12,13,-8,4,11,8,-3,-12,-1,5],[11,-9,-15,-15,-13,-15,0,-7,15,12,21,41,29,36,33,36,12,1,-5,-27,-33,-20,2,18,-3,-12,-20,-30,-8,-13,-34,-42,-10,-7,-11,10,25,-1,-13,-45,-8,-5,10,19,6,-7,-3,-1,-3,5,4,-10,-6,13,15,6,27,4,1,0,12,18,16,5],[-8,-13,4,11,23,19,5,-11,-11,-23,8,9,-2,-5,9,3,-12,-19,4,5,-33,6,15,2,-8,-27,9,-1,-42,26,29,12,-4,-23,-14,-7,-18,14,10,-12,17,9,-8,-4,-4,12,-20,-23,10,8,1,-7,-1,-6,-10,5,5,18,0,-9,18,18,6,12],[-14,9,-11,-6,29,41,-9,-29,-2,2,-19,-13,10,-20,-42,-12,-11,0,-11,4,28,-13,-32,-14,-10,0,-9,-1,6,9,10,23,-27,-8,0,12,12,-1,25,31,-40,-22,-15,19,15,12,7,3,-14,-20,15,8,-8,-18,-17,9,-8,-18,1,-3,11,3,-15,-17],[-2,-15,-21,-15,6,20,12,17,4,1,1,5,1,-1,16,24,13,23,8,-13,-6,-7,-14,-9,13,22,14,8,11,-10,-38,-33,-1,-1,1,2,-10,-6,-25,-27,3,-1,-7,-11,-7,13,20,-18,8,9,-14,-11,-3,16,16,-22,6,16,17,7,-2,15,9,-4],[-8,12,-7,4,0,-2,-8,-10,-13,6,2,-8,-10,-11,-4,6,-10,-10,-7,3,14,-9,5,12,3,-3,-5,-9,-3,1,-6,17,10,6,-11,-7,12,-2,6,5,0,-3,-7,24,22,4,2,-1,3,-10,-8,16,27,9,-9,8,8,-9,-14,-18,6,8,2,11],[9,3,-12,-1,14,23,34,17,-5,1,2,12,-16,-33,-32,-30,0,0,23,6,-9,-29,-41,-56,10,7,0,-9,14,17,3,19,6,5,-11,-30,8,22,41,34,-2,5,10,-17,-18,6,13,15,0,3,12,4,-2,-12,-15,15,1,-3,6,3,-2,-11,-13,9],[-8,-2,-3,9,6,-8,0,-4,2,8,2,-7,-11,4,10,-4,18,6,6,18,2,13,12,3,-3,-4,1,0,-14,9,3,-3,0,4,12,1,-2,16,-5,-12,-2,5,-7,-13,7,1,4,-5,4,10,-4,-4,4,0,-1,-3,-2,5,-4,-6,16,5,4,13],[11,-2,9,13,8,-1,-12,2,-30,-37,3,10,0,-12,8,16,-68,-41,3,25,16,-6,15,17,-64,-34,13,23,13,15,14,4,-36,-26,-5,16,-12,15,2,8,-18,-18,-4,13,-11,0,13,20,-20,-24,-5,-1,-29,-8,22,9,-11,-37,-16,-3,-11,-9,11,25],[-10,-12,-6,-7,8,12,8,10,-2,3,2,7,-6,-1,-1,5,-9,16,17,5,-1,4,1,18,4,10,16,-8,4,14,18,17,14,9,-3,-15,-1,15,17,9,1,-20,-37,6,23,-1,-14,-5,-3,-29,-28,-11,3,-12,-15,6,15,-2,5,17,9,14,11,0],[-9,-3,-4,4,0,-6,-6,-9,4,-2,0,0,2,0,4,-1,8,-3,3,9,7,13,8,2,-7,1,4,4,-9,-3,4,5,0,-1,5,-3,9,0,-6,2,2,0,-1,-6,11,14,2,-12,-4,3,4,0,4,4,-3,3,3,-5,-5,2,3,0,1,9],[-4,-3,-7,-3,9,4,-4,13,2,1,0,7,13,15,19,3,4,-1,-13,7,17,16,4,12,-5,3,-11,8,22,7,7,-1,-20,-7,-8,4,15,22,17,-17,-12,-2,-4,-12,-3,13,3,-5,0,7,0,-11,-13,0,12,-6,-3,18,6,-2,-8,8,7,-8],[-2,13,-5,3,-19,-49,-76,-22,13,8,24,28,2,-49,-94,-15,12,3,13,39,16,-38,-58,-10,-7,13,2,31,-12,-22,0,6,3,21,-2,10,-1,-4,-3,-4,-8,1,2,-14,-5,9,7,27,1,-3,-8,-4,9,22,15,-4,-2,9,9,1,-9,-22,-16,-24],[11,7,-9,5,12,-4,-8,-14,-3,-2,-21,-2,9,-2,-26,9,-8,-1,-14,7,11,-18,-13,6,-9,-9,-7,-9,-22,-6,-2,5,1,7,0,-23,-1,0,14,2,-1,20,15,0,-5,9,11,-11,11,7,14,9,21,14,-1,11,-1,8,3,-4,10,19,12,23],[-11,-6,0,9,-2,-7,-8,-2,2,-20,-4,0,-11,-35,-23,12,5,-11,-10,19,32,-11,-21,13,-4,0,-23,-16,2,1,1,-4,-2,12,11,-11,-5,-3,-20,-35,-19,4,22,1,5,-2,-3,-5,-19,-1,32,18,3,9,21,27,-12,-3,21,12,1,7,6,9],[-14,-8,-16,-36,-43,-6,20,20,-10,8,-27,-16,15,9,-6,-11,-18,-11,-6,14,2,9,0,3,-22,-3,12,31,8,25,7,7,-7,9,15,14,-34,20,16,12,-12,-6,12,6,-8,13,13,17,-3,-19,5,4,8,9,3,8,-3,11,14,7,-4,8,9,18],[15,15,-11,7,16,29,27,25,11,3,5,16,0,2,2,10,-10,6,7,14,0,-2,-20,-12,-7,9,-1,0,12,4,-10,-31,4,-3,-22,-4,-8,-8,-12,-25,9,-10,-7,-9,2,-9,-12,-14,7,2,10,-3,15,18,6,-7,8,14,-9,-30,-16,14,14,6],[25,4,4,3,0,-10,-4,5,17,12,20,23,7,-2,-12,-6,5,22,20,5,19,26,-13,-23,11,-3,3,3,8,-3,-29,-32,10,-20,-23,-11,-10,-17,-10,-4,-7,-27,-33,-26,-18,4,9,25,-24,-10,1,6,22,18,5,-13,1,17,26,9,-5,-18,-11,-9],[0,2,-2,7,7,-3,-1,8,2,-2,6,0,15,10,11,-3,-7,0,14,7,10,10,7,-2,-13,5,10,7,-7,5,-2,-8,-9,-10,-1,8,-8,-5,-2,-4,-16,4,-2,-12,-11,-14,1,2,-14,10,4,7,-4,3,-11,-17,-14,-9,-2,2,-2,2,-4,2],[-28,-2,6,8,-8,-17,-29,3,3,-9,-4,-19,-30,-22,5,27,2,1,1,13,-3,-15,3,-9,14,15,6,26,3,-13,-16,-17,21,7,6,15,-2,-12,-17,-20,14,9,35,20,-15,-5,3,4,12,13,42,4,-13,-2,17,11,-1,31,34,7,0,-9,-1,5],[-3,3,5,11,6,27,14,-3,1,0,0,-6,15,16,6,2,-16,8,-9,-2,21,28,3,-2,-21,-2,-15,-8,11,13,2,-14,-28,1,-9,14,16,9,-8,-12,-2,-1,0,5,10,-8,-20,2,10,-4,-9,-11,-17,-14,3,5,-8,-4,-5,1,-11,-2,1,11],[-2,14,5,11,16,9,20,21,-7,-7,-8,6,8,2,-2,1,-25,-14,-13,-5,0,-10,-18,-8,-12,-6,-14,-8,8,0,-7,-31,-14,-7,-8,6,23,10,11,-9,1,-3,3,26,7,-20,-3,14,4,10,3,13,4,-13,-15,-22,-7,-7,-1,13,12,-3,10,2],[-2,-3,-10,-4,2,21,8,2,-6,1,-2,-15,-10,13,5,-35,-4,-4,4,-14,17,45,10,-34,-8,-3,-2,0,7,20,-2,-34,-12,1,-4,15,10,-3,-38,-26,-22,-1,5,7,-5,-27,-32,-9,1,-4,-2,2,-6,2,7,18,-4,-2,2,5,23,14,8,18],[10,27,25,12,5,-9,-1,-4,-28,0,17,9,5,10,7,6,-30,-21,-1,17,1,-3,5,9,-35,-51,-10,32,12,-8,3,6,-4,-29,-55,-9,-1,-1,0,19,16,14,-19,-41,-12,-3,-7,-15,21,45,34,-1,20,-2,-1,-30,-7,-12,4,8,12,11,-7,5],[-7,0,4,3,-1,4,13,5,-1,11,-4,5,15,2,6,3,7,-1,5,8,14,-3,-2,21,-3,6,-9,-15,12,8,-4,-18,-4,-2,-8,10,12,-4,-4,-29,0,-5,15,41,-25,-38,1,-22,0,3,21,38,-24,-54,-29,-30,6,19,16,24,3,-15,3,-11],[10,16,14,10,20,21,-2,-14,6,10,10,10,5,-12,-4,3,8,-3,7,10,10,-28,-1,-5,5,-3,-7,1,2,-8,-18,-43,-29,-16,-13,-6,14,-9,-17,-25,-16,-23,-27,0,6,-14,-10,13,15,-2,3,17,18,11,-8,3,10,19,21,6,1,5,10,-3],[10,-3,2,5,-11,-10,-10,-6,3,7,-1,-1,7,11,5,-4,9,11,-1,-1,-1,11,19,-3,5,1,6,7,-10,8,6,0,-1,1,7,8,2,6,-8,9,-16,5,6,-12,-16,-7,8,11,-1,5,18,6,7,4,-1,0,-5,9,1,9,13,2,11,15],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[11,17,-4,0,7,9,2,0,0,1,-1,0,4,0,-3,-7,5,-10,-2,41,28,-9,-12,0,-7,-3,-11,8,16,10,-16,-5,4,24,-13,-19,2,18,-5,-17,-22,9,-4,-20,-12,16,33,10,-29,-27,19,5,-17,21,22,2,-12,-43,-41,-24,-26,-18,-10,18],[-18,-2,-9,-13,-2,-2,-4,5,-15,5,-8,3,24,11,-4,0,-1,12,7,-7,10,16,0,8,14,3,5,-11,-1,0,-9,-10,2,1,6,-20,-2,18,16,-11,8,3,15,20,13,14,5,-20,1,3,-4,1,1,-17,-22,-1,3,-8,-8,0,4,-7,1,2],[13,4,8,6,-11,5,14,8,14,15,4,-1,1,-6,-26,0,12,18,8,-4,14,18,-18,5,12,9,2,-19,10,23,-23,-21,4,13,7,-11,27,15,-31,-50,17,13,18,35,27,14,-21,-46,2,-25,-20,-8,-14,-42,-16,8,8,6,-9,-3,-14,-31,-19,-59],[-7,8,9,11,-7,-11,-9,-5,11,0,-18,1,1,-2,4,-8,1,-6,6,3,4,6,16,-2,-1,-20,-8,1,0,1,-5,-12,-8,-19,12,5,2,-8,-13,-15,-18,22,47,10,-31,-7,7,-3,-4,31,36,-13,-26,1,-4,2,-3,26,40,15,-13,-9,-11,-14],[18,0,-2,-7,-4,12,-7,-13,9,5,-14,-14,0,12,0,-8,1,1,-6,-11,10,21,17,18,-1,-2,-8,-15,-11,14,15,6,4,-1,5,3,1,15,6,-11,9,-14,-21,-3,29,15,-2,4,13,-4,-1,7,30,9,3,18,9,14,-2,-5,12,-4,-12,8],[1,9,1,4,22,16,12,-5,-2,-2,1,12,6,17,13,9,5,-10,-9,-8,-15,-23,-25,-6,15,11,-9,-1,3,-20,-39,-29,-6,2,3,12,10,-3,-17,-25,-4,-2,-7,8,-2,-20,-24,-19,3,16,6,8,15,5,-4,-31,7,3,-9,-3,16,33,22,-11],[26,27,35,15,15,9,2,-3,1,-4,2,-11,-10,3,3,11,-22,-8,16,16,10,-4,-16,14,-27,17,47,23,12,14,3,-2,-50,-44,-15,-5,-9,9,13,6,-32,-39,-54,-50,-29,-11,-16,-18,-2,21,32,23,2,-19,-13,-22,23,17,3,-3,-18,-10,-12,-15],[-4,-10,-11,-2,-3,-12,-17,-22,9,-12,8,7,6,11,6,-12,7,0,-10,-12,-16,-1,17,4,-2,2,-1,-8,-3,17,7,10,-19,1,10,11,7,-2,-11,-4,-36,2,11,2,-16,-28,4,16,-24,-9,13,1,-14,6,16,11,13,0,-5,2,24,14,22,25],[-14,-8,-20,-24,1,17,14,13,-13,-12,8,-20,14,26,9,1,9,5,-22,-27,21,-14,-28,-12,9,1,-23,6,38,-4,-33,-1,16,16,-30,-12,28,22,15,18,6,-25,-31,-37,-8,22,17,6,4,12,9,-35,-18,9,1,-12,-10,20,16,-25,-25,12,19,1],[-5,12,13,5,8,7,-7,-20,-7,9,23,-19,-39,-3,-7,-6,-7,18,28,-12,-26,-5,-13,2,-2,0,20,-3,5,14,-8,-3,-5,6,27,1,-6,1,6,-1,-1,6,11,-8,-8,-8,-1,14,-5,5,0,6,-1,4,4,4,2,3,4,4,0,-7,-15,9],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[4,-20,-11,-3,10,13,11,-10,-3,6,12,10,-10,-1,12,-17,-9,12,19,0,-11,-5,11,-20,-4,-5,0,-9,-15,12,-3,-12,11,-18,-8,2,-8,-3,-8,9,-45,-21,18,15,-14,-13,5,11,-66,-28,21,15,3,18,6,-3,-34,-20,0,-1,-5,2,-4,7],[9,0,1,2,1,1,-6,9,12,4,10,7,3,6,3,10,0,4,-8,-7,-10,0,-2,6,-3,6,8,16,17,12,0,-5,-11,-7,-3,20,0,8,10,8,-14,0,1,-20,-18,1,5,9,-18,0,10,-8,-15,-15,-4,-1,-4,0,14,10,-3,-24,-12,11],[-2,-2,-12,-3,0,5,-6,2,13,5,12,15,15,19,7,-6,17,12,-4,-7,0,5,4,-1,7,6,-7,17,12,4,3,-6,-8,-1,3,10,-4,-5,-3,-5,-13,4,4,-7,-21,-8,2,12,-3,8,0,-7,0,11,14,-7,-2,0,12,13,13,0,0,0],[-4,0,4,5,5,19,19,8,-24,-11,2,5,7,5,-4,-10,-19,-1,6,4,18,-4,-15,-12,-5,7,-10,-7,8,-4,-17,-27,-2,-7,-9,1,16,-8,-19,-31,7,2,-8,10,-2,-20,-20,-18,16,5,6,17,8,-13,-13,-14,3,9,9,5,8,11,21,-9],[1,16,0,2,16,30,25,12,-15,-11,-15,-19,-1,-6,-12,-7,-7,-18,-10,1,-16,-40,-49,-45,15,-13,2,8,10,-13,-32,-2,1,5,11,-11,4,29,41,36,-2,3,2,-19,1,27,24,7,-3,-2,9,3,1,5,1,1,16,-7,0,6,12,-4,9,8],[-4,-17,5,2,-3,0,-7,3,-15,3,8,1,15,10,-2,-6,0,7,3,-13,9,6,30,16,8,-2,-22,-26,-11,-5,12,25,7,-1,5,-2,-9,-7,11,18,7,12,-2,3,-21,-5,15,10,-4,8,5,-1,7,21,-6,12,7,3,0,-1,10,10,9,10],[0,-7,0,13,7,-3,-3,-7,-2,-1,9,8,12,1,-5,6,-4,3,1,-4,-5,8,-2,-5,-8,1,18,-2,7,10,-10,-4,-5,-1,6,10,6,-3,1,8,4,-1,15,-1,19,19,13,-23,-2,0,5,-4,-4,-7,4,-10,1,-3,-3,6,-3,-5,-10,-12],[-7,13,13,8,12,21,-17,-20,7,10,-2,-21,11,0,-26,-38,-2,-16,-11,19,39,-4,-23,-8,-16,-5,3,18,-12,-23,-8,18,-3,6,5,6,-2,-15,-12,-3,6,5,8,10,-4,0,1,4,19,13,11,3,-3,-5,11,5,18,3,10,12,12,-12,-13,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[7,-7,3,0,7,4,2,-4,7,12,10,10,17,13,0,-6,1,-1,-12,-17,-15,-4,4,-5,-2,-7,-1,-8,13,4,1,-2,0,-4,4,-6,-2,-11,-4,9,10,5,-1,2,-8,7,3,-2,-7,-11,-8,-9,-7,10,-9,4,-3,-10,6,-4,-1,1,1,-1],[-2,12,19,16,16,15,9,25,-4,-5,-7,-13,-20,-14,-10,9,-12,-8,-2,-10,-16,-21,-24,-20,-9,9,19,20,21,-1,-17,-26,-19,7,19,31,1,-1,-3,2,-2,18,26,2,-35,-13,9,9,16,21,14,-15,-8,13,6,-17,-12,-13,0,-9,-13,-12,-20,-6],[14,-3,1,9,7,8,7,11,15,6,1,-12,-27,-42,-46,-40,3,-1,2,1,20,14,6,4,3,1,-1,3,18,26,42,53,5,0,-6,2,5,-2,22,46,-1,8,-6,-2,-4,-25,-16,-2,-3,5,1,8,14,-12,-19,-6,5,-5,-5,-8,-13,-5,-5,-13],[-5,9,-1,9,8,4,5,4,-9,-3,5,10,11,-2,-1,-7,-4,3,9,-4,-9,-16,-7,-7,10,-2,9,-2,12,-10,-5,-4,8,1,12,-10,-15,-10,16,3,1,-1,2,4,-3,0,-2,-15,-5,-2,-7,-3,11,7,-16,-9,5,4,2,-2,-9,9,9,-8],[12,0,-6,-13,-10,-12,5,-1,9,12,0,10,-4,-7,-11,5,-9,10,24,1,-2,-5,-5,3,-4,-3,9,-11,-13,-9,-24,-3,2,-8,-3,-24,-7,0,-4,-2,-27,-14,4,17,-1,19,8,1,-14,-2,20,15,8,13,3,18,15,7,7,6,6,-8,-3,11],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[-17,-1,-1,-7,-1,3,-11,-1,-2,-3,-10,-18,-16,-1,1,-1,1,-12,-26,-17,11,3,-10,-24,3,-6,-14,20,15,-11,-27,-9,5,0,-5,20,24,-1,-6,9,-4,0,2,4,28,27,9,1,6,14,19,0,-1,16,22,9,12,15,16,3,-17,-2,20,13],[6,-12,-23,-24,-7,-5,-5,-19,-31,-20,-4,13,11,6,1,9,-3,6,15,0,-15,-18,-17,-12,21,-4,4,-20,-20,-9,-27,5,3,-15,-1,-23,-10,24,19,22,1,3,18,18,22,34,19,2,0,1,18,17,12,8,-1,17,21,15,-1,0,-3,-22,2,8],[12,9,-3,-10,3,4,9,10,-2,0,0,12,21,0,-1,-2,-6,6,2,3,-4,10,7,1,5,-8,3,14,-13,8,13,6,-6,-5,0,7,-12,7,-5,-6,-6,6,19,0,-20,-5,-20,-12,-3,6,14,-10,-19,-7,-17,-9,-12,11,21,0,-13,2,2,0],[-11,15,9,0,6,14,4,3,-10,-4,0,11,12,17,10,-5,-14,-6,7,23,38,13,-1,5,-18,-16,-8,11,20,20,12,-1,-14,-31,-56,-43,-21,13,10,-8,8,-10,-41,-70,-27,18,10,2,7,27,35,7,-2,4,-14,-16,0,-37,-25,0,3,1,3,-6],[8,3,-5,-5,-3,0,17,-5,-6,-9,0,-15,-16,-10,-2,-10,-9,-6,2,12,-1,-3,-4,-15,-4,4,8,-7,-7,-6,-2,8,-3,19,14,-14,-1,2,19,11,-4,0,-15,13,26,3,-2,-8,-3,-16,-16,14,33,20,-1,9,12,-12,-8,2,8,7,10,9],[15,11,20,16,3,-11,-15,-8,-13,-29,-32,-28,-14,-3,-8,0,-28,-20,0,21,12,8,10,10,-9,13,22,21,8,-5,6,8,8,2,20,4,-3,-2,13,-5,2,-7,0,12,-2,14,12,-8,4,-13,0,13,2,3,7,17,-2,-4,13,3,-6,-11,-7,-3],[-5,3,-3,9,6,10,-1,5,13,-1,-2,-1,1,3,4,14,3,-9,-17,11,14,13,3,10,-5,10,-2,9,11,10,9,3,0,9,-10,10,9,-3,-7,0,-1,-12,-3,1,2,-12,0,12,1,-5,-2,2,2,2,10,-2,-10,-10,-10,2,-4,-6,-18,-13],[-15,-12,0,-6,-1,-1,-4,-2,6,22,6,-3,-5,18,15,23,20,7,-24,-29,-16,-3,13,18,4,-9,-23,-1,21,-12,-25,-16,-7,-8,-25,7,25,-4,-20,-17,-12,-15,2,33,8,-4,9,3,-21,-7,0,9,6,19,10,12,0,-7,-3,1,10,15,-5,3],[-8,-7,4,6,6,7,8,8,-18,-5,7,7,-13,-11,-5,7,-22,-8,9,18,1,-6,7,1,-14,-11,2,-10,-5,-1,-3,5,10,-1,4,-12,-4,-9,8,2,12,7,3,12,13,8,1,-17,1,-1,6,-3,4,5,-11,6,7,-7,-2,-5,4,16,-1,9],[-3,3,1,5,18,13,6,11,-3,-1,-6,7,17,8,11,-2,-17,-3,-6,-4,3,2,-15,0,-10,14,3,18,8,0,-5,-1,-12,2,-6,6,-1,5,12,1,-8,-10,-1,-1,3,-3,-18,-1,-3,-5,-1,-2,4,4,-5,-22,-2,3,13,3,-20,-1,-6,-27],[-7,9,9,-6,-10,8,5,-6,-5,-3,-4,1,-4,-9,10,10,-1,-7,2,-2,-5,-25,-13,-6,-2,-2,-2,-5,15,-9,-29,-15,-7,6,-6,-7,11,-4,10,-1,2,-6,-21,9,27,-2,-6,14,-6,-9,-23,16,34,18,-6,13,11,-14,-10,5,17,23,15,13],[19,0,3,13,26,15,-17,-7,-11,-8,-16,7,39,25,-3,-21,-15,-2,-27,-19,17,19,-3,9,-1,9,-17,-14,14,12,11,-2,1,10,-16,-3,8,13,6,-21,6,6,-4,2,-3,10,-10,-2,8,10,-7,0,1,2,-8,-12,-6,10,0,-11,-10,-7,8,-2],[-2,-10,1,3,4,-9,2,-5,2,-3,4,3,1,0,8,10,3,-1,5,-2,-6,8,10,0,-1,4,8,8,5,4,-4,-3,3,4,15,9,-4,2,-4,3,0,12,13,1,8,13,11,-17,-3,7,2,-4,0,7,11,3,4,0,0,6,11,9,6,10],[1,-5,-7,-5,3,-3,-4,-5,9,2,8,9,-4,5,11,16,3,-1,-15,8,10,1,-1,6,-4,1,5,15,10,6,6,-3,-13,-3,0,19,14,2,-8,-2,-8,9,7,-8,-15,-4,8,9,-5,10,5,-5,-4,10,9,-3,-3,-4,4,6,12,1,-4,4],[21,29,46,30,17,7,1,12,18,-1,-21,-11,6,11,19,26,-23,-55,-43,-16,-10,-16,1,36,-15,-10,19,10,-4,-15,-27,8,5,2,26,8,1,-2,4,-8,16,8,3,-10,-16,12,6,-3,6,-3,-7,9,3,2,5,-6,1,-7,-11,-12,-7,-5,7,-11],[-10,-7,7,-8,-1,11,20,15,35,40,37,10,-12,12,11,-12,26,15,9,-4,10,11,10,0,-13,-11,4,0,4,-9,0,-19,-31,-14,12,28,7,-24,-11,-15,-24,-29,-8,15,-9,-28,6,15,-12,-13,-14,-22,-21,-10,8,21,24,18,26,22,-4,-17,-17,-7],[-6,2,5,2,-2,0,-2,8,3,1,9,-4,-1,-12,-2,-14,1,-1,-6,11,24,-3,3,-12,-9,14,-12,-6,3,1,1,-21,16,1,-10,3,18,-16,-17,-15,-3,-24,13,26,6,-24,-10,14,-10,-8,23,22,9,-6,-3,17,-16,0,9,11,14,-11,-13,-8],[-12,5,-5,6,3,-2,4,0,6,-3,-1,-5,-12,3,9,3,9,-13,-4,9,14,0,-2,-4,-5,5,-1,1,4,-4,-2,-6,4,16,4,7,-2,-3,6,-7,-5,-6,4,-5,3,-5,7,-4,3,3,-1,1,12,4,7,-10,9,5,1,-3,12,-5,-2,8],[24,3,26,17,13,-12,-15,-10,0,-7,-2,-7,-8,8,-2,10,14,3,7,-1,3,13,10,15,-11,-13,-2,21,10,6,4,-9,-10,-51,-53,-37,-2,-18,-9,-13,34,20,-3,-10,-22,-13,-3,-12,25,38,53,45,8,3,8,-18,-2,-18,-10,-18,-18,-8,-8,-19],[-4,-12,-4,16,18,-8,16,6,-4,-3,11,13,-10,-12,10,-5,16,5,21,14,-15,-4,-5,-5,9,3,10,-5,-4,4,-15,-6,11,18,17,-19,-7,9,13,-4,-2,11,9,-20,3,15,-1,-28,-7,11,0,-15,4,5,6,-6,10,15,-5,-21,-4,9,23,8],[-4,20,0,-2,-3,-8,8,-2,9,13,5,-4,-10,-4,8,14,-3,-8,-4,16,5,12,7,9,-26,-19,-2,4,5,13,3,4,-31,-14,-2,-7,7,19,9,-16,6,-5,-2,-21,26,30,-3,-24,-2,15,-7,-22,3,20,7,-5,-8,-2,-10,-6,15,32,21,11],[-10,-13,-17,2,4,9,12,-5,-17,-25,11,12,0,7,16,-17,-34,-20,14,18,-7,-3,-6,-19,-44,-42,8,28,15,-12,-25,1,-22,-14,-2,18,5,-9,-5,-2,-18,-7,7,4,12,4,-1,-10,-6,7,-8,-10,6,-5,-2,-35,4,3,6,-3,9,6,-2,0],[-6,-10,-13,-11,0,11,-7,5,6,7,5,5,7,6,8,3,8,4,-3,16,16,0,2,11,-13,3,-9,5,13,-1,13,-2,-10,4,-6,10,11,4,2,-7,5,1,-4,2,2,-10,5,9,-3,1,-9,-15,-3,9,7,7,-5,2,-1,1,11,7,-9,5],[5,22,28,12,15,18,10,11,9,8,8,13,1,9,14,22,-5,-5,6,21,17,-1,-9,17,-9,10,8,2,9,-6,3,-6,-15,4,-3,5,-5,7,9,-9,2,-7,-4,-21,-4,3,-4,1,-12,-18,-10,-15,-31,-13,14,10,-17,-22,-6,-3,-12,-21,-13,-4],[18,9,-22,-16,-1,-4,-9,24,30,38,-7,-41,3,5,-22,-6,17,45,11,-53,-22,1,-6,1,7,36,45,-22,4,-4,-12,0,14,16,35,24,11,6,13,1,12,-15,-5,10,4,-3,13,8,-2,-14,-10,-1,-1,-12,5,6,22,11,-5,6,-2,4,-6,11],[3,0,3,-8,10,7,-4,-19,-4,12,3,9,22,17,8,-17,11,10,-8,-21,-2,24,6,-10,16,-1,-7,-7,-2,-2,-3,-10,-12,-8,5,-5,0,12,9,-1,1,-7,-9,-1,1,27,17,6,3,-10,-3,-14,-3,4,1,4,4,1,-11,2,-4,-9,-2,-12],[-16,-2,15,11,9,12,6,3,-15,2,9,13,-4,-3,-3,6,-12,-13,-11,6,6,5,-10,3,5,-10,4,-4,12,-3,-10,-4,16,7,-3,-10,4,-6,-2,-4,11,7,5,17,25,8,0,-19,-2,-6,-1,-1,8,10,-9,-5,3,-7,-11,-3,-6,-3,-15,-8],[6,-16,-13,-13,-15,5,4,10,18,2,12,-2,-2,-9,-6,10,29,21,16,4,16,-9,-13,-11,18,14,1,1,22,3,-8,-17,-6,-16,-14,-2,9,5,2,4,-18,-29,-26,-21,-26,13,43,20,-3,-5,-11,-24,-1,22,8,19,35,39,38,15,3,-7,-4,27],[-6,-7,4,-8,3,22,0,2,1,5,-4,2,4,1,-10,7,-13,2,-6,-1,5,5,0,10,-7,6,-4,-10,7,15,13,3,1,-2,-11,15,19,3,-6,2,6,3,-4,9,2,-5,-5,20,3,-11,-7,-1,-8,5,10,7,-8,-10,-7,-6,1,0,-7,2],[-11,-4,-2,7,14,-3,-5,4,2,-6,-11,2,-4,-4,-5,7,3,-12,-8,5,16,3,-8,9,-4,4,-1,-6,9,-9,-5,9,9,13,5,4,4,-12,-2,1,4,2,1,6,22,9,6,-6,5,-3,4,5,4,-1,9,-1,5,-5,-7,4,7,-11,-11,0]],"b1":[4,-5,-14,-15,2,-2,5,29,0,20,-6,-5,4,30,6,-17,-20,16,-4,12,0,10,15,3,-4,22,9,2,2,-13,15,8,14,17,18,-31,12,15,-25,11,1,18,6,-24,4,10,17,-13,7,0,3,-14,5,1,4,-30,-9,19,2,-21,-4,11,9,-24,-15,-23,2,-3,-19,-7,8,-6,2,-20,-2,9,-15,-2,-3,11,27,-8,-7,11,24,4,-13,-1,5,16,-26,-2,24,-8,7,6,21,-7,1,12,11,-12,-9,-37,5,1,11,-5,-5,-10,14,7,12,-2,-4,-18,0,-7,-31,3,-9,-10,7,-10,10,10,10,-10],"w2":[[-70,-10,-11,17,13,38,-11,7,33,-50,-4,-2,-47,-10,35,27,7,-3,17,27,-3,-62,-3,6,-11,7,6,76,-6,-16,21,3,23,28,21,13,6,15,15,9,22,-3,-2,-1,4,-98,7,-31,4,-7,-7,0,11,-22,5,-46,-45,12,-33,16,-15,23,20,-67,-59,-2,-12,-13,-49,-32,20,0,-27,20,44,9,-27,-58,-108,-2,20,14,0,18,7,16,-36,-50,20,10,-76,0,11,-48,-48,22,18,0,-48,7,26,-85,-21,-26,-30,-46,0,3,-11,-7,7,-18,-1,-62,-20,-24,-3,7,-46,43,-21,-78,5,11,-6,3,-18,-34],[-43,11,16,7,-7,15,14,63,10,7,40,5,66,123,16,31,11,-24,-24,-55,2,-36,-14,-6,2,-27,-105,-84,-21,19,-9,-3,-15,-60,-35,37,-12,-20,37,-4,3,-20,8,22,-17,-15,-27,35,-27,19,-16,9,5,-4,-5,33,27,-16,2,26,22,-8,-7,37,22,44,11,-36,57,21,-14,0,14,37,-10,4,26,18,-114,-45,73,11,0,-31,-28,-2,24,-51,-31,-21,15,0,-29,22,-96,9,-32,0,1,-67,-9,19,30,59,1,-9,-8,10,34,28,-18,-16,-88,-10,20,13,-72,15,33,-5,7,24,-57,15,-7,-36,-5,4],[-13,21,-1,-48,-1,-8,8,5,-23,-58,-24,24,19,-34,24,42,-29,22,-8,24,-3,-53,15,17,-17,-6,-15,-25,-4,-56,-6,22,43,-26,4,-37,11,1,2,13,-15,6,-123,-63,18,5,30,-33,-23,28,-71,-23,-75,50,-8,-21,36,22,23,-29,10,49,-8,11,5,16,18,-12,34,33,1,0,-15,-23,-61,41,32,-3,-44,-2,-129,-18,0,29,-20,-4,19,-23,17,-21,11,0,1,63,-57,-3,24,0,-14,19,12,-55,26,-10,3,3,5,-19,10,22,-15,-7,35,-5,18,-10,34,-47,-57,-38,-1,-32,-40,-4,-3,59,17,-10],[46,-57,-9,-40,15,-45,28,10,-2,-32,-60,12,3,-69,-20,12,-37,23,19,17,8,10,11,10,24,-7,-3,64,-20,36,-13,5,-61,-19,14,-30,-12,2,-31,-4,-32,-22,27,-24,14,23,-59,4,25,-3,61,7,-47,-28,7,6,28,-1,-48,-58,-13,-5,-4,-48,-2,-11,13,2,-33,2,13,0,9,-3,-18,-46,-4,16,18,30,42,-33,0,-10,1,19,5,34,-5,-2,32,0,-3,-23,37,-6,-23,0,6,-2,-39,28,-11,30,2,31,-13,-15,-1,3,9,16,47,28,-21,8,23,9,-9,-11,7,-15,-76,10,-15,29,-5,-2],[45,-56,12,17,-10,32,-51,-39,-30,74,26,-26,-50,-10,2,-42,16,-99,35,37,-43,8,-14,45,8,13,-75,-48,20,12,-17,5,-47,-30,-7,19,1,-14,34,5,25,14,-9,20,-59,-105,19,49,-46,19,0,15,3,15,10,-10,-53,38,31,-25,-82,-53,-22,13,17,-30,19,8,8,-17,-10,0,10,9,55,10,21,-30,34,-39,54,-1,0,-56,-33,-31,23,24,13,5,25,0,-17,-50,6,-2,-3,0,8,38,-28,-76,21,14,-11,-17,18,-27,8,-55,9,-20,-40,25,7,2,5,16,37,-11,-15,6,7,2,8,-32,-8,7],[11,-60,2,3,-7,35,-130,-43,7,-47,-22,9,31,-50,-81,-32,-2,-13,14,25,13,2,6,-82,-1,7,31,-59,25,7,12,-15,-41,-23,-14,-7,-13,-3,13,-11,14,6,68,-7,-40,74,-20,-45,15,-16,31,-18,22,15,-11,10,-82,-18,-66,15,10,22,-8,-32,-38,22,-90,17,16,28,-15,0,-15,6,19,-35,-21,8,49,-14,-45,24,0,-34,16,3,-2,8,26,2,-55,0,20,35,56,22,-5,0,-42,-4,-1,43,5,-7,-9,13,11,5,20,-12,4,-4,13,-4,-29,-10,45,8,2,32,1,16,34,0,12,15,-1,-9],[-119,46,-2,19,-27,30,2,-37,16,-33,-12,-34,11,-11,37,-27,12,-62,8,-21,-32,7,4,-29,10,2,48,31,13,-23,-5,-19,47,49,-24,2,-7,20,-24,16,27,-13,45,13,7,62,-74,22,17,-6,19,-2,68,-9,-8,-29,-35,-12,1,37,10,-62,8,21,-27,18,-30,-90,-85,-22,12,0,32,-36,-29,-8,-15,34,-90,20,60,21,0,36,11,-1,-5,18,-14,-6,-18,0,-20,22,43,1,10,0,10,7,1,-23,-4,27,6,9,-5,14,-15,-16,6,0,-73,-125,-22,3,-59,3,-49,7,-24,-19,-4,-60,-11,7,-21,-12],[26,11,5,-27,-16,-135,5,48,3,42,5,-6,22,-24,17,-12,43,11,46,-43,24,-22,-16,39,-9,7,48,25,-63,-5,-2,-17,71,-15,18,8,-11,3,-13,-21,-88,13,-39,-7,24,20,16,35,-45,-9,-15,-15,11,-2,1,-7,29,-37,19,-31,-26,-21,-15,50,8,14,-2,-70,-3,-33,-13,0,-112,15,23,7,-1,-42,6,-25,-28,-83,0,-16,10,-4,-18,31,-27,15,17,0,9,8,37,-8,46,0,49,43,0,-42,-2,14,13,1,-16,12,10,14,-3,-7,28,-3,12,-9,-17,-25,0,-42,-7,13,-63,22,12,-92,11,12],[-45,17,-10,-7,10,-27,38,-115,-5,-109,-1,-5,-45,-116,31,-44,-18,27,-78,-67,-10,27,7,-13,6,8,14,-35,31,-12,3,13,46,50,9,4,10,-6,-39,15,-4,10,13,-4,-13,-3,22,-4,15,12,-27,0,20,-24,9,-8,-4,0,11,-41,20,1,9,-14,-10,-33,5,40,-33,-30,0,0,33,-27,-52,21,-40,-18,-26,10,-32,8,0,22,10,9,-27,4,-27,11,1,0,-3,-19,7,1,17,0,14,-1,14,-32,-14,-52,14,32,11,-3,-11,-20,10,10,-6,13,15,12,-91,-7,4,14,6,21,65,-32,12,4,4,12],[39,23,-6,14,-11,-22,-4,9,-12,20,10,15,-84,0,-47,34,-16,9,-33,23,2,47,-10,-22,-51,-2,13,50,0,-3,7,-10,-85,1,8,-3,3,8,0,-18,23,6,0,12,24,-85,15,-107,19,-43,-79,5,9,2,-1,14,2,6,9,41,6,29,-2,-57,5,-44,6,55,-50,-7,9,0,11,-12,-6,-81,5,2,55,17,-90,-6,0,-5,20,9,10,-112,-6,-2,-7,0,-2,-58,-54,-21,-39,0,-34,-53,11,32,-47,-78,6,-102,-6,-5,-62,2,5,9,-34,4,-17,-13,67,-16,-4,8,11,4,44,7,-19,2,13,-17]],"b2":[15,-27,3,-7,-4,0,3,4,11,-4]}; // rede pequena treinada com dígitos manuscritos (pesos × 40)
@@ -2105,9 +2453,207 @@ $('ocrOk').onclick = () => { const t = $('ocrText').value; closeOv(() => insertI
 
 /* teclado virtual (iOS): mantém a barra de ferramentas acima do teclado */
 if (window.visualViewport) {
-  const kb = () => { const v = window.visualViewport, o = Math.max(0, innerHeight - v.height - v.offsetTop); $('editor').style.setProperty('--kb', o > 80 ? o + 'px' : '0px'); };
+  const kb = () => { const v = window.visualViewport, o = Math.max(0, innerHeight - v.height - v.offsetTop); $('editor').style.setProperty('--kb', o > 80 ? o + 'px' : '0px'); $('taskScreen').style.setProperty('--kb', o > 80 ? o + 'px' : '0px'); };
   visualViewport.addEventListener('resize', kb); visualViewport.addEventListener('scroll', kb);
 }
+
+/* ---------- Zoom e arrastar com dois dedos no editor ---------- */
+let ezx = 0, ezy = 0, pz = null;
+function applyZoom() {
+  const sh = $('sheet'), hz = $('editor').classList.contains('dir-h');
+  sh.style.transformOrigin = '50% 0';
+  sh.style.transform = ez === 1 && !ezx && !ezy ? '' : `translate(${ezx}px, ${ezy}px) scale(${ez})`;
+  sh.style.marginBottom = hz || ez === 1 ? '' : (28 + (ez - 1) * sh.offsetHeight) + 'px';
+}
+function resetZoom() { ez = 1; ezx = 0; ezy = 0; pz = null; const sh = $('sheet'); sh.style.transform = ''; sh.style.marginBottom = ''; }
+(function () {
+  const w = $('wrap'), dist = t => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY), mid = t => [(t[0].clientX + t[1].clientX) / 2, (t[0].clientY + t[1].clientY) / 2];
+  w.addEventListener('touchstart', e => {
+    if (e.touches.length !== 2 || !current || current.kind === 'task') return;
+    if (typeof activeId !== 'undefined' && activeId !== null) { // 2º dedo chegou no meio de um traço: descarta o traço
+      const s = strokes[strokes.length - 1]; if (s && s.p.length <= 8) { strokes.pop(); redrawInk(); } activeId = null;
+    }
+    const sh = $('sheet'), r = sh.getBoundingClientRect(), c = mid(e.touches), wr = w.getBoundingClientRect(), hz = $('editor').classList.contains('dir-h');
+    const cx = r.left + r.width / 2;
+    pz = { d:dist(e.touches), z:ez, u:(c[0] - cx) / ez, v:(c[1] - r.top) / ez, T0:r.top + (hz ? -ezy : w.scrollTop), cx0:cx - ezx, hz, wr };
+    closePop(); e.preventDefault();
+  }, { passive:false });
+  w.addEventListener('touchmove', e => {
+    if (!pz || e.touches.length < 2) return;
+    e.preventDefault();
+    const c = mid(e.touches), sh = $('sheet'), vw = w.clientWidth, W = sh.offsetWidth;
+    ez = Math.max(1, Math.min(3, pz.z * dist(e.touches) / pz.d));
+    if (ez < 1.03) ez = 1;
+    // x: o ponto sob os dedos acompanha o movimento; limita para não sair da folha
+    let tx = c[0] - pz.cx0 - ez * pz.u;
+    const half = (ez * W) / 2, mx = Math.max(0, half - vw / 2 + 8);
+    ezx = ez === 1 ? 0 : Math.max(-mx, Math.min(mx, tx));
+    if (pz.hz) {
+      const H = sh.offsetHeight; ezy = ez === 1 ? 0 : Math.max(-(ez - 1) * H, Math.min(0, c[1] - pz.T0 - ez * pz.v));
+      applyZoom();
+    } else {
+      applyZoom();
+      w.scrollTop = Math.max(0, Math.min(w.scrollHeight - w.clientHeight, pz.T0 - (c[1] - ez * pz.v)));
+    }
+  }, { passive:false });
+  const end = e => { if (pz && e.touches.length < 2) { pz = null; if (ez < 1.03) resetZoom(); } };
+  w.addEventListener('touchend', end); w.addEventListener('touchcancel', end);
+})();
+
+/* ---------- Pesquisar nos Ajustes ---------- */
+(function () {
+  const root = $('settings'), nrm = t => String(t).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  const rows = [...root.querySelectorAll('.nav-row')];
+  $('setQ').addEventListener('input', () => {
+    const q = nrm($('setQ').value); let any = false;
+    rows.forEach(r => { const hit = !q || nrm(r.textContent + ' ' + (r.dataset.kw || '')).includes(q); r.hidden = !hit; if (hit) any = true; });
+    root.querySelectorAll('.group').forEach(g => { const v = [...g.querySelectorAll('.nav-row')].some(r => !r.hidden); g.hidden = !v; if (g.previousElementSibling && g.previousElementSibling.classList.contains('gcap')) g.previousElementSibling.hidden = !v; });
+    $('setEmpty').hidden = any;
+  });
+})();
+
+/* ---------- Tarefas ---------- */
+const TKD = {
+  'Frutas':'maca,uva,banana,laranja,limao,mamao,melancia,melao,abacaxi,manga,morango,pera,pessego,ameixa,kiwi,abacate,goiaba,maracuja,caqui,cereja,coco,tangerina,mexerica,bergamota,lima,framboesa,mirtilo,figo,jabuticaba,acerola,caju,pitaya,nectarina,uva passa,fruta,acai,amora,graviola,cupuacu,jaca,carambola,tamarindo,roma,damasco,tamara',
+  'Verduras e legumes':'alface,tomate,cebola,alho,batata,cenoura,brocolis,couve,couve flor,repolho,pepino,abobrinha,abobora,beterraba,pimentao,berinjela,chuchu,espinafre,rucula,agriao,salsa,cebolinha,coentro,mandioca,aipim,macaxeira,inhame,batata doce,milho,ervilha,vagem,quiabo,jilo,rabanete,cogumelo,champignon,gengibre,acelga,escarola,palmito,hortela,manjericao,alho poro,aspargo,nabo,maxixe,legume,verdura,salada,cheiro verde',
+  'Carnes e peixes':'carne,carne moida,bife,picanha,alcatra,contrafile,costela,patinho,acem,file,file de frango,frango,peito de frango,coxa,sobrecoxa,asa,porco,lombo,pernil,salsicha,hamburguer,linguica,calabresa,bacon,peixe,salmao,tilapia,sardinha,atum,camarao,bacalhau,tainha,merluza,peru,cordeiro,figado,carne seca,charque,carne de sol,mortadela',
+  'Laticínios e frios':'leite,queijo,iogurte,manteiga,margarina,requeijao,creme de leite,leite condensado,nata,ricota,mussarela,mucarela,parmesao,coalho,cream cheese,presunto,peito de peru,ovo,chantilly,kefir,coalhada,queijo ralado,queijo prato,danone',
+  'Padaria':'pao,pao de forma,pao frances,bisnaga,bolo,biscoito,bolacha,torrada,croissant,rosca,broa,pao de queijo,sonho,bolinho,cuca,pao integral,pao de hamburguer',
+  'Bebidas':'agua,suco,refrigerante,cerveja,vinho,vinho tinto,cafe,cha,energetico,agua de coco,vodka,whisky,cachaca,gin,espumante,isotonico,guarana,coca cola,coca,soda,tonica,achocolatado,agua com gas,leite de aveia,leite vegetal',
+  'Mercearia':'arroz,feijao,macarrao,espaguete,lentilha,grao de bico,farinha,farinha de trigo,farinha de mandioca,fuba,aveia,granola,cuscuz,tapioca,polvilho,amido de milho,massa,lasanha,penne,parafuso,molho de tomate,extrato de tomate,oleo,azeite,vinagre,acucar,fermento,milho verde,azeitona,maionese,ketchup,catchup,mostarda,molho,molho de soja,shoyu,geleia,mel,pasta de amendoim,castanha,amendoim,nozes,cereal,sucrilhos,leite de coco,sardinha em lata,enlatado',
+  'Temperos':'sal,pimenta,oregano,colorau,cominho,canela,noz moscada,louro,curry,paprica,tempero,caldo,cravo,acafrao,pimenta do reino,alecrim,tomilho',
+  'Doces e snacks':'chocolate,bombom,doce,bala,chiclete,pirulito,gelatina,pudim,pacoca,brigadeiro,batata frita,salgadinho,pipoca,chips,barra de cereal,goiabada,doce de leite,wafer,rocambole,sobremesa,granulado',
+  'Congelados':'sorvete,pizza,nuggets,polpa,gelo,picole,congelado,batata congelada,lasanha congelada,hamburguer congelado',
+  'Limpeza':'sabao em po,sabao,detergente,desinfetante,agua sanitaria,alvejante,amaciante,esponja,saco de lixo,sacola de lixo,vassoura,rodo,pano,limpa vidro,multiuso,lustra moveis,desengordurante,cloro,papel toalha,flanela,luva,inseticida,limpeza',
+  'Higiene':'shampoo,xampu,condicionador,sabonete,pasta de dente,creme dental,escova de dente,fio dental,desodorante,papel higienico,absorvente,fralda,cotonete,algodao,protetor solar,hidratante,barbeador,lamina,lenco umedo,perfume,enxaguante,antisseptico bucal,creme'
+};
+const TK_ORDER = Object.keys(TKD).concat('Outros');
+const TK_STOP = new Set(['de', 'da', 'do', 'das', 'dos', 'com', 'sem', 'em', 'para', 'e', 'a', 'o', 'um', 'uma']);
+const tkNorm = t => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[-_]/g, ' ').replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+const TKMAP = {};
+Object.entries(TKD).forEach(([c, ws]) => ws.split(',').forEach(w => { if (!(w in TKMAP)) TKMAP[w] = c; }));
+function tkSing(w) {
+  if (w.length < 4) return w;
+  if (/(oes|aes|aos)$/.test(w)) return w.slice(0, -3) + 'ao';
+  if (/(ais|eis|ois)$/.test(w)) return w.slice(0, -2) + 'l';
+  if (/ns$/.test(w)) return w.slice(0, -2) + 'm';
+  if (/(res|zes)$/.test(w)) return w.slice(0, -2);
+  if (/s$/.test(w) && !/ss$/.test(w)) return w.slice(0, -1);
+  return w;
+}
+function tkCat(text) {
+  const s = tkNorm(text); if (!s) return 'Outros';
+  const ws = s.split(' ');
+  const full = [s, ws.map(tkSing).join(' '), tkSing(s)];
+  for (const f of full) if (TKMAP[f]) return TKMAP[f];
+  for (const w of ws) { if (TK_STOP.has(w)) continue; const c = TKMAP[w] || TKMAP[tkSing(w)]; if (c) return c; }
+  return 'Outros';
+}
+const BUILTIN_TPL = [{ id:'b-compras', name:'Compras', mode:'shopping', items:[] }];
+const TPK = 'bloco-de-notas-tpl';
+let userTpls = []; try { userTpls = JSON.parse(localStorage.getItem(TPK)) || []; } catch (e) { userTpls = []; }
+const saveTpls = () => { try { localStorage.setItem(TPK, JSON.stringify(userTpls)); } catch (e) {} };
+
+let taskOpen = false;
+const tkUid = () => 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+function newTask(folderId) {
+  const n = { id:String(Date.now()), title:'', body:'', kind:'task', mode:'list', items:[], updated:Date.now() };
+  if (folderId) n.folder = folderId;
+  notes.push(n); openNote(n.id);
+}
+function openTask() {
+  taskOpen = true;
+  $('tkTitle').value = current.title; $('tkInput').value = ''; favUI();
+  tkPlaceholder(); tkRender();
+  $('taskScreen').classList.add('open'); $('taskScreen').setAttribute('aria-hidden', 'false');
+  history.pushState({ task:1 }, '');
+  if (!current.title && !current.items.length) setTimeout(() => $('tkTitle').focus(), 350);
+}
+function closeTask() {
+  if (!taskOpen) return false;
+  tkCommit();
+  if (current && !current.title.trim() && !current.items.length) { notes = notes.filter(n => n.id !== current.id); save(); }
+  taskOpen = false; current = null; closePop();
+  $('taskScreen').classList.remove('open'); $('taskScreen').setAttribute('aria-hidden', 'true');
+  document.activeElement && document.activeElement.blur();
+  render();
+  return true;
+}
+function tkSync() {
+  if (!current) return;
+  current.title = $('tkTitle').value; current.body = current.items.map(x => x.text).join(', '); current.updated = Date.now(); save();
+}
+function tkPlaceholder() { $('tkInput').placeholder = current && current.mode === 'shopping' ? 'Ex.: maçã, uva, leite, sabão…' : 'Escreva um item…'; }
+function tkAdd(text) {
+  let t = text.trim().slice(0, 80); if (!t) return;
+  t = t[0].toUpperCase() + t.slice(1);
+  if (current.items.some(x => !x.done && tkNorm(x.text) === tkNorm(t))) return;
+  current.items.push({ id:tkUid(), text:t, done:false });
+}
+function tkCommit() {
+  const inp = $('tkInput'); if (!current) return;
+  if (inp.value.trim()) { inp.value.split(/[,;\n]/).forEach(tkAdd); inp.value = ''; tkGrow(); tkSync(); tkRender(); }
+}
+function tkGrow() { const t = $('tkInput'); t.style.height = '28px'; t.style.height = Math.min(110, t.scrollHeight) + 'px'; }
+function tkRow(it, ghost) {
+  return `<div class="tk-row${it.done ? ' done' : ''}${ghost ? ' ghost' : ''}" data-id="${esc(it.id || '')}"><button class="tk-box" aria-label="Concluir" ${ghost ? 'disabled' : ''}><svg class="i"><use href="#i-check"/></svg></button><span class="tk-text">${esc(it.text)}</span>${ghost ? '' : '<button class="tk-x" aria-label="Remover">×</button>'}</div>`;
+}
+function tkRender() {
+  if (!current) return;
+  const draft = $('tkInput').value.trim();
+  const all = current.items.map(x => ({ x, g:false }));
+  if (draft) all.push({ x:{ text:draft[0].toUpperCase() + draft.slice(1), done:false }, g:true });
+  const el = $('tkList');
+  if (!all.length) { el.innerHTML = `<div class="tk-hint">${current.mode === 'shopping' ? 'Escreva os itens separados por vírgula.<br>Eles vão para a categoria certa sozinhos.' : 'Escreva um item e toque em Enter.<br>Use o botão Template para listas prontas.'}</div>`; return; }
+  if (current.mode === 'shopping') {
+    const g = {}; all.forEach(o => { const c = tkCat(o.x.text); (g[c] = g[c] || []).push(o); });
+    el.innerHTML = TK_ORDER.filter(c => g[c]).map(c => `<div class="tk-cat"><span>${esc(c)}</span><span>${g[c].filter(o => o.x.done).length}/${g[c].length}</span></div><div class="tk-group">${g[c].map(o => tkRow(o.x, o.g)).join('')}</div>`).join('');
+  } else el.innerHTML = `<div class="tk-group">${all.map(o => tkRow(o.x, o.g)).join('')}</div>`;
+}
+$('tkTitle').oninput = () => { tkSync(); };
+$('tkTitle').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); $('tkInput').focus(); } };
+$('tkInput').oninput = () => {
+  const inp = $('tkInput'), v = inp.value;
+  if (/[,;\n]/.test(v)) { const p = v.split(/[,;\n]/), tail = p.pop(); p.forEach(tkAdd); inp.value = tail.replace(/^\s+/, ''); tkSync(); }
+  tkGrow(); tkRender();
+};
+$('tkInput').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); tkCommit(); } };
+$('tkInput').onblur = tkCommit;
+$('tkList').onclick = e => {
+  const r = e.target.closest('.tk-row'); if (!r || r.classList.contains('ghost') || !current) return;
+  const i = current.items.findIndex(x => x.id === r.dataset.id); if (i < 0) return;
+  if (e.target.closest('.tk-x')) current.items.splice(i, 1); else current.items[i].done = !current.items[i].done;
+  tkSync(); tkRender();
+};
+$('tkBack').onclick = () => history.back();
+$('tkOk').onclick = () => {
+  tkCommit();
+  if (current && (current.title.trim() || current.items.length)) chooseFolder(); else leave();
+};
+function tkApply(t) {
+  if (!current) return;
+  const names = BUILTIN_TPL.concat(userTpls).map(x => x.name);
+  if (!$('tkTitle').value.trim() || names.includes($('tkTitle').value.trim())) $('tkTitle').value = t.name;
+  current.mode = t.mode; t.items.forEach(tkAdd);
+  tkPlaceholder(); tkSync(); tkRender();
+  setTimeout(() => $('tkInput').focus(), 60);
+}
+$('tkTpl').onclick = e => {
+  tkCommit();
+  const all = BUILTIN_TPL.concat(userTpls);
+  openPop(e.currentTarget,
+    '<button class="pi" data-v="new"><span>Criar template</span><svg class="i ic"><use href="#i-compose"/></svg></button><div class="pdiv"></div><div class="plabel">Usar template</div>' +
+    all.map(t => `<button class="pi" data-v="t:${esc(t.id)}"><span>${esc(t.name)}</span></button>`).join(''),
+    v => {
+      if (v === 'new') {
+        if (!current.items.length && current.mode !== 'shopping') return alert('Monte a lista primeiro (título e itens). Depois toque em Criar template para salvá-la como modelo.');
+        return askName('Novo template', $('tkTitle').value.trim(), 'Salvar', name => {
+          userTpls.push({ id:'t-' + Date.now().toString(36), name, mode:current.mode, items:current.items.map(x => x.text) }); saveTpls();
+        }, 'Nome do template');
+      }
+      const t = all.find(x => 't:' + x.id === v); if (t) tkApply(t);
+    });
+};
 
 /* ---------- Calendário ---------- */
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -2115,7 +2661,7 @@ const calTrack = $('calTrack'), calView = $('calView');
 let calY = new Date().getFullYear(), calM = new Date().getMonth(), calDrag = null, calAnim = false;
 
 const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-let evByDay = {};
+let evByDay = {}, habByDay = {}, calSel = null;
 function monthHtml(y, m) {
   const first = new Date(y, m, 1).getDay(), t = new Date();
   let h = '';
@@ -2124,19 +2670,21 @@ function monthHtml(y, m) {
     const cls = 'd' + (d.getMonth() !== m ? ' out' : '') + (d.getDay() === 0 ? ' sun' : '')
       + (d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear() ? ' today' : '');
     const key = ymd(d);
-    h += `<div class="${cls}${evByDay[key] ? ' has' : ''}" data-date="${key}"><span>${d.getDate()}</span></div>`;
+    const dots = (evByDay[key] ? '<i></i>' : '') + '<i class="h"></i>'.repeat(Math.min(3, habByDay[key] || 0));
+    h += `<div class="${cls}${key === calSel ? ' sel' : ''}" data-date="${key}"><span>${d.getDate()}</span>${dots ? `<em class="dots">${dots}</em>` : ''}</div>`;
   }
   return `<div class="cal-m">${h}</div>`;
 }
 function renderCal() {
   evByDay = {}; events.forEach(e => { evByDay[e.date] = (evByDay[e.date] || 0) + 1; });
+  habByDay = {}; habits.forEach(h => h.days.forEach(d => { habByDay[d] = (habByDay[d] || 0) + 1; }));
   const p = new Date(calY, calM - 1, 1), n = new Date(calY, calM + 1, 1);
   calTrack.innerHTML = monthHtml(p.getFullYear(), p.getMonth()) + monthHtml(calY, calM) + monthHtml(n.getFullYear(), n.getMonth());
   calTrack.style.transition = 'none'; calTrack.style.transform = 'translateX(-33.3333%)';
   $('calNum').textContent = String(calM + 1).padStart(2, '0');
   $('calName').textContent = MESES[calM];
   $('calYear').textContent = calY;
-  renderEvents();
+  renderEvents(); renderHabits();
 }
 function calSlide(dir) { // -1 mês anterior, 0 volta, 1 próximo mês
   calAnim = true;
@@ -2145,7 +2693,7 @@ function calSlide(dir) { // -1 mês anterior, 0 volta, 1 próximo mês
   let done = false;
   const fin = () => {
     if (done) return; done = true; calAnim = false;
-    if (dir) { const d = new Date(calY, calM + dir, 1); calY = d.getFullYear(); calM = d.getMonth(); }
+    if (dir) { const d = new Date(calY, calM + dir, 1); calY = d.getFullYear(); calM = d.getMonth(); calSel = null; }
     renderCal();
   };
   calTrack.addEventListener('transitionend', fin, { once:true });
@@ -2173,7 +2721,7 @@ function calEnd(e) {
 }
 calView.addEventListener('pointerup', calEnd);
 calView.addEventListener('pointercancel', calEnd);
-$('calName').onclick = () => { const t = new Date(); calY = t.getFullYear(); calM = t.getMonth(); renderCal(); };
+$('calName').onclick = () => { const t = new Date(); calY = t.getFullYear(); calM = t.getMonth(); calSel = null; renderCal(); };
 
 /* ---------- Eventos do calendário ---------- */
 const WD = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
@@ -2181,18 +2729,24 @@ const ALARMS = { none:'Sem alarme', sound:'Som', vibrate:'Vibração', both:'Som
 const evTime = e => new Date(e.date + 'T' + (e.time || '09:00') + ':00');
 function renderEvents() {
   const pre = calY + '-' + String(calM + 1).padStart(2, '0') + '-';
-  const list = events.filter(e => e.date.startsWith(pre)).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-  $('evTitle').textContent = 'Eventos de ' + MESES[calM];
+  const list = events.filter(e => calSel ? e.date === calSel : e.date.startsWith(pre)).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  if (calSel) { const sd = new Date(calSel + 'T00:00:00'); $('evTitle').textContent = 'Eventos de ' + sd.getDate() + ' de ' + MESES[sd.getMonth()].toLowerCase(); }
+  else $('evTitle').textContent = 'Eventos de ' + MESES[calM];
   $('evList').innerHTML = !list.length
-    ? '<div class="empty" style="margin-top:10px">Nenhum evento neste mês.<br>Toque em um dia para criar.</div>'
+    ? `<div class="empty" style="margin-top:10px">${calSel ? 'Nenhum evento neste dia.' : 'Nenhum evento neste mês.'}<br>Use o botão ao lado da barra de navegação para criar.</div>`
     : '<div class="group">' + list.map(e => {
         const d = new Date(e.date + 'T00:00:00');
         return `<button class="evrow" data-eid="${esc(e.id)}"><span class="eday${d.getDay() === 0 ? ' sun' : ''}"><b>${d.getDate()}</b><small>${WD[d.getDay()]}</small></span>
           <span class="einfo"><h3>${esc(e.title)}</h3><div>${esc(e.desc || ALARMS[e.alarm] || '')}</div></span><span class="etime">${esc(e.time)}</span></button>`;
       }).join('') + '</div>';
 }
+calView.addEventListener('click', e => {
+  const d = e.target.closest('.d'); if (!d || !d.dataset.date || calAnim) return;
+  calSel = calSel === d.dataset.date ? null : d.dataset.date;
+  if (calSel) { const t = new Date(calSel + 'T00:00:00'); calY = t.getFullYear(); calM = t.getMonth(); }
+  renderCal();
+});
 $('evList').onclick = e => { const b = e.target.closest('[data-eid]'); if (b) openEvent(null, b.dataset.eid); };
-calView.addEventListener('click', e => { const d = e.target.closest('.d'); if (d && d.dataset.date) openEvent(d.dataset.date); });
 
 let evEdit = null, evNotify = true;
 (() => { // selects de hora/minuto: sempre 24h
@@ -2223,7 +2777,7 @@ $('evOk').onclick = () => {
   if (evEdit) events[events.indexOf(evEdit)] = ev; else events.push(ev);
   saveEvents();
   if (ev.notify && 'Notification' in window && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (e) {} }
-  const d = new Date(date + 'T00:00:00'); calY = d.getFullYear(); calM = d.getMonth();
+  const d = new Date(date + 'T00:00:00'); calY = d.getFullYear(); calM = d.getMonth(); calSel = null;
   closeOv(() => { renderCal(); });
 };
 $('evDel').onclick = () => {
@@ -2232,6 +2786,41 @@ $('evDel').onclick = () => {
     a => { if (a === 'cancel') return closeModal(); closeModal(() => { events = events.filter(x => x !== evEdit); saveEvents(); closeOv(() => renderCal()); }); });
 };
 
+/* ---------- Hábitos ---------- */
+function renderHabits() {
+  const today = ymd(new Date());
+  $('habList').innerHTML = !habits.length
+    ? '<div class="empty" style="padding:18px 20px">Nenhum hábito ainda.<br>Toque no botão ao lado da barra de navegação para criar.</div>'
+    : '<div class="group">' + habits.map(h => `<div class="hrow${h.days.includes(today) ? ' done' : ''}" data-hid="${esc(h.id)}"><button class="hbox" data-hk="${esc(h.id)}" aria-label="Marcar hoje"><svg class="i"><use href="#i-check"/></svg></button><span class="hn">${esc(h.name)}</span><button class="hx" data-hd="${esc(h.id)}" aria-label="Excluir hábito"><svg class="i"><use href="#i-trash"/></svg></button></div>`).join('') + '</div>';
+}
+function refreshHabits() { habByDay = {}; habits.forEach(h => h.days.forEach(d => { habByDay[d] = (habByDay[d] || 0) + 1; })); renderCal(); }
+$('habList').onclick = e => {
+  const k = e.target.closest('[data-hk]'), d = e.target.closest('[data-hd]');
+  if (k) {
+    const h = habits.find(x => x.id === k.dataset.hk); if (!h) return;
+    const t = ymd(new Date()), i = h.days.indexOf(t);
+    if (i >= 0) h.days.splice(i, 1); else h.days.push(t);
+    saveHabits(); refreshHabits();
+  } else if (d) {
+    const h = habits.find(x => x.id === d.dataset.hd); if (!h) return;
+    showModal(`<h3>Excluir hábito?</h3><p>“${esc(h.name)}” e todas as marcações dele no calendário serão apagados.</p>
+      <div class="mbtns"><button data-m="cancel">Cancelar</button><button class="pri" style="background:var(--danger)" data-m="del">Excluir</button></div>`,
+      a => { if (a === 'cancel') return closeModal(); closeModal(() => { habits = habits.filter(x => x !== h); saveHabits(); refreshHabits(); }); });
+  }
+};
+function newHabitDialog() {
+  showModal(`<div class="dlgtop"><button data-m="cancel">Cancelar</button><h3>Novo hábito</h3><button id="habOk" data-m="ok" disabled>OK</button></div>
+    <input class="dlgin" id="habIn" maxlength="40" placeholder="Nome do hábito" autocomplete="off">`,
+    a => {
+      if (a === 'cancel') return closeModal();
+      const v = $('habIn').value.trim(); if (!v) return;
+      closeModal(() => { habits.push({ id:'h' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name:v, days:[] }); saveHabits(); renderHabits(); });
+    });
+  const inp = $('habIn'); inp.oninput = () => { $('habOk').disabled = !inp.value.trim(); };
+  inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); $('habOk').click(); } };
+  setTimeout(() => inp.focus(), 80);
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) renderHabits(); });
 /* alarme / notificação: só dispara com o app aberto (ver LEIA-ME para notificações com o app fechado) */
 let audCtx = null;
 function beep() {
@@ -2243,6 +2832,7 @@ function beep() {
   } catch (e) {}
 }
 function fireEvent(e) {
+  if (e.notify) logNotif(e, false);
   if (e.alarm === 'sound' || e.alarm === 'both') beep();
   if ((e.alarm === 'vibrate' || e.alarm === 'both') && navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]);
   if (e.notify) {
@@ -2258,7 +2848,7 @@ function checkEvents() {
     if (e.fired) return;
     const t = evTime(e).getTime(); if (t > now) return;
     e.fired = true; ch = true;
-    if (now - t <= 5 * 60000) fireEvent(e); // perdeu há mais de 5 min: só marca como passado
+    if (now - t <= 5 * 60000) fireEvent(e); else if (e.notify) logNotif(e, true); // perdeu há mais de 5 min: só registra como perdida
   });
   if (ch) saveEvents();
 }
@@ -2347,7 +2937,6 @@ $('list').onclick = e => {
   if (selMode) { selected.has(id) ? selected.delete(id) : selected.add(id); r.classList.toggle('sel'); updateSelUI(); }
   else openNote(id);
 };
-$('moreBtn').onclick = e => openPop(e.currentTarget, '<button class="pi" data-v="select"><span>Selecionar</span><svg class="i"><use href="#i-checkc"/></svg></button>', v => { if (v === 'select') enterSel(); });
 $('selCancel').onclick = () => { if (!shattering) exitSel(); };
 document.querySelectorAll('.theme-card[data-h]').forEach(c => c.onclick = () => { cfg.home = c.dataset.h; saveCfg(); render(); renderAppearance(); });
 
@@ -2382,7 +2971,7 @@ function shatter(els, done) { // destrói as notas em pedaços que voam para a d
 $('selDelete').onclick = () => {
   if (!selected.size || shattering) return;
   shattering = true; const ids = new Set(selected);
-  shatter([...document.querySelectorAll('#list .nitem.sel')], () => { notes = notes.filter(n => !ids.has(n.id)); save(); shattering = false; exitSel(); });
+  shatter([...document.querySelectorAll('#list .nitem.sel')], () => { const t = Date.now(); notes.forEach(n => { if (ids.has(n.id)) n.trash = t; }); save(); shattering = false; exitSel(); });
 };
 
 applyTheme(); applyPalette(); render(); renderAppearance(); showCurrent();
