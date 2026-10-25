@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="auto">
+<html lang="pt-BR" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f2f2f7">
+<meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>N+</title>
+<title>Orbia Flow</title>
 <style>
   :root {
     --accent-l:#6a5af9; --accent-d:#8b7dff; --on-l:#fff; --on-d:#fff;
@@ -126,7 +126,6 @@
   .nav-row.t[data-go="set-guide"] .tile { background:#ff9f0a; color:#fff; }
   .nav-row.t[data-go="set-datetime"] .tile { background:#8e8e93; color:#fff; }
   .nav-row.t[data-go="set-lang"] .tile { background:#30b0c7; color:#fff; }
-  .nav-row.t[data-go="set-devices"] .tile { background:#34c759; color:#fff; }
   .nav-row.t[data-go="set-aivoice"] .tile { background:#ff3b30; color:#fff; }
   .nav-row.t[data-go="set-aipen"] .tile { background:#ff9500; color:#fff; }
   .nav-row.t[data-go="set-aiscan"] .tile { background:#af52de; color:#fff; }
@@ -417,6 +416,27 @@
   .mbtns.col button.pri { background:var(--accent); box-shadow:none; }
   .mbtns.col button.dng { color:var(--danger); }
   /* telas sobrepostas */
+  #onb { position:fixed; inset:0; z-index:200; background:var(--bg); color:var(--text); display:none; flex-direction:column; padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+  #onb.show { display:flex; }
+  .onb-stage { flex:1; overflow-y:auto; padding:48px 28px 120px; display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .onb-stage.left { align-items:stretch; text-align:left; }
+  .onb-ic { width:96px; height:96px; border-radius:28px; background:var(--accent); color:var(--on-accent); display:grid; place-items:center; margin:8vh 0 28px; flex:none; }
+  .onb-ic svg.i { width:52px; height:52px; }
+  .onb-stage h1 { font-size:30px; margin:0 0 12px; }
+  .onb-stage p { font-size:17px; line-height:1.45; color:var(--muted); margin:0 0 10px; max-width:420px; }
+  .onb-stage .terms { text-align:left; max-height:52vh; overflow-y:auto; background:var(--card); border-radius:16px; padding:6px 16px; margin:12px 0; font-size:14px; line-height:1.45; }
+  .terms h2 { font-size:15px; margin:14px 0 4px; } .terms p, .terms li { font-size:14px; color:var(--text); max-width:none; } .terms ul { padding-left:20px; margin:4px 0; } .terms .tmeta { color:var(--muted); }
+  .onb-acc { display:flex; gap:12px; align-items:center; text-align:left; font-size:15px; margin-top:8px; }
+  .onb-acc input { width:24px; height:24px; accent-color:var(--accent); flex:none; }
+  .onb-pix { display:flex; gap:8px; width:100%; max-width:420px; margin-top:12px; }
+  .onb-pix input { flex:1; min-width:0; border:0; border-radius:12px; background:var(--field); color:var(--text); padding:12px; font:14px ui-monospace,Menlo,monospace; }
+  .onb-pix button { border:0; border-radius:12px; background:var(--accent); color:var(--on-accent); padding:0 16px; font-size:15px; }
+  .onb-dots { position:absolute; left:0; right:0; bottom:calc(46px + env(safe-area-inset-bottom)); display:flex; gap:7px; justify-content:center; pointer-events:none; }
+  .onb-dots i { width:7px; height:7px; border-radius:50%; background:var(--sep); } .onb-dots i.on { background:var(--accent); }
+  .onb-next { position:absolute; right:22px; bottom:calc(22px + env(safe-area-inset-bottom)); width:60px; height:60px; border-radius:50%; border:0; background:var(--accent); color:var(--on-accent); display:grid; place-items:center; box-shadow:0 6px 18px rgba(0,0,0,.3); }
+  .onb-next svg.i { width:28px; height:28px; } .onb-next:disabled { opacity:.35; }
+  .onb-back { position:absolute; left:22px; bottom:calc(36px + env(safe-area-inset-bottom)); border:0; background:none; color:var(--muted); font-size:17px; }
+  #privBody { padding:0 16px 24px; } #privBody .terms h2 { font-size:17px; } #privBody .terms p, #privBody .terms li { font-size:15px; line-height:1.45; }
   .ov { position:fixed; inset:0; z-index:60; background:var(--bg); display:none; flex-direction:column; padding-bottom:env(safe-area-inset-bottom); }
   .ov.open { display:flex; animation:fadeIn .25s ease; }
   .ov-top > :first-child { justify-self:start; } .ov-top > :last-child { justify-self:end; }
@@ -661,13 +681,6 @@
   .ctxm button:disabled { opacity:.35; }
   .ctxm button.dng { color:var(--danger); }
 
-  .acct { width:66px; height:66px; border-radius:50%; border:0; display:grid; place-items:center; color:var(--text); flex:none; }
-  .acct[hidden] { display:none; }
-  .acct svg.i { width:28px; height:28px; }
-  .ac-body { display:flex; gap:16px; padding:24px 16px 8px; }
-  .ac-btn { flex:1; height:min(56vh,420px); border:0; border-radius:26px; background:var(--card); color:var(--text); display:grid; place-items:center; box-shadow:0 0 0 .5px var(--sep); }
-  .ac-btn:active { transform:scale(.98); background:var(--field); }
-  .ac-btn svg.i { width:64px; height:64px; stroke-width:1.6; }
 
   #body { position:relative; z-index:1; }
   #inkbg { position:absolute; left:0; top:0; pointer-events:none; z-index:0; }
@@ -825,7 +838,6 @@
     <button class="nav-row t" data-go="set-access"><span class="tile"><svg class="i"><use href="#i-access"/></svg></span><span class="lbl">Acessibilidade</span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row t" data-go="set-guide"><span class="tile"><svg class="i"><use href="#i-book"/></svg></span><span class="lbl">Guia do usuário</span><svg class="i chev"><use href="#i-chev"/></svg></button>
     <button class="nav-row t" data-go="set-datetime"><span class="tile"><svg class="i"><use href="#i-clock"/></svg></span><span class="lbl">Data e hora</span><svg class="i chev"><use href="#i-chev"/></svg></button>
-    <button class="nav-row t" data-go="set-devices"><span class="tile"><svg class="i"><use href="#i-device"/></svg></span><span class="lbl">Aparelhos conectados</span><svg class="i chev"><use href="#i-chev"/></svg></button>
   </div>
   <div class="gcap">Recursos de IA</div>
   <div class="group">
@@ -1066,6 +1078,10 @@
 <!-- Ajustes › Notificações -->
 <main id="set-notif" class="screen sub">
   <h1 class="large">Notificações</h1>
+  <div class="group">
+    <div class="item"><span class="lbl">Ativar notificações</span><label class="sw"><input type="checkbox" id="notifSw"><span></span></label></div>
+  </div>
+  <p class="note-help">Desligado, o app não avisa nem toca som para eventos e lembretes. Os eventos continuam salvos no calendário.</p>
 </main>
 
 <!-- Ajustes › Atualização do software -->
@@ -1127,8 +1143,8 @@
 <!-- Ajustes › Doações -->
 <main id="set-donate" class="screen sub">
   <h1 class="large">Doações</h1>
-  <p class="note-help" style="font-size:15px;line-height:1.45;color:var(--text)">O N+ é feito com muito carinho e vai crescendo a cada ideia. Se ele ajuda você no dia a dia, uma doação voluntária apoia a continuidade e as novas funções. Ela é opcional e não libera nada no app.</p>
-  <p class="note-help" style="font-size:15px;line-height:1.45;color:var(--text)">Muito obrigado por usar o N+ e por fazer parte disso. ❤️</p>
+  <p class="note-help" style="font-size:15px;line-height:1.45;color:var(--text)">O Orbia Flow é feito com muito carinho e vai crescendo a cada ideia. Se ele ajuda você no dia a dia, uma doação voluntária apoia a continuidade e as novas funções. Ela é opcional e não libera nada no app.</p>
+  <p class="note-help" style="font-size:15px;line-height:1.45;color:var(--text)">Muito obrigado por usar o Orbia Flow e por fazer parte disso. ❤️</p>
   <div class="gcap">Chave Pix</div>
   <div class="group"><div class="item"><input id="pixKey" readonly value="7b38f3d2-74b3-48db-9f87-d6a0b8cbb40c" aria-label="Chave Pix" style="flex:1;min-width:0;border:0;background:none;color:var(--text);font-size:15px;font-family:ui-monospace,Menlo,monospace;outline:none;padding:0"></div></div>
   <div class="group" style="margin-top:12px"><button class="item act" id="pixCopy"><span>Copiar chave Pix</span><svg class="i"><use href="#i-compose"/></svg></button></div>
@@ -1137,16 +1153,55 @@
 <!-- Ajustes › Privacidade -->
 <main id="set-privacy" class="screen sub">
   <h1 class="large">Privacidade e termos de condições</h1>
+  <div id="privBody"></div>
 </main>
 
-<!-- Ajustes › Aparelhos conectados -->
-<main id="set-devices" class="screen sub">
-  <h1 class="large">Aparelhos conectados</h1>
-  <div class="group">
-    <div class="item"><span class="lbl">Ativar aparelhos conectados</span><label class="sw"><input type="checkbox" id="acctSw"><span></span></label></div>
-  </div>
-  <p class="note-help">Ativado, um ícone de pessoa aparece ao lado esquerdo da barra de navegação e abre a tela de aparelhos.</p>
-</main>
+<template id="termsTpl">
+<div class="terms">
+<p class="tmeta">Orbia Flow · versão 1.0 · atualizado em outubro de 2026</p>
+<h2>1. O que é o Orbia Flow</h2>
+<p>O Orbia Flow é um aplicativo gratuito de notas, desenhos, hábitos, eventos e tarefas. Ao usá-lo você declara que leu e concorda com estes Termos de Uso e com esta Política de Privacidade.</p>
+<h2>2. Base legal</h2>
+<p>Estes termos seguem a legislação brasileira, em especial:</p>
+<ul>
+<li><b>Constituição Federal de 1988</b>: art. 1º, III (dignidade da pessoa humana); art. 5º, X (inviolabilidade da intimidade e da vida privada), XII (sigilo das comunicações e dos dados), XXVII (direito exclusivo do autor sobre suas obras) e LXXIX, incluído pela Emenda Constitucional nº 115/2022 (direito fundamental à proteção dos dados pessoais, inclusive nos meios digitais).</li>
+<li><b>Lei nº 13.709/2018 (LGPD)</b>, com as alterações das Leis nº 13.853/2019 e nº 14.460/2022, que tratam da proteção de dados pessoais e da Autoridade Nacional de Proteção de Dados (ANPD).</li>
+<li><b>Lei nº 12.965/2014 (Marco Civil da Internet)</b>: direitos e deveres no uso da internet.</li>
+<li><b>Lei nº 8.078/1990 (Código de Defesa do Consumidor)</b>: no que for aplicável.</li>
+<li><b>Lei nº 9.610/1998 (Direitos Autorais)</b>.</li>
+<li><b>Lei nº 8.069/1990 (ECA)</b> e <b>Lei nº 15.211/2025 (ECA Digital)</b>: proteção de crianças e adolescentes no ambiente digital.</li>
+</ul>
+<h2>3. Quais dados o app trata</h2>
+<p>Suas notas, desenhos, anexos, hábitos, eventos, tarefas e configurações ficam <b>somente no armazenamento do seu aparelho</b>. O Orbia Flow não tem servidor, não exige conta, não envia seu conteúdo para o desenvolvedor, não usa anúncios e não usa rastreadores.</p>
+<p>Alguns recursos, que ficam <b>desativados por padrão</b> e só funcionam se você os ativar e usar, dependem de serviços do aparelho ou da internet:</p>
+<ul>
+<li><b>Voz para texto:</b> usa o reconhecimento de voz do seu sistema ou navegador, que pode enviar o áudio ao fornecedor desse serviço (por exemplo, Google ou Apple), conforme a política dele. Pede permissão do microfone.</li>
+<li><b>Imagem para texto:</b> pede permissão da câmera ou de arquivos. A leitura da imagem é feita no aparelho, mas o app baixa da internet a biblioteca e os dados de idioma necessários na primeira vez.</li>
+<li><b>Gestos por Escrita:</b> os desenhos de gestos ficam só no aparelho.</li>
+</ul>
+<h2>4. Finalidade e base legal do tratamento</h2>
+<p>Os dados são tratados apenas para o app funcionar como você pediu: guardar, organizar e lembrar o que você cria (LGPD, art. 7º, I e V, consentimento e execução do que você solicitou). Não vendemos, não compartilhamos e não fazemos perfis.</p>
+<h2>5. Seus direitos (LGPD, art. 18)</h2>
+<p>Você pode, a qualquer momento e dentro do próprio app: ter acesso aos seus dados (suas notas estão na tela), corrigi-los (editando), exportá-los (Ajustes › Backups, portabilidade), eliminá-los (apagando notas ou limpando os dados do app nas configurações do aparelho) e revogar permissões (desativando os recursos em Ajustes ou nas permissões do sistema). Como os dados ficam no seu aparelho, o desenvolvedor não tem acesso a eles. Dúvidas ou pedidos podem ser enviados pelo canal de contato informado na página do aplicativo.</p>
+<h2>6. Segurança e backup</h2>
+<p>Seus dados dependem da segurança do seu aparelho. O app não criptografa o conteúdo por conta própria, então quem acessar seu aparelho desbloqueado poderá ler suas notas. Limpar os dados do app, desinstalar ou trocar de aparelho pode apagar tudo. <b>Faça backups regularmente.</b> Anexos e gestos podem não entrar no backup nesta versão.</p>
+<h2>7. Crianças e adolescentes</h2>
+<p>O app não coleta dados pessoais para o desenvolvedor. Ainda assim, em respeito ao ECA, ao ECA Digital e ao art. 14 da LGPD, menores de 18 anos devem usá-lo com ciência e acompanhamento de um responsável.</p>
+<h2>8. Conteúdo e direitos autorais</h2>
+<p>O conteúdo que você cria é seu (Lei nº 9.610/1998), e você é responsável por ele e por ter direito de usar o que anexa. O código, o nome e o visual do Orbia Flow pertencem ao desenvolvedor, e você recebe uma licença pessoal, gratuita e não exclusiva de uso.</p>
+<h2>9. Uso adequado</h2>
+<p>Você concorda em não usar o app para atividades ilícitas nem para violar direitos de terceiros, conforme o Marco Civil da Internet e demais leis.</p>
+<h2>10. Gratuidade e doações</h2>
+<p>O app é gratuito. As doações por Pix são voluntárias, não liberam funções e não geram contrapartida. O pagamento é processado pela sua instituição financeira.</p>
+<h2>11. Limitação de responsabilidade</h2>
+<p>O app é oferecido como está, e o desenvolvedor busca mantê-lo funcionando bem, mas não garante ausência de falhas, de perda de dados ou de alarmes e notificações perdidos (por exemplo, com o app fechado), na medida permitida pela lei e sem afastar direitos que a lei não permite afastar, inclusive os do Código de Defesa do Consumidor.</p>
+<h2>12. Alterações</h2>
+<p>Estes termos podem ser atualizados. Mudanças relevantes serão informadas no próprio app, e o uso após o aviso indica concordância.</p>
+<h2>13. Lei aplicável e foro</h2>
+<p>Estes termos são regidos pelas leis da República Federativa do Brasil. Fica eleito o foro do domicílio do usuário para resolver qualquer conflito, nos termos da lei.</p>
+</div>
+</template>
+
 
 <!-- Ajustes › Sobre -->
 <main id="set-about" class="screen sub">
@@ -1157,6 +1212,14 @@
     <div class="item"><span>Armazenamento</span><span class="val">Neste aparelho</span></div>
   </div>
 </main>
+
+<!-- Boas-vindas (primeiro acesso) -->
+<div id="onb" aria-hidden="true">
+  <div class="onb-stage" id="onbStage"></div>
+  <div class="onb-dots" id="onbDots"></div>
+  <button class="onb-back" id="onbBack" aria-label="Voltar" hidden>Voltar</button>
+  <button class="onb-next" id="onbNext" aria-label="Continuar"><svg class="i"><use href="#i-chev"/></svg></button>
+</div>
 
 <!-- Tela de pesquisa -->
 <div class="sscreen" id="sscreen" aria-hidden="true">
@@ -1175,7 +1238,6 @@
 
 <!-- Barra de navegação -->
 <nav class="dock" id="dock">
-  <button class="acct glass" id="acctBtn" aria-label="Aparelhos conectados" hidden><svg class="i"><use href="#i-user"/></svg></button>
   <div class="pill glass" id="pill" data-active="home">
     <div class="bubble"></div>
     <button class="tab active" data-tab="home" aria-label="Notas">
@@ -1309,16 +1371,6 @@
   </div>
 </div>
 
-<!-- Aparelhos conectados (atalho da barra) -->
-<div class="ov" id="acScreen" aria-hidden="true">
-  <div class="ov-top"><button id="acBack" class="ov-x" aria-label="Voltar"><svg class="i" style="width:22px;height:22px;vertical-align:-5px"><use href="#i-back"/></svg>Voltar</button><span class="ov-title">Aparelhos</span><span></span></div>
-  <div class="ac-body">
-    <button class="ac-btn" id="acAdd" aria-label="Adicionar aparelho"><svg class="i"><use href="#i-plus"/></svg></button>
-    <button class="ac-btn" id="acOut" aria-label="Sair"><svg class="i"><use href="#i-door"/></svg></button>
-  </div>
-  <p class="note-help" id="acMsg" style="text-align:center"></p>
-</div>
-
 <!-- Agenda: todos os eventos do ano -->
 <div class="ov" id="agScreen" aria-hidden="true">
   <div class="ov-top"><button id="agBack" class="ov-x" aria-label="Voltar"><svg class="i" style="width:22px;height:22px;vertical-align:-5px"><use href="#i-back"/></svg>Calendário</button><span class="ov-title">Agenda</span><span></span></div>
@@ -1391,7 +1443,7 @@ const SPECIAL = [{ id:'fav', name:'Favoritos', special:true }, { id:'notif', nam
 const NKEY = 'bloco-de-notas-notifs';
 let notifLog = []; try { const nv = JSON.parse(localStorage.getItem(NKEY)); notifLog = Array.isArray(nv) ? nv.filter(x => x && typeof x.id === 'string' && typeof x.title === 'string').slice(0, 100) : []; } catch (e) { notifLog = []; }
 const saveNotifs = () => { try { localStorage.setItem(NKEY, JSON.stringify(notifLog.slice(0, 100))); } catch (e) {} };
-function logNotif(e, missed) { notifLog.unshift({ id:'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 4), title:e.title, date:e.date, time:e.time, desc:e.desc || '', at:Date.now(), missed:!!missed }); notifLog = notifLog.slice(0, 100); saveNotifs(); try { render(); } catch (er) {} }
+function logNotif(e, missed, pre) { notifLog.unshift({ id:'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 4), title:e.title, date:e.date, time:e.time, desc:e.desc || '', at:Date.now(), missed:!!missed, pre:!!pre }); notifLog = notifLog.slice(0, 100); saveNotifs(); try { render(); } catch (er) {} }
 const folderOf = id => folders.find(f => f.id === id) || SPECIAL.find(f => f.id === id);
 const live = () => notes.filter(n => !n.trash);
 const $ = id => document.getElementById(id);
@@ -1406,10 +1458,10 @@ const PALETTES = {
   orange: { name:'Laranja',  l:'#ff8a00', d:'#ff9f0a', onL:'#ffffff', onD:'#ffffff' }
 };
 const TABS = ['home', 'calendar', 'settings'];
-const NPLUS = 'N<span class="plus">+</span>';
-const TITLES = { home:NPLUS, calendar:'Calendário', settings:'Ajustes', 'set-theme':'Tema e Aparência', 'set-palette':'Paleta de cores', 'set-data':'Backups', 'set-accounts':'Contas', 'set-about':'Sobre', 'set-sound':'Sons', 'set-datetime':'Data e hora', 'set-notif':'Notificações', 'set-update':'Atualização do software', 'set-guide':'Guia do usuário', 'set-access':'Acessibilidade', 'set-security':'Segurança', 'set-gest':'Gestos por Escrita', 'set-gestdur':'Duração do gesto', 'set-font':'Fonte', 'set-ntone':'Notificações', 'set-vol':'Volume', 'set-syssnd':'Som do sistema', 'set-tz':'Fuso horário', 'set-gestset':'Padrão', 'set-uiscale':'Tamanho da tela', 'set-lang':'Idioma', 'set-privacy':'Privacidade e termos', 'set-donate':'Doações', 'set-devices':'Aparelhos conectados', 'set-homestyle':'Estilo de nota na tela de início', 'set-gridscale':'Escala da grade', 'set-aivoice':'Voz para texto', 'set-aipen':'Escrever com caneta', 'set-aiscan':'Imagem para texto', 'set-notestyle':'Estilo de nota', 'set-scroll':'Tipo de rolagem' };
+const NPLUS = 'Orbia Flow';
+const TITLES = { home:NPLUS, calendar:'Calendário', settings:'Ajustes', 'set-theme':'Tema e Aparência', 'set-palette':'Paleta de cores', 'set-data':'Backups', 'set-accounts':'Contas', 'set-about':'Sobre', 'set-sound':'Sons', 'set-datetime':'Data e hora', 'set-notif':'Notificações', 'set-update':'Atualização do software', 'set-guide':'Guia do usuário', 'set-access':'Acessibilidade', 'set-security':'Segurança', 'set-gest':'Gestos por Escrita', 'set-gestdur':'Duração do gesto', 'set-font':'Fonte', 'set-ntone':'Notificações', 'set-vol':'Volume', 'set-syssnd':'Som do sistema', 'set-tz':'Fuso horário', 'set-gestset':'Padrão', 'set-uiscale':'Tamanho da tela', 'set-lang':'Idioma', 'set-privacy':'Privacidade e termos', 'set-donate':'Doações', 'set-homestyle':'Estilo de nota na tela de início', 'set-gridscale':'Escala da grade', 'set-aivoice':'Voz para texto', 'set-aipen':'Escrever com caneta', 'set-aiscan':'Imagem para texto', 'set-notestyle':'Estilo de nota', 'set-scroll':'Tipo de rolagem' };
 
-let notes = [], cfg = { auto:true, theme:'light', palette:'purple', home:'list', cols:2, noteStyle:'a4', scroll:'v', aiVoice:true, aiPen:false, aiScan:true, ui:'m', gestDur:1000, gestEn:true, h12:false, dfmt:'dmy', acct:false, fz:1, ff:'sys', rm:false, hlb:false, hc:false, tzAuto:true, tz:'', vol:.8, ntone:'tritone', tapSnd:false, typeSnd:false }, current = null;
+let notes = [], cfg = { auto:false, theme:'dark', palette:'orange', onb:false, notifOn:true, home:'list', cols:2, noteStyle:'a4', scroll:'v', aiVoice:false, aiPen:false, aiScan:false, ui:'m', gestDur:1000, gestEn:false, h12:false, dfmt:'dmy', fz:1, ff:'sys', rm:false, hlb:false, hc:false, tzAuto:true, tz:'', vol:.8, ntone:'tritone', tapSnd:false, typeSnd:false }, current = null;
 let stack = ['settings'];
 try { notes = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) {}
 try { const f = JSON.parse(localStorage.getItem(FKEY)); folders = Array.isArray(f) ? f.filter(x => x && typeof x.id === 'string' && typeof x.name === 'string') : null; } catch (e) { folders = null; }
@@ -1420,13 +1472,14 @@ try {
   const s = JSON.parse(localStorage.getItem(CFG)) || {};
   if (s.theme && s.auto === undefined) { s.auto = s.theme === 'auto'; if (s.theme === 'auto') s.theme = 'light'; } // migra versão anterior
   Object.assign(cfg, s);
-  if (!PALETTES[cfg.palette]) cfg.palette = 'purple';
+  if (!PALETTES[cfg.palette]) cfg.palette = 'orange';
   if (!['list', 'grid'].includes(cfg.home)) cfg.home = 'list';
   if (![2, 3].includes(cfg.cols)) cfg.cols = 2;
   if (!['a4', 'caderno'].includes(cfg.noteStyle)) cfg.noteStyle = 'a4';
   if (!['v', 'h'].includes(cfg.scroll)) cfg.scroll = 'v';
   if (![500, 1000, 1500, 2000].includes(cfg.gestDur)) cfg.gestDur = 1000;
-  ['aiVoice', 'aiScan'].forEach(k => { if (typeof cfg[k] !== 'boolean') cfg[k] = true; });
+  ['aiVoice', 'aiScan'].forEach(k => { if (typeof cfg[k] !== 'boolean') cfg[k] = false; });
+  if (typeof cfg.notifOn !== 'boolean') cfg.notifOn = true;
   if (typeof cfg.aiPen !== 'boolean') cfg.aiPen = false;
 } catch (e) {}
 
@@ -1969,7 +2022,7 @@ function renderFolderScreen() {
   if (f.id === 'notif') {
     $('fTitle').textContent = f.name; $('fMore').hidden = false; $('fNew').hidden = true;
     $('fList').innerHTML = notifLog.length ? '<div class="group">' + notifLog.map(x => { const d = new Date(x.date + 'T00:00:00');
-      return `<div class="nrow"><svg class="i"><use href="#i-bell"/></svg><div class="ni"><h3>${esc(x.title)}</h3><div class="sub">${fmtDate(d)} · ${esc(fmtTime(x.time))}${x.missed ? ' · Perdida' : ''}${x.desc ? ' · ' + esc(x.desc) : ''}</div></div></div>`; }).join('') + '</div>'
+      return `<div class="nrow"><svg class="i"><use href="#i-bell"/></svg><div class="ni"><h3>${esc(x.title)}</h3><div class="sub">${fmtDate(d)} · ${esc(fmtTime(x.time))}${x.missed ? ' · Perdida' : ''}${x.pre ? ' · Lembrete: falta 1 dia' : ''}${x.desc ? ' · ' + esc(x.desc) : ''}</div></div></div>`; }).join('') + '</div>'
       : '<div class="empty">Nenhuma notificação ainda.<br>Os avisos dos seus eventos aparecem aqui.</div>';
     $('fCount').textContent = notifLog.length ? `${notifLog.length} ${notifLog.length === 1 ? 'Notificação' : 'Notificações'}` : '';
     return;
@@ -2090,7 +2143,7 @@ function chooseFolder() { // ao tocar em OK no editor: em qual pasta salvar?
 /* ---------- Dados: exportar / importar / apagar ---------- */
 $('exportBtn').onclick = () => {
   if (!notes.length && !events.length && !habits.length) return alert('Não há notas, eventos nem hábitos para exportar.');
-  const pack = { app:'N+', format:'nplus', version:1, exported:new Date().toISOString(), folders, events, notes, templates:userTpls, habits };
+  const pack = { app:'Orbia Flow', format:'nplus', version:1, exported:new Date().toISOString(), folders, events, notes, templates:userTpls, habits };
   const blob = new Blob([JSON.stringify(pack)], { type:'application/octet-stream' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -3122,7 +3175,7 @@ function runGest() {
 }
 function gestPush(s) { gestSess.push(s); clearTimeout(gestTimer); gestTimer = setTimeout(runGest, cfg.gestDur); }
 function setGest(on) {
-  if (on && cfg.gestEn === false) { toast('Gestos por Escrita está desativado. Ative em Ajustes › Recursos de IA.', 3400); on = false; }
+  if (on && !cfg.gestEn) { toast('Gestos por Escrita está desativado. Ative em Ajustes › Recursos de IA.', 3400); on = false; }
   if (on && !gItems().length) { toast('Nenhum padrão cadastrado. Crie em Ajustes › Recursos de IA › Gestos por Escrita.', 3600); on = false; }
   gestOn = on; gestSess = []; clearTimeout(gestTimer);
   if (on && mathOn) setMath(false);
@@ -3161,13 +3214,6 @@ $('set-datetime').addEventListener('click', e => {
   if (h) cfg.h12 = h.dataset.h12 === '1'; else cfg.dfmt = d.dataset.df;
   saveCfg(); refreshDates();
 });
-function applyAcct() { $('acctBtn').hidden = !cfg.acct; $('acctSw').checked = !!cfg.acct; }
-$('acctSw').onchange = () => { cfg.acct = $('acctSw').checked; saveCfg(); applyAcct(); };
-$('acctBtn').onclick = () => { $('acMsg').textContent = ''; openOv('acScreen'); };
-$('acBack').onclick = () => closeOv();
-$('acAdd').onclick = () => { $('acMsg').textContent = 'Adicionar aparelho ainda não está disponível.'; };
-$('acOut').onclick = () => { $('acMsg').textContent = 'Sair ainda não está disponível: não há conta conectada.'; };
-applyAcct();
 $('pixCopy').onclick = async () => {
   const k = $('pixKey').value; let ok = false;
   try { await navigator.clipboard.writeText(k); ok = true; } catch (_) {}
@@ -3175,7 +3221,52 @@ $('pixCopy').onclick = async () => {
   const sp = $('pixCopy').firstElementChild; sp.textContent = ok ? 'Chave copiada!' : 'Não foi possível copiar. Toque e segure a chave.';
   setTimeout(() => { sp.textContent = 'Copiar chave Pix'; }, 2200);
 };
-$('gestEn').checked = cfg.gestEn !== false;
+
+/* ===== Boas-vindas (primeiro acesso) ===== */
+(function () {
+  const PIX = '7b38f3d2-74b3-48db-9f87-d6a0b8cbb40c';
+  const pages = [
+    { ic:'i-home', t:'Bem-vindo ao Orbia Flow', p:'Seu espaço para anotar, desenhar e organizar o dia, tudo guardado no seu aparelho. Vamos conhecer o app em poucos passos.' },
+    { ic:'i-compose', t:'Notas', p:'Escreva com formatação, organize em pastas, anexe imagens, vídeos, PDFs e músicas, e use modelos para começar mais rápido.' },
+    { ic:'i-pencil', t:'Desenhos', p:'Desenhe direto na nota com vários pincéis, cores e tamanhos. Errou? Volte e avance com as setas.' },
+    { ic:'i-checkc', t:'Hábitos', p:'Crie hábitos e marque a cada dia para acompanhar sua sequência e manter a constância.' },
+    { ic:'i-calendar', t:'Eventos', p:'Marque compromissos no calendário e receba avisos, inclusive um lembrete um dia antes.' },
+    { ic:'i-task', t:'Tarefas', p:'Monte listas de tarefas dentro das suas notas e vá riscando o que já fez.' },
+    { terms:true },
+    { ic:'i-heart', t:'Obrigado por usar o Orbia Flow', p:'O app é gratuito. Se quiser contribuir, a chave Pix está abaixo. É totalmente opcional.', pix:true }
+  ];
+  let i = 0, accepted = false;
+  const el = $('onb'), stage = $('onbStage'), next = $('onbNext'), back = $('onbBack'), dots = $('onbDots');
+  function draw() {
+    const pg = pages[i], last = i === pages.length - 1;
+    stage.classList.toggle('left', !!pg.terms); stage.scrollTop = 0;
+    if (pg.terms) {
+      stage.innerHTML = '<h1 style="text-align:center">Termos e privacidade</h1><p style="max-width:none;text-align:center">Leia e aceite para continuar.</p><div id="onbTerms"></div><label class="onb-acc"><input type="checkbox" id="onbAcc"' + (accepted ? ' checked' : '') + '><span>Li e aceito os Termos de Uso e a Política de Privacidade.</span></label>';
+      $('onbTerms').appendChild($('termsTpl').content.cloneNode(true));
+      $('onbAcc').onchange = e => { accepted = e.target.checked; next.disabled = !accepted; };
+    } else {
+      stage.innerHTML = '<div class="onb-ic"><svg class="i"><use href="#' + pg.ic + '"/></svg></div><h1></h1><p></p>' + (pg.pix ? '<div class="onb-pix"><input id="onbPix" readonly aria-label="Chave Pix"><button id="onbCopy">Copiar</button></div>' : '');
+      stage.querySelector('h1').textContent = pg.t; stage.querySelector('p').textContent = pg.p;
+      if (pg.pix) {
+        $('onbPix').value = PIX;
+        $('onbCopy').onclick = async () => { let ok = false; try { await navigator.clipboard.writeText(PIX); ok = true; } catch (_) {} if (!ok) { try { $('onbPix').select(); ok = document.execCommand('copy'); } catch (_) {} } $('onbCopy').textContent = ok ? 'Copiada!' : 'Segure a chave'; setTimeout(() => { $('onbCopy').textContent = 'Copiar'; }, 2000); };
+      }
+    }
+    next.disabled = !!pg.terms && !accepted;
+    next.setAttribute('aria-label', last ? 'Continuar para o app' : 'Continuar');
+    back.hidden = i === 0;
+    dots.innerHTML = pages.map((_, k) => '<i' + (k === i ? ' class="on"' : '') + '></i>').join('');
+  }
+  function finish() { cfg.onb = true; saveCfg(); el.classList.remove('show'); el.setAttribute('aria-hidden', 'true'); }
+  next.onclick = () => { if (i < pages.length - 1) { i++; draw(); } else finish(); };
+  back.onclick = () => { if (i > 0) { i--; draw(); } };
+  window.showOnboarding = () => { i = 0; accepted = false; draw(); el.classList.add('show'); el.setAttribute('aria-hidden', 'false'); };
+  const pb = $('privBody'); if (pb) pb.appendChild($('termsTpl').content.cloneNode(true));
+  if (!cfg.onb) showOnboarding();
+})();
+$('notifSw').checked = cfg.notifOn;
+$('notifSw').onchange = () => { cfg.notifOn = $('notifSw').checked; saveCfg(); if (cfg.notifOn && 'Notification' in window && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (e) {} } };
+$('gestEn').checked = cfg.gestEn === true;
 $('gestEn').onchange = () => { cfg.gestEn = $('gestEn').checked; saveCfg(); if (!cfg.gestEn && gestOn) setGest(false); };
 $('gdR').oninput = () => { cfg.gestDur = GDUR[+$('gdR').value]; saveCfg(); renderGest(); };
 $('gestList').onclick = e => { const b = e.target.closest('[data-gset]'); if (!b) return; gestCur = b.dataset.gset; renderGestSet(); go('set-gestset'); };
@@ -3284,7 +3375,7 @@ function insertIntoNote(text, para) {
 
 /* ---------- Telas sobrepostas (áudio, câmera, texto detectado) ---------- */
 let ovOpen = null, ovAfter = null;
-const OVS = ['acScreen', 'audioScreen', 'camScreen', 'ocrScreen', 'evScreen', 'agScreen', 'gpScreen'];
+const OVS = ['audioScreen', 'camScreen', 'ocrScreen', 'evScreen', 'agScreen', 'gpScreen'];
 function showOv(id) { OVS.forEach(o => { $(o).classList.toggle('open', o === id); $(o).setAttribute('aria-hidden', o === id ? 'false' : 'true'); }); }
 function openOv(id) { if (!ovOpen) history.pushState({ ov:1 }, ''); ovOpen = id; showOv(id); }
 function closeOv(after) { if (!ovOpen) return; ovAfter = after || null; history.back(); }
@@ -3775,6 +3866,7 @@ $('evOk').onclick = () => {
   const ev = { id:evEdit ? evEdit.id : 'e' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
     title:$('evName').value.trim() || 'Evento', date, time:$('evH').value + ':' + $('evM').value, desc:$('evDesc').value.trim().slice(0, 500),
     alarm:$('evAlarm').value, notify:evNotify, fired:false };
+  ev.pre = evTime(ev).getTime() - 864e5 <= wallNow().getTime(); // evento criado a menos de 1 dia do horário: não há lembrete de véspera
   if (evEdit) events[events.indexOf(evEdit)] = ev; else events.push(ev);
   saveEvents();
   if (ev.notify && 'Notification' in window && Notification.permission === 'default') { try { Notification.requestPermission(); } catch (e) {} }
@@ -3833,6 +3925,7 @@ function beep() {
   } catch (e) {}
 }
 function fireEvent(e) {
+  if (!cfg.notifOn) return;
   if (e.notify) logNotif(e, false);
   if (e.alarm === 'sound' || e.alarm === 'both') playNTone(cfg.ntone);
   if ((e.alarm === 'vibrate' || e.alarm === 'both') && navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]);
@@ -3847,14 +3940,34 @@ function checkEvents() {
   const now = wallNow().getTime(); let ch = false;
   events.forEach(e => {
     if (e.fired) return;
-    const t = evTime(e).getTime(); if (t > now) return;
+    const t = evTime(e).getTime();
+    if (!e.pre && cfg.notifOn && e.notify && t > now && t - 864e5 <= now) { // lembrete de 1 dia antes
+      e.pre = true; ch = true; logNotif(e, false, true);
+      if (e.alarm === 'sound' || e.alarm === 'both') playNTone(cfg.ntone);
+      $('evAlertT').textContent = e.title; $('evAlertS').textContent = 'Falta 1 dia · ' + fmtDate(new Date(e.date + 'T00:00:00')) + ' às ' + fmtTime(e.time); $('evAlert').classList.add('show');
+    }
+    if (t > now) return;
     e.fired = true; ch = true;
-    if (now - t <= 5 * 60000) fireEvent(e); else if (e.notify) logNotif(e, true); // perdeu há mais de 5 min: só registra como perdida
+    if (!cfg.notifOn) { /* notificações desligadas: não avisa */ } else if (now - t <= 5 * 60000) fireEvent(e); else if (e.notify) logNotif(e, true); // perdeu há mais de 5 min: só registra como perdida
   });
   if (ch) saveEvents();
 }
-setInterval(checkEvents, 15000); document.addEventListener('visibilitychange', () => { if (!document.hidden) checkEvents(); });
-checkEvents();
+/* som de lembrete ao abrir o app: enquanto houver notificações no histórico, toca o som escolhido (uma vez por abertura, no máximo a cada 5 min) até você limpar */
+var ntLastSound = 0, ntArmed = false;
+function notifReminderSound() {
+  if (!cfg.notifOn || !notifLog.length || Date.now() - ntLastSound < 5 * 60000) return;
+  const c = sfx(); if (!c || !sfxVol()) return;
+  ntLastSound = Date.now();
+  setTimeout(() => {
+    if (!notifLog.length) return;
+    if (c.state === 'running') return playNTone(cfg.ntone);
+    if (ntArmed) return; ntArmed = true; // o navegador bloqueou o som automático: toca no primeiro toque
+    const go = () => { document.removeEventListener('pointerdown', go, true); document.removeEventListener('keydown', go, true); ntArmed = false; if (notifLog.length) playNTone(cfg.ntone); };
+    document.addEventListener('pointerdown', go, true); document.addEventListener('keydown', go, true);
+  }, 200);
+}
+setInterval(checkEvents, 15000); document.addEventListener('visibilitychange', () => { if (!document.hidden) { checkEvents(); notifReminderSound(); } });
+checkEvents(); notifReminderSound();
 
 /* ---------- Layout do editor: estilo (A4 / Caderno) e direção da rolagem ---------- */
 const ed = $('editor'), sheet = $('sheet'), scroller = $('scroller'), snaps = $('snaps');
